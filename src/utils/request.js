@@ -91,7 +91,7 @@ service.interceptors.response.use((config) => {
         })
         break
       default:
-        if (errorMessage === 'refresh token无效') {
+        if (errorMessage === '刷新令牌已过期，请重新登录') {
           MessageBox.alert('登录已过期，请重新登录', '温馨提示', {
             confirmButtonText: '确定',
             showClose: false,
@@ -136,6 +136,9 @@ const request = {
     })
   },
   post(url, params) {
+    if (Object.is(params, undefined)) {
+      params = ''
+    }
     return service.post(url, params, {
       transformRequest: [(params) => {
         return tansParams(params)
@@ -238,7 +241,7 @@ function tansParams(params) {
 }
 
 async function queryRefreshToken(config, refreshToken) {
-  const result = await request.refresh('oauth/token', {
+  const result = await request.refresh('auth/oauth/token', {
     refresh_token: refreshToken
   })
   if (result.status === success) {

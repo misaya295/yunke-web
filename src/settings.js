@@ -1,9 +1,13 @@
+const baseUrl = process.env.VUE_APP_BASE_API
+
 module.exports = {
   title: 'yunke-vue',
   // 获取令牌时，请求头信息(Basic Base64.encode(client_id:client_secret))
   authorizationValue: 'Basic eXVua2U6MTIzNDU2',
   // 社交登录后台地址
   socialLoginUrl: 'http://api.cloudx.cn:8301/auth/social/login',
+  // 七牛云文件上传地址
+  qiNiuUrl: baseUrl + 'oss/content',
   // 请替换为您的实际地址
   pages: {
     // Yunke-Admin 控制台地址
