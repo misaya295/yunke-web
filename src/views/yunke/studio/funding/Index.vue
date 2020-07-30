@@ -50,6 +50,7 @@
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         下载
       </el-button> -->
+
       <el-dropdown class="filter-item">
         <el-button type="primary">
           更多操作<i class="el-icon-arrow-down el-icon--right"></i>
@@ -255,8 +256,11 @@
         </el-row>
 
         <div slot="footer" class="dialog-footer" v-if="handleJudgePass(temp)">
-          <el-button @click="handleUnPass">驳回</el-button>
-          <el-button type="primary" @click="handlePass">通过</el-button>
+          <el-button @click="handleChangeState('fail')">驳回</el-button>
+          <el-button type="primary" @click="handleChangeState('pass')">通过</el-button>
+        </div>
+        <div slot="footer" class="dialog-footer" v-if="handleJudgeSuccess(temp)">
+          <el-button type="success" @click="handleChangeState('success')">成功报销</el-button>
         </div>
       </el-dialog>
 
@@ -297,7 +301,7 @@
             </el-col>
             <el-col :xs="24" :sm="8">
               <div class="view-item">
-                <el-button class="filter-item" type="primary" icon="el-icon-search" @click="importFunding">
+                <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleTaskSearch">
                   搜索
                 </el-button>
               </div>
@@ -319,21 +323,18 @@
               <template slot-scope="scope">
                 <el-row>
                   <el-col>
-                    <el-dropdown-item><i class="el-icon-plus table-operation"
-                            style="color: #87d068;" @click="fundingImportVisible=false;handleCreate(scope.row);"></i></el-dropdown-item>
+                    <el-dropdown-item><i class="el-icon-plus table-operation" style="color: #87d068;"
+                        @click="fundingImportVisible=false;handleCreate(scope.row);"></i></el-dropdown-item>
                   </el-col>
                 </el-row>
               </template>
             </el-table-column>
           </el-table>
           <div style="text-align: center;margin-top: 30px;">
-
-        <el-pagination @size-change="handleSizeChange2" @current-change="handleCurrentChange2"
-          :current-page="task.pageNum" :page-sizes="[5,10.20]"
-          layout="total, sizes, prev, pager, next, jumper" :total="taskTotal">
-        </el-pagination>
-
-      </div>
+            <el-pagination @current-change="handleCurrentChange2"
+              :current-page="task.pageNum" :page-size="task.pageSize" layout="total, prev, pager, next, jumper" :total="taskTotal">
+            </el-pagination>
+          </div>
         </div>
       </el-dialog>
     </div>
@@ -350,7 +351,7 @@
   export default {
     data() {
       return {
-        taskTotal:'',
+        taskTotal: 0,
         taskType: "thesis",
         BillDate: null,
         spent: null,
@@ -410,7 +411,7 @@
         },
         task: {
           pageNum: 1,
-          pageSize: 10,
+          pageSize: 1,
           field: '',
           order: '',
           title: '',
@@ -459,15 +460,27 @@
           update: '编辑',
           create: '添加'
         },
-        paperTypeMap:{
+        paperTypeMap: {
           '1': '核心',
           '2': '普通'
         },
-        taskTypeMap:{
-          'thesis':'论文',
-          'match':'比赛',
-          'items':'项目',
-          'copyright':'著作权'
+        taskTypeMap: {
+          'thesis': '论文',
+          'match': '比赛',
+          'items': '项目',
+          'copyright': '著作权'
+        },
+        infoMap: {
+          'success': '完成',
+          'pass': '通过',
+          'fail': '驳回',
+          'apply': '申报'
+        },
+        stateMap: {
+          'fail': '4',
+          'success': '3',
+          'pass': '2',
+          'apply': '1'
         },
         rules: {
           name: [{
@@ -587,6 +600,10 @@
         }
         this.handleSearchFunding();
       },
+      handleTaskSearch(){
+        this.task.pageNum = 1;
+        this.importFunding();
+      },
       handleSearchFunding() {
         this.loadTable();
       },
@@ -606,6 +623,10 @@
       },
       handleJudgePass(row) {
         if (row.state == 1 && this.currentUser.roleId == 1) return true;
+        return false;
+      },
+      handleJudgeSuccess(row) {
+        if (row.state == 2 && this.currentUser.userId == row.verifierId) return true;
         return false;
       },
       handleJudgeDelete(row) {
@@ -675,48 +696,22 @@
         this.importFunding();
         this.fundingImportVisible = true;
       },
-      handleUnPass() {
+      handleChangeState(s) {
         var row = this.temp;
-        this.$confirm('此操作将拒绝该项申报, 是否继续?', '提示', {
+        this.$confirm(`此操作将${this.infoMap[s]}该项申报, 是否继续?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
           center: true
         }).then(() => {
-          row.state = 4
-          this.$put('/studio/funding/state', {
-            ...row
-          }).then(() => {
-            this.handleSearchFunding();
-            this.$message({
-              type: 'success',
-              message: '已拒绝该申报!'
-            });
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已驳回通过该申报'
-          });
-        });
-        this.fundingViewVisible = false;
-      },
-      handlePass() {
-        var row = this.temp;
-        this.$confirm('此操作将接受该项申报, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-          center: true
-        }).then(() => {
-          row.state = 2;
+          row.state = this.stateMap[s];
           row.verifierId = this.currentUser.roleId;
           this.$put('/studio/funding/state', {
             ...row
           }).then(() => {
             this.$message({
               type: 'success',
-              message: '已通过该申报!'
+              message: '操作成功!'
             });
           })
           this.$put('/studio/funding/', {
@@ -727,7 +722,7 @@
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消通过该申报  '
+            message: '已取消'
           });
         });
         this.fundingViewVisible = false;
@@ -739,10 +734,6 @@
       handleCurrentChange(val) {
         this.page.param.pageNum = val;
         this.handleSearchFunding();
-      },
-      handleSizeChange2(val) {
-        this.task.pageSize = val;
-        this.importFunding();
       },
       handleCurrentChange2(val) {
         this.task.pageNum = val;
@@ -777,9 +768,9 @@
       },
       handleCreate(row) {
         this.resetTemp()
-        if(row.id) { 
+        if (row.id) {
           this.getStaskInFo(row.id)
-          
+
         }
         this.dialogStatus = 'create'
         this.dialogFormVisible = true
@@ -830,11 +821,10 @@
         });
       },
       importFunding() {
-        this.task.pageNum = 1;
         this.$get(`/studio/${this.taskType}/`, {
           ...this.task
         }).then((r) => {
-          this.taskTotal  = r.data.data.total;
+          this.taskTotal = r.data.data.total;
           this.taskTableData = this.dealId(r.data.data.rows);
         })
       },
@@ -865,23 +855,24 @@
           f.verifierName == "" && f.verifierId == "") return true;
         else return false;
       },
-      getStaskInFo(id){
+      getStaskInFo(id) {
         this.$get(`/studio/${this.taskType}/${id}`).then((r) => {
-          this.setTemp(JSON.parse(JSON.stringify(r)));  
+          this.setTemp(JSON.parse(JSON.stringify(r)));
         })
       },
       dealId(r) {
         return JSON.parse(JSON.stringify(r).replace(/thesisId/g, 'id').replace(/matchId/g, 'id')
-          .replace(/itemsId/g, 'id').replace(/copyrightId/g, 'id').replace(/thesis_id/g,'id').replace(/match_id/g,'id')
-          .replace(/items_id/g,'id').replace(/copyright_id/g,'id'));
+          .replace(/itemsId/g, 'id').replace(/copyrightId/g, 'id').replace(/thesis_id/g, 'id').replace(/match_id/g,
+            'id')
+          .replace(/items_id/g, 'id').replace(/copyright_id/g, 'id'));
       },
-      setTemp(r){
+      setTemp(r) {
         r = this.dealId(r.data.data);
         this.temp.name = r.title;
-        this.temp.cost = r.cost?r.cost:"";
-        this.temp.type = this.taskTypeMap[this.taskType]?this.taskTypeMap[this.taskType]:"";
-        this.temp.invoice = r.invoice?r.invoice:"";
-        this.temp.taskId = r.id?r.id:"";
+        this.temp.cost = r.cost ? r.cost : "";
+        this.temp.type = this.taskTypeMap[this.taskType] ? this.taskTypeMap[this.taskType] : "";
+        this.temp.invoice = r.invoice ? r.invoice : "";
+        this.temp.taskId = r.id ? r.id : "";
       }
     },
     mounted() {
