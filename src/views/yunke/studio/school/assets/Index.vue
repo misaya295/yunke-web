@@ -420,33 +420,38 @@ export default {
       //检查是否已经报修
       const searchByAssetsName = {};
       searchByAssetsName.assetsName = row.id;
-      this.$get("studio/school/assets/repair", { ...searchByAssetsName }).then((r) => {
-        console.log("r:" + r)
-      });
+      this.$get("studio/school/assets/repair", { ...searchByAssetsName }).then(
+        async (r) => {
+          console.log(r)
+          if (r.data.data.total != 0) {
+            return this.$message.info("该资产已申请报修!");
+          }
 
-      //符合条件，弹出报修对话框
-      const confirmResult = await this.$confirm("是否确认报修?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).catch((err) => err);
+          //符合条件，弹出报修对话框
+          const confirmResult = await this.$confirm("是否确认报修?", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }).catch((err) => err);
 
-      if (confirmResult !== "confirm") {
-        return this.$message.info("取消了报修");
-      }
+          if (confirmResult !== "confirm") {
+            return this.$message.info("取消了报修");
+          }
 
-      this.schoolAssetsRepair.assetsName = row.id;
-      this.schoolAssetsRepair.repairProverUserInfoUuid = this.userInfo.userId;
-      console.log(this.schoolAssetsRepair);
-      this.$post("studio/school/assets/repair", {
-        ...this.schoolAssetsRepair,
-      }).then((r) => {
-        if (r.status == 200) {
-          this.$message.success("报修成功!");
-        } else {
-          this.$message.error("报修失败！");
+          this.schoolAssetsRepair.assetsName = row.id;
+          this.schoolAssetsRepair.repairProverUserInfoUuid = this.userInfo.userId;
+          console.log(this.schoolAssetsRepair);
+          this.$post("studio/school/assets/repair", {
+            ...this.schoolAssetsRepair,
+          }).then((r) => {
+            if (r.status == 200) {
+              this.$message.success("报修成功!");
+            } else {
+              this.$message.error("报修失败！");
+            }
+          });
         }
-      });
+      );
     },
     //修改证书对话框
     showEditDialog(row) {

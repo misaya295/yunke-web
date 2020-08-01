@@ -172,7 +172,7 @@
           <el-step title="基本信息"></el-step>
           <el-step title="发票上传"></el-step>
         </el-steps>
-        <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px">
+        <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px" style="margin-right: 100px">
           <el-tabs v-model="activeIndex" tab-position="left" :before-leave="beforeTabLeave">
             <el-tab-pane label="基本信息" name="0">
               <el-form-item label="姓名" prop="fullName">
@@ -221,7 +221,7 @@
               </el-form-item>
             </el-tab-pane>
             <el-tab-pane label="发票上传" name="1">
-              <el-upload
+              <!-- <el-upload
                 :action="uploadURL"
                 :on-preview="handlePreview"
                 :headers="headerObj"
@@ -230,7 +230,8 @@
               >
                 <el-button size="small" type="primary">点击上传</el-button>
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-              </el-upload>
+              </el-upload> -->
+              <el-input v-model="addForm.invoice"></el-input>
               <el-form-item class="formbutton">
                 <el-button @click="addDialogVisible = false" class="addFormButton">取 消</el-button>
                 <el-button type="primary" @click="addCertificate" class="addFormButton">添 加</el-button>
@@ -438,7 +439,7 @@ export default {
       },
       activeIndex: 0,
       //上传图片的URL地址
-      uploadURL: "http://120.78.0.140:8300/",
+      uploadURL: "http://120.78.0.140:8300/upload",
       //图片上传组件的headers请求头对象
       headerObj: {
         Authorization: window.sessionStorage.getItem("token"),
@@ -515,8 +516,6 @@ export default {
         if (this.addForm.cost == "") {
           this.addForm.cost = "" - 0;
         }
-        //把考证ID转为数字
-        this.addForm.id = this.addForm.id - 0;
         this.$post("studio/certificate", {
           ...this.addForm,
         }).then((r) => {
@@ -687,7 +686,7 @@ export default {
         }
       }
       if (oldActiveName === "0") {
-        if (this.addForm.state == "" || this.addForm.state == null) {
+        if (this.addForm.state == null) {
           this.$message.error("请先填写考试状态");
           return false;
         }
@@ -743,9 +742,10 @@ export default {
 }
 
 .formbutton {
-  text-align: center;
+  margin-top: 20px;
+  padding-left: 290px;
 }
 .addFormSteps {
-  margin-bottom: 20px;
+  margin: 0 0 20px 150px;
 }
 </style>
