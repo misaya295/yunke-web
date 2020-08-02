@@ -293,7 +293,7 @@
                 <el-input v-model="task.title" placeholder="请输入标题" style="width:200px" class="filter-item">
                 </el-input>
 
-                <el-select v-model="taskType" placeholder="类型" style="width: 110px" class="filter-item">
+                <el-select v-model="taskType" placeholder="类型" style="width: 110px" class="filter-item" :command="handleTaskSearch">
                   <el-option v-for="item in taskTypeTable" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
@@ -331,9 +331,11 @@
             </el-table-column>
           </el-table>
           <div style="text-align: center;margin-top: 30px;">
+
             <el-pagination @current-change="handleCurrentChange2"
               :current-page="task.pageNum" :page-size="task.pageSize" layout="total, prev, pager, next, jumper" :total="taskTotal">
             </el-pagination>
+
           </div>
         </div>
       </el-dialog>
