@@ -15,7 +15,11 @@ const port = 9527 // dev port
 module.exports = {
   /**
    * You will need to set publicPath if you plan to deploy your site under a sub path,
+<<<<<<< HEAD
+   * for example GitHub Pages. If you plan to deploy your site npm run devto https://foo.github.io/bar/,
+=======
    * for example GitHub Pages. If you plan to deploy your site to https://foo.github.io/bar/,
+>>>>>>> 83dd4f9cfd503f36eeb60e0e066845b48ad8690b
    * then publicPath should be set to "/bar/".
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
