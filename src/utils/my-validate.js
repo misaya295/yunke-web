@@ -94,3 +94,17 @@ export function isArray(arg) {
 export function isIntegerGreaterThanZero(arg) {
   return /(^[1-9]\d*$)/.test(arg)
 }
+
+export function is2thIdCard(arg) {
+  return /(^\d{8}(0\d|10|11|12)([0-2]\d|30|31)\d{3}$)|(^\d{6}(18|19|20)\d{2}(0[1-9]|10|11|12)([0-2]\d|30|31)\d{3}(\d|X|x)$)/.test(arg)
+}
+
+export function validateImageExt(ext) {
+  if (ext === null || ext === '') return false
+  return ['jpg', 'png', 'jpeg'].indexOf(ext.toLowerCase()) !== -1
+}
+
+export function validateFileExt(ext) {
+  if (ext === null || ext === '') return false
+  return ['jpg', 'png', 'txt', 'jpeg', 'pdf', 'doc', 'docx', 'xlsx', 'xls'].indexOf(ext.toLowerCase()) !== -1
+}

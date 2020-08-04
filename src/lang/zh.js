@@ -69,6 +69,16 @@ export default {
       orderNum: '排序',
       perms: '权限'
     },
+    oss: {
+      qiniu: {
+        name: '文件名',
+        suffix: '类型',
+        bucket: '空间名称',
+        size: '文件大小',
+        type: '空间类型',
+        updateTime: '创建日期'
+      }
+    },
     dept: {
       deptName: '部门名称',
       parentId: '上级部门',
@@ -240,6 +250,9 @@ export default {
     confirm: '确定',
     cancel: '取消',
     add: '新增',
+    synchronized: '同步',
+    config: '配置',
+    upload: '上传',
     edit: '修改',
     yes: '是',
     no: '否',
