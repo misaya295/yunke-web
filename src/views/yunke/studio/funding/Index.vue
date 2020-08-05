@@ -22,20 +22,26 @@
         </el-date-picker>
       </div>
 
-
+      <el-select v-model="otherId" placeholder="其他信息" style="width: 103px" class="filter-item">
+        <el-option v-for="item in otherInfoTable" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
       <!-- 报销名称 -->
-      <el-input v-model="funding.name" placeholder="请输入报销名称" style="width:200px" class="filter-item"></el-input>
+      <el-input v-model="funding.name" v-show="otherId=='1'" placeholder="请输入报销名称" style="width:155px"
+        class="filter-item"></el-input>
 
       <!-- 申请人 -->
-      <el-autocomplete popper-class="my-autocomplete" v-model="funding.proposerName" :fetch-suggestions="querySearch"
-        placeholder="请选择申请人" @select="handleSelect1" style="width: 155px" class="filter-item">
+      <el-autocomplete popper-class="my-autocomplete" v-model="funding.proposerName" v-show="otherId=='2'"
+        :fetch-suggestions="querySearch" placeholder="请选择申请人" @select="handleSelect1" style="width: 155px"
+        class="filter-item">
         <template slot-scope="{ item }">
           <div class="name">{{ item.fullName }} <span class="id">{{ item.userId }}</span></div>
         </template>
       </el-autocomplete>
       <!-- 审核人 -->
-      <el-autocomplete popper-class="my-autocomplete" v-model="funding.verifierName" :fetch-suggestions="querySearch2"
-        placeholder="请选择审核人" @select="handleSelect2" style="width: 155px" class="filter-item">
+      <el-autocomplete popper-class="my-autocomplete" v-model="funding.verifierName" v-show="otherId=='3'"
+        :fetch-suggestions="querySearch2" placeholder="请选择审核人" @select="handleSelect2" style="width: 155px"
+        class="filter-item">
         <template slot-scope="{ item }">
           <div class="name">{{ item.fullName }} <span class="id">{{ item.userId }}</span></div>
         </template>
@@ -90,25 +96,30 @@
             <span style="margin-left: 10px">{{ scope.row.cost }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="70px" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" width="50px" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <el-row>
-              <el-col>
                 <el-dropdown>
                   <span>
                     <i class="el-icon-s-operation table-operation" style="color: 	#96CDCD;"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item v-if="handleJudgeUpdate(scope.row)"><i class="el-icon-edit table-operation"
-                        style="color: #87d068;" @click="handleUpdate(scope.row)"></i></el-dropdown-item>
-                    <el-dropdown-item v-if="handleJudgeDelete(scope.row)"><i class="el-icon-delete table-operation"
-                        style="color: #f50;" @click="handleDelete(scope.$index, scope.row)"></i></el-dropdown-item>
-                    <el-dropdown-item><i class="el-icon-view table-operation" style="color: #2db7f5;"
-                        @click="handleView(scope.row)"></i></el-dropdown-item>
+                    <el-dropdown-item v-if="handleJudgeUpdate(scope.row)" style="padding:0; width:40px">
+                      <div class="operator" style="color: #87d068;" @click="handleUpdate(scope.row)">
+                        <i class="el-icon-edit table-operation"></i>
+                      </div>
+                    </el-dropdown-item>
+                    <el-dropdown-item v-if="handleJudgeDelete(scope.row)" style="padding:0; width:40px">
+                      <div class="operator" style="color: #f50;" @click="handleDelete(scope.$index, scope.row)">
+                        <i class="el-icon-delete table-operation"></i>
+                      </div>
+                    </el-dropdown-item>
+                    <el-dropdown-item style="padding:0; width:40px">
+                      <div class="operator" style="color: #2db7f5;" @click="handleView(scope.row)">
+                        <i class="el-icon-view table-operation"></i>
+                      </div>
+                    </el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
-              </el-col>
-            </el-row>
 
 
 
@@ -293,7 +304,8 @@
                 <el-input v-model="task.title" placeholder="请输入标题" style="width:200px" class="filter-item">
                 </el-input>
 
-                <el-select v-model="taskType" placeholder="类型" style="width: 110px" class="filter-item" :command="handleTaskSearch">
+                <el-select v-model="taskType" placeholder="类型" style="width: 110px" class="filter-item"
+                  :command="handleTaskSearch">
                   <el-option v-for="item in taskTypeTable" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
@@ -332,8 +344,8 @@
           </el-table>
           <div style="text-align: center;margin-top: 30px;">
 
-            <el-pagination @current-change="handleCurrentChange2"
-              :current-page="task.pageNum" :page-size="task.pageSize" layout="total, prev, pager, next, jumper" :total="taskTotal">
+            <el-pagination @current-change="handleCurrentChange2" :current-page="task.pageNum"
+              :page-size="task.pageSize" layout="total, prev, pager, next, jumper" :total="taskTotal">
             </el-pagination>
 
           </div>
@@ -353,6 +365,7 @@
   export default {
     data() {
       return {
+        otherId: '',
         taskTotal: 0,
         taskType: "thesis",
         BillDate: null,
@@ -384,6 +397,19 @@
           value: '0',
           label: '查看所有',
         }],
+        otherInfoTable: [{
+            value: "1",
+            label: "报销名称"
+          },
+          {
+            value: "2",
+            label: "申请人"
+          },
+          {
+            value: "3",
+            label: "审核人"
+          }
+        ],
         taskTypeTable: [{
           value: "thesis",
           label: '论文'
@@ -413,7 +439,7 @@
         },
         task: {
           pageNum: 1,
-          pageSize: 1,
+          pageSize: 5,
           field: '',
           order: '',
           title: '',
@@ -602,7 +628,7 @@
         }
         this.handleSearchFunding();
       },
-      handleTaskSearch(){
+      handleTaskSearch() {
         this.task.pageNum = 1;
         this.importFunding();
       },
@@ -805,22 +831,29 @@
       },
       update(formName) {
         const funding = this.temp;
+        //如果是申报失败，重新申报的，需要修改一下状态
+        if (funding.state == "4") {
+          funding.state = "1";
+          this.$put('/studio/funding/state', {
+            ...funding
+          })
+        }
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.$put('/studio/funding/', {
               ...funding
             }).then(() => {
               this.$message({
-                message: '修改成功',
+                message: '操作成功',
                 type: 'success'
               })
             })
-            this.handleSearchFunding()
             this.dialogFormVisible = false;
           } else {
             return false;
           }
         });
+        this.handleSearchFunding();
       },
       importFunding() {
         this.$get(`/studio/${this.taskType}/`, {
@@ -875,6 +908,9 @@
         this.temp.type = this.taskTypeMap[this.taskType] ? this.taskTypeMap[this.taskType] : "";
         this.temp.invoice = r.invoice ? r.invoice : "";
         this.temp.taskId = r.id ? r.id : "";
+      },
+      handleCommand(command) {
+        this.$message('click on item ' + command);
       }
     },
     mounted() {
@@ -891,6 +927,12 @@
 
 </script>
 <style lang="scss" scoped>
+  .operator {
+    border:1px solid red;
+    width: 100%;
+    text-align: center;
+  }
+
   .menu {
     margin: 10px;
 
