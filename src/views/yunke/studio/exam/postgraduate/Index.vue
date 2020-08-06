@@ -2,18 +2,30 @@
   <div class="app-container">
     <div class="filter-container">
       <!-- 输入框 -->
-      <el-input v-model="queryParams.fullName" placeholder="姓名" class="filter-item search-item"></el-input>
-      <el-select v-model="queryParams.state" placeholder="请选择考试状态">
+      <el-input v-model="queryParams.fullName" placeholder="姓名" class="filter-item search-item" />
+      <el-select v-model="queryParams.state" placeholder="请选择考试状态" class="filter-item search-item">
         <el-option
           v-for="(item,i) in stateOptions"
           :key="i"
           :label="item.label"
           :value="item.value"
-        ></el-option>
+        />
       </el-select>
-      <el-button @click="searchPostgraduate" type="primary" class="filter-item" plain>搜索</el-button>
-      <el-button @click="resetPostgraduate" type="warning" class="filter-item" plain>重置</el-button>
-      <el-button type="success" class="filter-item" @click="showAddDialog" plain>添加</el-button>
+      <el-button
+        v-hasPermission="['postgraduate:get']"
+        type="primary"
+        class="filter-item"
+        plain
+        @click="searchPostgraduate"
+      >搜索</el-button>
+      <el-button type="warning" class="filter-item" plain @click="resetPostgraduate">重置</el-button>
+      <el-button
+        v-hasPermission="['postgraduate:add']"
+        type="success"
+        class="filter-item"
+        plain
+        @click="showAddDialog"
+      >添加</el-button>
       <!-- table内容 -->
       <el-table ref="tableref" :data="postgraduateList" border fit style="width: 100%;">
         <el-table-column type="selection" align="center" width="40px" />
@@ -23,35 +35,35 @@
           :show-overflow-tooltip="true"
           align="center"
           min-width="80px"
-        ></el-table-column>
+        />
         <el-table-column
           label="报考时间"
           prop="time"
           :show-overflow-tooltip="true"
           align="center"
           min-width="120px"
-        ></el-table-column>
+        />
         <el-table-column
           label="报考学校"
           prop="school"
           :show-overflow-tooltip="true"
           align="center"
           min-width="120px"
-        ></el-table-column>
+        />
         <el-table-column
           label="报考方向"
           prop="orientation"
           :show-overflow-tooltip="true"
           align="center"
           min-width="120px"
-        ></el-table-column>
+        />
         <el-table-column
           label="统考成绩"
           prop="exam"
           :show-overflow-tooltip="true"
           align="center"
           min-width="80px"
-        ></el-table-column>
+        />
         <el-table-column
           label="通过状态"
           prop="success"
@@ -60,8 +72,8 @@
           min-width="70px"
         >
           <template slot-scope="scope">
-            <i class="el-icon-success" style="color: lightgreen" v-if="scope.row.success === 1"></i>
-            <i class="el-icon-error" style="color: red" v-else></i>
+            <i v-if="scope.row.success === 1" class="el-icon-success" style="color: lightgreen" />
+            <i v-else class="el-icon-error" style="color: red" />
           </template>
         </el-table-column>
         <el-table-column
@@ -72,8 +84,8 @@
           min-width="80px"
         >
           <template slot-scope="scope">
-            <el-tag type="warning" v-if="scope.row.state === 0">正在考取</el-tag>
-            <el-tag type="success" v-else>已完成</el-tag>
+            <el-tag v-if="scope.row.state === 0" type="warning">正在考取</el-tag>
+            <el-tag v-else type="success">已完成</el-tag>
           </template>
         </el-table-column>
         <el-table-column
@@ -84,6 +96,7 @@
         >
           <template slot-scope="slope">
             <el-tooltip
+              v-hasPermission="['postgraduate:put']"
               class="item"
               effect="dark"
               content="修改考研"
@@ -96,6 +109,24 @@
                 @click="showEditDialog(slope.row)"
               />
             </el-tooltip>
+            <el-tooltip
+              v-hasPermission="['postgraduate:delete']"
+              class="item"
+              effect="dark"
+              content="删除考研"
+              placement="top"
+              :enterable="false"
+            >
+              <i
+                class="el-icon-delete table-operation"
+                style="color: #F56C6C;"
+                @click="showDeleteDialog(slope.row)"
+              />
+            </el-tooltip>
+            <el-link
+              v-has-no-permission="['postgraduate:put','postgraduate:delete']"
+              class="no-perm"
+            >{{ $t('tips.noPermission') }}</el-link>
           </template>
         </el-table-column>
       </el-table>
@@ -110,30 +141,30 @@
       />
 
       <!-- 添加对话框 -->
-      <el-dialog @close="closeAddDialog" title="添加考研" :visible.sync="addDialogVisible" width="50%">
-        <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px">
+      <el-dialog title="添加考研" :visible.sync="addDialogVisible" width="50%" @close="closeAddDialog">
+        <el-form ref="addFormRef" :model="addForm" :rules="addFormRules" label-width="100px">
           <el-form-item label="姓名" prop="fullName">
-            <el-input v-model="addForm.fullName" disabled></el-input>
+            <el-input v-model="addForm.fullName" disabled />
           </el-form-item>
           <el-form-item label="报考时间" prop="type">
             <el-date-picker
               v-model="addForm.time"
-              type="datetime"
-              placeholder="选择日期时间"
+              type="date"
+              placeholder="选择日期"
               align="right"
-              format="yyyy-MM-dd HH:mm:ss"
-              value-format="yyyy-MM-dd HH:mm:ss"
+              format="yyyy-MM-dd"
+              value-format="yyyy-MM-dd"
               style="width: 100%"
-            ></el-date-picker>
+            />
           </el-form-item>
           <el-form-item label="报考学校" prop="school">
-            <el-input v-model="addForm.school"></el-input>
+            <el-input v-model="addForm.school" />
           </el-form-item>
           <el-form-item label="报考方向" prop="orientation" type="number">
-            <el-input v-model="addForm.orientation"></el-input>
+            <el-input v-model="addForm.orientation" />
           </el-form-item>
           <el-form-item label="统考成绩" prop="exam">
-            <el-input v-model="addForm.exam"></el-input>
+            <el-input v-model="addForm.exam" />
           </el-form-item>
           <el-form-item label="通过状态" prop="success">
             <el-radio-group v-model="addForm.success">
@@ -143,8 +174,8 @@
           </el-form-item>
           <el-form-item label="状态" prop="state">
             <el-select v-model="addForm.state" placeholder="请选择状态" style="width:100%">
-              <el-option label="正在考取" :value="0"></el-option>
-              <el-option label="已完成" :value="1"></el-option>
+              <el-option label="正在考取" :value="0" />
+              <el-option label="已完成" :value="1" />
             </el-select>
           </el-form-item>
         </el-form>
@@ -156,26 +187,26 @@
 
       <!-- 修改对话框 -->
       <el-dialog
-        @close="closeEditDialog"
         title="修改考证信息"
         :visible.sync="editDialogVisible"
         width="50%"
+        @close="closeEditDialog"
       >
-        <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="100px">
+        <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="100px">
           <el-form-item label="姓名" prop="fullName">
-            <el-input v-model="editForm.fullName" disabled></el-input>
+            <el-input v-model="editForm.fullName" disabled />
           </el-form-item>
           <el-form-item label="报考时间" prop="type">
-            <el-input v-model="editForm.time"></el-input>
+            <el-input v-model="editForm.time" />
           </el-form-item>
           <el-form-item label="报考学校" prop="school">
-            <el-input v-model="editForm.school"></el-input>
+            <el-input v-model="editForm.school" />
           </el-form-item>
           <el-form-item label="报考方向" prop="orientation" type="number">
-            <el-input v-model.number="editForm.orientation"></el-input>
+            <el-input v-model.number="editForm.orientation" />
           </el-form-item>
           <el-form-item label="统考成绩" prop="exam">
-            <el-input v-model="editForm.exam"></el-input>
+            <el-input v-model="editForm.exam" />
           </el-form-item>
           <el-form-item label="通过状态" prop="success">
             <el-radio-group v-model="editForm.success">
@@ -185,8 +216,8 @@
           </el-form-item>
           <el-form-item label="状态" prop="state">
             <el-select v-model="editForm.state" placeholder="请选择状态" style="width:100%">
-              <el-option label="正在考取" :value="0"></el-option>
-              <el-option label="已完成" :value="1"></el-option>
+              <el-option label="正在考取" :value="0" />
+              <el-option label="已完成" :value="1" />
             </el-select>
           </el-form-item>
         </el-form>
@@ -200,243 +231,250 @@
 </template>
 
 <script>
-import Pagination from "@/components/Pagination";
+import Pagination from '@/components/Pagination'
 export default {
-  name: "Index",
+  name: 'Index',
   components: { Pagination },
   data() {
     return {
-      //输入框的值
-      input: "",
-      //存放查询数据
+      // 输入框的值
+      input: '',
+      // 存放查询数据
       postgraduateList: [],
-      //存放查询数目
+      // 存放查询数目
       total: 0,
       queryParams: {},
       stateOptions: [
         {
-          value: "0",
-          label: "正在考取",
+          value: '0',
+          label: '正在考取'
         },
         {
-          value: "1",
-          label: "已完成",
-        },
+          value: '1',
+          label: '已完成'
+        }
       ],
       sort: {},
       selection: [],
       pagination: {
         size: 10,
-        num: 1,
+        num: 1
       },
-      //添加对话框的显示与隐藏
+      // 添加对话框的显示与隐藏
       addDialogVisible: false,
-      userInfo: {},
-      //绑定添加对话框中的表单数据
+      // 绑定添加对话框中的表单数据
       addForm: {
-        fullName: "",
+        fullName: '',
         userId: 0,
-        time: "",
-        school: "",
-        orientation: "",
-        exam: "",
+        time: '',
+        school: '',
+        orientation: '',
+        exam: '',
         success: 0,
-        state: undefined,
+        state: undefined
       },
-      //添加对话框的验证规则
+      // 添加对话框的验证规则
       addFormRules: {
         success: [
-          { required: true, message: "请填写通过状态！", trigger: "blur" },
+          { required: true, message: '请填写通过状态！', trigger: 'blur' }
         ],
-        state: [{ required: true, message: "请填写状态！", trigger: "blur" }],
+        state: [{ required: true, message: '请填写状态！', trigger: 'blur' }]
       },
-      //修改对话框的显示与隐藏
+      // 修改对话框的显示与隐藏
       editDialogVisible: false,
-      //绑定修改对话框中的表单数据
+      // 绑定修改对话框中的表单数据
       editForm: {
-        fullName: "",
+        fullName: '',
         id: 0,
-        userId: "",
-        time: "",
-        school: "",
-        title: "",
-        orientation: "",
-        exam: "",
-        success: "",
-        state: undefined,
+        userId: '',
+        time: '',
+        school: '',
+        title: '',
+        orientation: '',
+        exam: '',
+        success: '',
+        state: undefined
       },
-      //修改对话框的验证规则
+      // 修改对话框的验证规则
       editFormRules: {
         success: [
-          { required: true, message: "请填写通过状态！", trigger: "blur" },
+          { required: true, message: '请填写通过状态！', trigger: 'blur' }
         ],
-        state: [{ required: true, message: "请填写状态！", trigger: "blur" }],
-      },
-    };
-  },
-  created() {
-    //获取用户信息
-    this.userInfo = this.currentUser;
-  },
-  mounted() {
-    this.fetch();
+        state: [{ required: true, message: '请填写状态！', trigger: 'blur' }]
+      }
+    }
   },
   computed: {
     currentUser() {
-      const user = this.$store.state.account.user;
-      this.userInfo = user;
-      return user;
-    },
+      return this.$store.state.account.user
+    }
+  },
+  mounted() {
+    this.fetch()
   },
   methods: {
-    //根据条件获取所有考证信息
+    // 根据条件获取所有考证信息
     fetch(params = {}) {
-      params.pageSize = this.pagination.size;
-      params.pageNum = this.pagination.num;
+      params.pageSize = this.pagination.size
+      params.pageNum = this.pagination.num
       if (this.queryParams.timeRange) {
-        params.createTimeFrom = this.queryParams.timeRange[0];
-        params.createTimeTo = this.queryParams.timeRange[1];
+        params.createTimeFrom = this.queryParams.timeRange[0]
+        params.createTimeTo = this.queryParams.timeRange[1]
       }
-      this.loading = true;
-      this.$get("studio/postgraduate", {
-        ...params,
+      this.loading = true
+      this.$get('studio/postgraduate', {
+        ...params
       }).then((r) => {
-        console.log(r);
-        const data = r.data.data;
-        this.total = data.total;
-        this.postgraduateList = data.rows;
-        console.log(data);
-        this.loading = false;
-      });
+        console.log(r)
+        const data = r.data.data
+        this.total = data.total
+        this.postgraduateList = data.rows
+        console.log(data)
+        this.loading = false
+      })
     },
     search() {
       this.fetch({
         ...this.queryParams,
-        ...this.sort,
-      });
+        ...this.sort
+      })
     },
 
-    //展示对话框
-    //完成时记得打开检查id的判断
+    // 展示对话框
+    // 完成时记得打开检查id的判断
     showAddDialog() {
-      //判断是否为学生
-      // if (this.userInfo.roleId !== 7) {
-      //   return this.$message.info("您不是学生，无法添加考证！");
-      // }
-      //获得id
-      this.addForm.fullName = this.userInfo.fullName;
-      this.addForm.userId = this.userInfo.userId;
-      this.addDialogVisible = true;
+      // 获得id
+      this.addForm.fullName = this.currentUser.fullName
+      this.addForm.userId = this.currentUser.userId
+      this.addDialogVisible = true
     },
-    //提交添加考证表单
+    // 提交添加考证表单
     addPostgraduate() {
       this.$refs.addFormRef.validate((valid) => {
-        if (!valid) return;
-        //判断通过状态和考试状态是否冲突
-        if (this.addForm.state == 0 && this.addForm.success == 1) {
-          return this.$message.error("考试还未结束，无法将通过状态设置为成功!");
+        if (!valid) return
+        // 判断通过状态和考试状态是否冲突
+        if (this.addForm.state === 0 && this.addForm.success === 1) {
+          return this.$message.error('考试还未结束，无法将通过状态设置为成功!')
         }
-        //把考证ID转为数字
-        this.addForm.id = this.addForm.id - 0;
-        this.$post("studio/postgraduate", {
-          ...this.addForm,
+        this.$post('studio/postgraduate', {
+          ...this.addForm
         }).then((r) => {
-          if (r.status == 200) {
-            this.$message.success("添加考证成功!");
+          if (r.status === 200) {
+            this.$message.success('添加考研成功!')
           } else {
-            this.$message.error("添加考证失败！");
+            this.$message.error('添加考研失败！')
           }
-        });
-        this.addDialogVisible = false;
-        this.fetch();
-        console.log(this.addForm.id);
-      });
+          this.fetch()
+        })
+        this.addDialogVisible = false
+      })
     },
-    //监听关闭对话框事件
+    // 监听关闭对话框事件
     closeAddDialog() {
-      this.$refs.addFormRef.resetFields();
+      this.$refs.addFormRef.resetFields()
     },
     // 搜索考证
     searchPostgraduate() {
-      console.log(this.queryParams);
+      console.log(this.queryParams)
       this.$get(`studio/postgraduate`, { ...this.queryParams }).then((r) => {
-        const data = r.data.data;
-        this.postgraduateList = data.rows;
-        this.total = data.total;
-        console.log(r);
-      });
+        const data = r.data.data
+        this.postgraduateList = data.rows
+        this.total = data.total
+        console.log(r)
+      })
     },
-    //重置搜索框数据
+    // 重置搜索框数据
     resetPostgraduate() {
-      this.queryParams = {};
-      this.fetch();
+      this.queryParams = {}
+      this.fetch()
     },
-    //获取时间
-    getTime: function () {
-      var _this = this;
-      let yy = new Date().getFullYear();
-      let mm =
+    // 获取时间
+    getTime: function() {
+      var _this = this
+      const yy = new Date().getFullYear()
+      const mm =
         new Date().getMonth() + 1 < 10
-          ? "0" + (new Date().getMonth() + 1)
-          : new Date().getMonth() + 1;
-      let dd =
+          ? '0' + (new Date().getMonth() + 1)
+          : new Date().getMonth() + 1
+      const dd =
         new Date().getDate() < 10
-          ? "0" + new Date().getDate()
-          : new Date().getDate();
-      let HH =
-        new Date().getHours() < 10
-          ? "0" + new Date().getHours()
-          : new Date().getHours();
-      let MM =
-        new Date().getMinutes() < 10
-          ? "0" + new Date().getMinutes()
-          : new Date().getMinutes();
-      let SS =
-        new Date().getSeconds() < 10
-          ? "0" + new Date().getSeconds()
-          : new Date().getSeconds();
-      _this.nowTime = HH + ":" + MM + ":" + SS;
-      _this.nowDate = yy + "-" + mm + "-" + dd;
-      return _this.nowDate + " " + _this.nowTime;
+          ? '0' + new Date().getDate()
+          : new Date().getDate()
+      _this.nowDate = yy + ':' + mm + ':' + dd
+      return _this.nowDate
     },
-    //修改考证对话框
+    // 修改考证对话框
     showEditDialog(row) {
-      if (this.userInfo.userId != row.userId) {
-        return this.$message.info("仅允许本人操作！");
+      // 判断是否有资格修改
+      if (this.currentUser.userId !== row.userId) {
+        if (this.currentUser.roleId !== '1') {
+          return this.$message.info('仅允许本人或管理员操作！')
+        }
       }
-      //获得数据
-      //浅克隆，同一源里的数值也会改变
+      // 获得数据
+      // 浅克隆，同一源里的数值也会改变
       // this.editForm = row;
-      this.editForm = Object.assign({}, row);
-      this.editDialogVisible = true;
+      this.editForm = Object.assign({}, row)
+      this.editDialogVisible = true
     },
-    //提交修改对话框
+    // 提交修改对话框
     editPostgraduate() {
       this.$refs.editFormRef.validate((valid) => {
-        if (!valid) return;
-        //判断通过状态和考试状态是否冲突
-        if (this.editForm.state == 0 && this.editForm.success == 1) {
-          return this.$message.error("考试还未结束，无法将通过状态设置为成功!");
-          //把考证ID转为字符串
-          this.editForm.id = this.editForm.id - 0;
+        if (!valid) return
+        // 判断通过状态和考试状态是否冲突
+        if (this.editForm.state === 0 && this.editForm.success === 1) {
+          return this.$message.error('考试还未结束，无法将通过状态设置为成功!')
+          // 把考证ID转为字符串
+          // this.editForm.id = this.editForm.id - 0
         }
-        this.$put("studio/postgraduate", { ...this.editForm }).then((r) => {
+        this.$put('studio/postgraduate', { ...this.editForm }).then((r) => {
           if (r.status === 200) {
-            this.$message.success("修改考证成功！");
-            this.editDialogVisible = false;
-            this.fetch();
+            this.$message.success('修改考证成功！')
+            this.editDialogVisible = false
+            this.fetch()
           } else {
-            this.$message.error("修改考证失败！");
+            this.$message.error('修改考证失败！')
           }
-        });
-      });
+        })
+      })
     },
-    //监听关闭对话框事件
+    // 监听关闭对话框事件
     closeEditDialog() {
-      this.$refs.editFormRef.resetFields();
+      this.$refs.editFormRef.resetFields()
     },
-  },
-};
+    // 删除考研
+    async showDeleteDialog(row) {
+      // 判断是否有资格删除
+      if (this.currentUser.userId !== row.userId) {
+        if (this.currentUser.roleId !== '1') {
+          return this.$message.info('仅允许本人或管理员操作！')
+        }
+      }
+      const confirmResult = await this.$confirm(
+        '是否确认删除该考研信息?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch((err) => err)
+
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('取消了删除')
+      }
+      this.$delete(`studio/postgraduate/${row.id}`).then((r) => {
+        console.log(r)
+        if (r.status === 200) {
+          this.$message.success('删除成功!')
+        } else {
+          this.$message.error('删除失败！')
+        }
+        this.fetch()
+      })
+    }
+  }
+}
 </script>
 
 <style scoped>
