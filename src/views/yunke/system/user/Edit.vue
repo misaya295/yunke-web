@@ -121,7 +121,7 @@ export default {
       rules: {
         username: [
           { required: true, message: this.$t('rules.require'), trigger: 'blur' },
-          { min: 4, max: 10, message: this.$t('rules.range4to10'), trigger: 'blur' },
+          { min: 4, max: 20, message: this.$t('rules.range4to20'), trigger: 'blur' },
           { validator: (rule, value, callback) => {
             if (!this.user.userId) {
               this.$get(`system/user/check/${value}`).then((r) => {

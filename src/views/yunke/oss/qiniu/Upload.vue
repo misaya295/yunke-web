@@ -103,6 +103,7 @@ export default {
       const uid = file.uid
       const id = response.data.contentId
       this.files.push({ uid, id })
+      console.log(file)
     },
     handleBeforeRemove(file, fileList) {
       for (let i = 0; i < this.files.length; i++) {
