@@ -98,28 +98,28 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="50px" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-                <el-dropdown>
-                  <span>
-                    <i class="el-icon-s-operation table-operation" style="color: 	#96CDCD;"></i>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item v-if="handleJudgeUpdate(scope.row)" style="padding:0; width:40px">
-                      <div class="operator" style="color: #87d068;" @click="handleUpdate(scope.row)">
-                        <i class="el-icon-edit table-operation"></i>
-                      </div>
-                    </el-dropdown-item>
-                    <el-dropdown-item v-if="handleJudgeDelete(scope.row)" style="padding:0; width:40px">
-                      <div class="operator" style="color: #f50;" @click="handleDelete(scope.$index, scope.row)">
-                        <i class="el-icon-delete table-operation"></i>
-                      </div>
-                    </el-dropdown-item>
-                    <el-dropdown-item style="padding:0; width:40px">
-                      <div class="operator" style="color: #2db7f5;" @click="handleView(scope.row)">
-                        <i class="el-icon-view table-operation"></i>
-                      </div>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
+            <el-dropdown>
+              <span>
+                <i class="el-icon-s-operation table-operation" style="color: 	#96CDCD;"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item v-if="handleJudgeUpdate(scope.row)" style="padding:0; width:40px">
+                  <div class="operator" style="color: #87d068;" @click="handleUpdate(scope.row)">
+                    <i class="el-icon-edit table-operation"></i>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item v-if="handleJudgeDelete(scope.row)" style="padding:0; width:40px">
+                  <div class="operator" style="color: #f50;" @click="handleDelete(scope.$index, scope.row)">
+                    <i class="el-icon-delete table-operation"></i>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item style="padding:0; width:40px">
+                  <div class="operator" style="color: #2db7f5;" @click="handleView(scope.row)">
+                    <i class="el-icon-view table-operation"></i>
+                  </div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
 
 
 
@@ -150,7 +150,14 @@
             </el-date-picker>
           </el-form-item>
           <el-form-item label="发票">
-            <el-input v-model="temp.invoice" placeholder="请输入报销发票" style="width:100%" />
+            <!-- <el-input v-model="temp.invoice" placeholder="请输入报销发票" style="width:100%" /> -->
+            <el-upload ref="upload" :before-upload="handleBeforeUpload" :before-remove="handleBeforeRemove"
+              :on-success="handleSuccess" :file-list="fileList" :auto-upload="true" :action="uploadUrl"
+              class="upload-demo" :headers="headers" multiple :limit="3" drag>
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+              <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+            </el-upload>
           </el-form-item>
           <el-form-item label="银行卡号">
             <el-input v-model="temp.card" placeholder="请输入银行卡号" style="width:100%" />
@@ -168,6 +175,12 @@
         </span>
 
       </el-dialog>
+
+      <el-image-viewer
+           v-if="showViewer"
+           :on-close="closeViewer"
+           :url-list="srcList" />
+      
       <el-dialog :title="temp.state | ViewTextFilter" :visible.sync="fundingViewVisible" :width="width">
         <el-row :gutter="10">
           <el-col :xs="24" :sm="12">
@@ -201,7 +214,8 @@
           </el-col>
           <el-col :xs="24" :sm="12">
             <div class="view-item">
-              <i class="el-icon-s-ticket" /> <span>发票: </span> {{ temp.invoice }}
+              <i class="el-icon-s-ticket" /> <span>发票: </span> <i class="el-icon-view table-operation" @click="onPreview"></i>
+             
             </div>
           </el-col>
         </el-row>
@@ -359,12 +373,33 @@
 
 </template>
 <script>
+  import ElImageViewer from 'element-ui/packages/image/src/image-viewer'
+  import {
+    qiNiuUrl
+  } from '@/settings'
+  import {
+    getToken
+  } from '@/utils/auth'
+  import {
+    validateFileExt
+  } from '@/utils/my-validate'
   import {
     date
   } from 'jszip/lib/defaults';
   export default {
+    components:{ ElImageViewer },
     data() {
       return {
+        showViewer: false,
+        url: '',
+        srcList: [],
+        files: [],
+        currentFiles: [],
+        fileList: [],
+        uploadUrl: qiNiuUrl,
+        headers: {
+          Authorization: `bearer ${getToken()}`
+        },
         otherId: '',
         taskTotal: 0,
         taskType: "thesis",
@@ -569,7 +604,62 @@
       }
     },
     methods: {
-
+      onPreview() {
+        if(!this.temp.invoice) {
+          this.$message({
+            message: '暂无数据',
+            type: 'warning'
+          })
+        }else{
+          this.showViewer = true;
+          this.fundingViewVisible = false;
+        }
+      },
+      closeViewer() {
+        this.showViewer = false;
+        this.fundingViewVisible = true;
+      },
+      handleBeforeUpload(file) {
+        if (file.size / 1024 > 5000) {
+          this.$message({
+            message: '上传文件大小不能超过5MB!',
+            type: 'error'
+          })
+          return false
+        } else {
+          const ext = file.name.replace(/.+\./, '')
+          if (!validateFileExt(ext)) {
+            this.$message({
+              type: 'error',
+              message: '禁止上传' + ext + '类型的附件'
+            })
+            return false
+          }
+        }
+      },
+      handleBeforeRemove(file, fileList) {
+        for (let i = 0; i < this.files.length; i++) {
+          if (this.files[i].uid === file.uid) {
+            this.$delete(`oss/content/${this.files[i].id}`).then(() => {
+              this.$message({
+                message: '删除成功',
+                type: 'success'
+              })
+            })
+            return true
+          }
+        }
+      },
+      handleSuccess(response, file, fileList) {
+        const uid = file.uid
+        const id = response.data.contentId
+        this.files.push({
+          uid,
+          id
+        })
+        this.currentFiles.push(id)
+        this.temp.invoice = this.currentFiles;
+      },
       initWidth() {
         this.screenWidth = document.body.clientWidth
         if (this.screenWidth < 991) {
@@ -681,7 +771,10 @@
       },
       handleIconClick(ev) {},
       handleUpdate(row) {
+        this.currentFiles = [];
+        this.fileList = [];
         this.temp = Object.assign({}, row)
+        console.log(this.temp)
         this.temp.applyTime = this.formatDate(new Date(this.temp.applyTime))
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
@@ -712,6 +805,7 @@
       },
       handleView(row) {
         this.temp = Object.assign({}, row);
+        if(this.temp.invoice){ this.initImageSrcList(this.temp.invoice.split(',')); }
         this.temp.date = new Date(this.temp.applyTime);
         this.fundingViewVisible = true;
       },
@@ -798,8 +892,9 @@
         this.resetTemp()
         if (row.id) {
           this.getStaskInFo(row.id)
-
         }
+        this.fileList = [];
+        this.currentFiles = [];
         this.dialogStatus = 'create'
         this.dialogFormVisible = true
         this.$nextTick(() => {
@@ -829,6 +924,20 @@
           }
         });
       },
+      updateAttr() {
+        // console.log("直接")
+        // console.log(this.temp)
+        this.$put('/studio/funding/', {
+          ...this.temp
+        }).then(() => {
+          this.$message({
+            message: '直接操作成功',
+            type: 'success'
+          })
+        })
+
+        this.handleSearchFunding();
+      },
       update(formName) {
         const funding = this.temp;
         //如果是申报失败，重新申报的，需要修改一下状态
@@ -848,6 +957,7 @@
                 type: 'success'
               })
             })
+            this.handleSearchFunding();
             this.dialogFormVisible = false;
           } else {
             return false;
@@ -878,6 +988,15 @@
       },
       initTableData() {
         this.handleSearchFunding();
+      },
+      initImageSrcList(arr) {
+        let i;
+        this.srcList = [];       
+        for(i=0; i<arr.length; i++){
+          this.$get(`/oss/content/download/${arr[i]}`).then((r) => {
+            this.srcList.push(r.data.data);
+          })
+        }
       },
       formatDate(date) {
         var d = new Date(date);
@@ -928,7 +1047,6 @@
 </script>
 <style lang="scss" scoped>
   .operator {
-    border:1px solid red;
     width: 100%;
     text-align: center;
   }
