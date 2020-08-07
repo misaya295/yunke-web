@@ -774,7 +774,6 @@
         this.currentFiles = [];
         this.fileList = [];
         this.temp = Object.assign({}, row)
-        console.log(this.temp)
         this.temp.applyTime = this.formatDate(new Date(this.temp.applyTime))
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
@@ -925,8 +924,6 @@
         });
       },
       updateAttr() {
-        // console.log("直接")
-        // console.log(this.temp)
         this.$put('/studio/funding/', {
           ...this.temp
         }).then(() => {
