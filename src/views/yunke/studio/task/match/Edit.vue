@@ -29,7 +29,7 @@
           <el-radio label='0'>国家级</el-radio>
           <el-radio label='1'>省级</el-radio>
           <el-radio label='2'>校级</el-radio>
-        </el-radio-group> 
+        </el-radio-group>
       </el-form-item>
       <!-- 申请书 -->
       <el-form-item label="申请书" prop="application_form">
@@ -100,11 +100,11 @@
 </template>
 <script>
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-//import { validMobile } from '@/utils/my-validate'
-import Treeselect from '@riophae/vue-treeselect'
+// import { validMobile } from '@/utils/my-validate'
+// import Treeselect from '@riophae/vue-treeselect'
 export default {
   name: 'MatchEdit',
-  components: { Treeselect },
+  // components: { Treeselect },
   props: {
     dialogVisible: {
       type: Boolean,
@@ -140,11 +140,9 @@ export default {
         title: [
           { required: true, message: this.$t('rules.require'), trigger: 'blur' },
           { min: 2, max: 20, message: '长度为2-20', trigger: 'blur' }],
-        
         state: { required: true, message: this.$t('rules.require'), trigger: 'blur' },
-        level: { required: true, message: this.$t('rules.require'), trigger: 'change' },
-        }
-      
+        level: { required: true, message: this.$t('rules.require'), trigger: 'change' }
+      }
     }
   },
   computed: {
@@ -171,13 +169,13 @@ export default {
       return {
         title: '',
         introduction: '',
-        type:'0',
-        level:'1',
-        application_form:'',
-        state:'1',
+        type: 0,
+        level: 1,
+        application_form: '',
+        state: 1,
         invoice: '',
-        reimbursement: '0',
-        time:'',
+        reimbursement: 0,
+        time: '',
         cost: 0.0,
         certificate: '',
         userId: '',
@@ -225,8 +223,8 @@ export default {
         if (valid) {
           this.buttonLoading = true
           console.log(this.tasks.matchId)
-          if(this.tasks.matchId){
-              this.$put('studio/match', { ...this.tasks }).then((r) => {
+          if (this.tasks.matchId) {
+            this.$put('studio/match', { ...this.tasks }).then((r) => {
               this.buttonLoading = false
               this.isVisible = false
               this.$message({
@@ -235,7 +233,7 @@ export default {
               })
               this.$emit('success')
             })
-          }else{
+          } else {
             this.tasks.userId = this.tasks.userId.join(',')
             this.tasks.m_state = this.tasks.m_state.join(',')
             this.$post('studio/match', { ...this.tasks }).then((r) => {
@@ -248,13 +246,11 @@ export default {
               })
               this.$emit('success')
             })
-          }         
+          }
           // if (!this.tasks.thesisId) {
-          //   // create
-         
+          // create
           // } else {
-          //   // update
-         
+          // update
           // }
         } else {
           return false

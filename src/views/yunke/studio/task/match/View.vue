@@ -120,6 +120,7 @@ export default {
   
   name: 'MatchView',
   props: {
+    taskId: Number,
     dialogVisible: {
       type: Boolean,
       default: false
@@ -129,17 +130,17 @@ export default {
     //比赛等级
     levelFilter(level) {
       const map = {
-        0: '',
-        1: '',
-        2: ''
+        0: '国家级',
+        1: '省级',
+        2: '校级'
       }
       return map[level]
     },
     //比赛类型
     typeFilter(type) {
       const map = {
-        0: '',
-        1: ''
+        0: '个人',
+        1: '团队'
       }
       return map[type]
     },
@@ -160,13 +161,13 @@ export default {
 
       // return u;
     },
-    userStateFilter(state){
+    userStateFilter(userState){
       const map = {
         1: '负责人',
         2: '成员',
         3: '指导老师',
       }
-      return map[state]
+      return map[userState]
     },
     //状态
     stateFilter(state){

@@ -2,7 +2,20 @@
   <div class="app-container">
    <div class="filter-container">
         <!-- 任务id -->
-        <el-input v-model="thesisId" placeholder="任务id" class="filter-item search-item" />
+        <!-- <el-input v-model="thesisId" placeholder="任务id" class="filter-item search-item" /> -->
+        <!-- 标题 -->
+        <el-input v-model="queryParams.title" placeholder="标题"  class="filter-item search-item"/>
+        <!-- 是否已报销 -->
+        <el-select  v-model="queryParams.reimbursement"  value="" placeholder="是否已报销">
+          <el-option
+            v-for="thesis in whether"
+            :key="thesis.id"
+            :label="thesis.name"
+            :value="thesis.id"
+          />
+        </el-select>
+        <!-- 真实姓名 -->
+        <el-input v-model="queryParams.fullName" placeholder="真实姓名"  class="filter-item search-item"/>
         <!-- 搜索 -->
         <el-button class="filter-item" type="primary" plain @click="search">
             {{ $t('table.search') }}
@@ -53,20 +66,21 @@
         </template>
       </el-table-column>
        <!-- 论文类型 -->
-      <el-table-column 
-            label="论文类型" 
+      <el-table-column
+            label="论文类型"
             :filters="[{text:'核心', value: '1'},{ text: '普通', value: '2' }]"
             :filter-method="filterPaperType"
             class-name="paperType-col"
-            align="center" min-width="90px"
+            align="center"
+            min-width="90px"
         >
             <template slot-scope="{row}">
                 <el-tag :type="row.paperType | paperTypeFilter">
-                    {{ row.paperType === '1' ? '核心' : '普通' }}
+                    {{ row.paperType === 1 ? '核心' : '普通' }}
                 </el-tag>
             </template>
         </el-table-column>
-      <!-- 创建时间  --> 
+      <!--创建时间-->
       <el-table-column label='创建时间' prop="time" :show-overflow-tooltip="true" align="center" min-width="150px">
           <template slot-scope="scope">
             <span>{{ scope.row.time }}</span>
@@ -85,7 +99,7 @@
           </template>
       </el-table-column>
       <!-- 状态  -->
-      <el-table-column 
+      <el-table-column
             label="状态"
             :filters="[{text: '进行中', value: '1'},{ text: '已完成', value: '2' }]"
             :filter-method="filterState"
@@ -94,10 +108,10 @@
         >
             <template slot-scope="{row}">
                 <el-tag :type="row.state | stateFilter">
-                    {{ row.state === '2' ? '已完成' : '进行中' }}
+                    {{ row.state === 2 ? '已完成' : '进行中' }}
                 </el-tag>
             </template>
-        </el-table-column>
+      </el-table-column>
        <!-- 发票  -->
       <el-table-column label="发票" prop="invoice" :show-overflow-tooltip="true" align="center" min-width="150px">
         <template slot-scope="scope">
@@ -105,8 +119,8 @@
         </template>
       </el-table-column>
       <!-- 是否已报销  -->
-      <el-table-column 
-            label="是否已报销" 
+      <el-table-column
+            label="是否已报销"
             :filters="[{text: '否', value: '0'},{ text: '是', value: '1' }]"
             :filter-method="filterReimbursement"
             class-name="reimbursement-col"
@@ -114,7 +128,7 @@
       >
             <template slot-scope="{row}">
                 <el-tag :type="row.reimbursement | reimbursementFilter">
-                    {{ row.reimbursement ==='1' ? '是' : '否' }}
+                    {{ row.reimbursement === 1 ? '是' : '否' }}
                 </el-tag>
             </template>
       </el-table-column>
@@ -152,170 +166,172 @@ import ThesisEdit from './Edit'
 import ThesisView from './View'
 export default {
   name: 'ThesisManage',
-  components: { Pagination,ThesisEdit,ThesisView },
+  components: { Pagination, ThesisEdit, ThesisView },
   filters: {
-        paperTypeFilter(paperType){
-          const map = {
-              1: '',
-              2: ''
-          }
-          return map[paperType]
-        },
-        stateFilter(state){
-          const map = {
-            1: 'warning',
-            2: 'success'
-          }
-          return map[state]
-        },
-        reimbursementFilter(reimbursement){
-          const map={
-            0:'warning',
-            1:'success'
-          }
-          return map[reimbursement]
-        }
-      },
-  data(){
-    return {
-        dialog: {
-              isVisible: false,
-              title: ''
-           },
-      
-        userViewVisible: false,
-          tableKey: 0,
-          loading: false,
-          list: [],
-          total: 0,
-          queryParams: {},
-          sort: {},
-          selection: [],
-          pagination: {
-            size: 10,
-            num: 1
-          },
-          thesisId:''
+    paperTypeFilter(paperType) {
+      const map = {
+        1: '',
+        2: ''
+      }
+      return map[paperType]
+    },
+    stateFilter(state) {
+      const map = {
+        1: 'warning',
+        2: 'success'
+      }
+      return map[state]
+    },
+    reimbursementFilter(reimbursement) {
+      const map = {
+        0: 'warning',
+        1: 'success'
+      }
+      return map[reimbursement]
     }
   },
-  computed:{
-        currentUser() {
-             return this.$store.state.account.user
-        }
-  },
-  mounted(){
-       this.fetch()
-  },
-  methods:{
-      //论文类型
-      filterPaperType(value, row){
-        return row.paperType === value
+  data() {
+    return {
+      dialog: {
+        isVisible: false,
+        title: ''
       },
-      //状态
-      filterState(value, row){
-            return row.state === value
+      userViewVisible: false,
+      tableKey: 0,
+      loading: false,
+      list: [],
+      total: 0,
+      queryParams: { reimbursement: '' },
+      selection: [],
+      pagination: {
+        size: 10,
+        num: 1
+      },
+      thesisId: '',
+      title: '',
+      whether: [
+        {
+          id: 0,
+          name: '否'
         },
-      //是否已报销
-      filterReimbursement(value, row){
-            return row.reimbursement === value
-        },
-      viewClose() {
-            this.userViewVisible = false
-        },
-      editClose() {
-            this.dialog.isVisible = false
-        },
-      editSuccess() {
-            this.search()
-        },
-      onSelectChange(selection) {
-            this.selection = selection
-        },
-      search() {
-            if(this.thesisId!==''){
-                this.getIdInfo(this.thesisId)
-                return ;
-            }
-            this.fetch({
-            ...this.queryParams,
-            ...this.sort 
-            })
-        },
-        //搜索
-        getIdInfo(id) {
-        this.$get(`studio/thesis/${id}`).then((r) => {
-         const data = r.data.data
-         data.thesisId = data.thesis_id
-         const arr = []
-         arr.push(data)
-         this.list =  arr    
+        {
+          id: 1,
+          name: '是'
+        }
+      ]
+    }
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.account.user
+    }
+  },
+  mounted() {
+    this.fetch()
+  },
+  methods: {
+    filterPaperType(value, row) {
+      return row.paperType === value
+    },
+    filterState(value, row) {
+      return row.state === value
+    },
+    filterReimbursement(value, row) {
+      return row.reimbursement === value
+    },
+    viewClose() {
+      this.userViewVisible = false
+    },
+    editClose() {
+      this.dialog.isVisible = false
+    },
+    editSuccess() {
+      this.search()
+    },
+    onSelectChange(selection) {
+      this.selection = selection
+    },
+    search() {
+      if (this.thesisId !== '') {
+        this.getIdInfo(this.thesisId)
+        return
+      }
+      this.fetch({
+        ...this.queryParams
+      })
+    },
+    getIdInfo(id) {
+      this.$get(`studio/thesis/${id}`).then((r) => {
+        const data = r.data.data
+        data.thesisId = data.thesis_id
+        const arr = []
+        arr.push(data)
+        this.list = arr
+      })
+    },
+    reset() {
+      this.queryParams = {}
+      this.sort = {}
+      this.$refs.table.clearSort()
+      this.$refs.table.clearFilter()
+      this.search()
+    },
+    exportExcel() {
+      this.$download('studio/task/thesis/excel', {
+        pageSize: this.pagination.size,
+        pageNum: this.pagination.num,
+        ...this.queryParams
+      }, `thesis_${new Date().getTime()}.xlsx`)
+    },
+    add() {
+      this.dialog.title = this.$t('common.add')
+      this.dialog.isVisible = true
+    },
+    singleDelete(row) {
+      this.$refs.table.toggleRowSelection(row, true)
+      this.batchDelete()
+    },
+    batchDelete() {
+      if (!this.selection.length) {
+        this.$message({
+          message: this.$t('tips.noDataSelected'),
+          type: 'warning'
         })
-        },
-      reset() {
-            this.queryParams = {}
-            this.sort = {}
-            this.$refs.table.clearSort()
-            this.$refs.table.clearFilter()
-            this.search()
-        },
-      exportExcel() {
-            this.$download('studio/task/thesis/excel', {
-                 pageSize: this.pagination.size,
-                 pageNum: this.pagination.num,
-                 ...this.queryParams
-            }, `thesis_${new Date().getTime()}.xlsx`)
-        },
-      add() {
-            this.dialog.title = this.$t('common.add')
-            this.dialog.isVisible = true
-        },
-      //操作--->删除
-      singleDelete(row) {
-            this.$refs.table.toggleRowSelection(row, true)
-            this.batchDelete()
-        },
-      //更多操作--->删除
-      batchDelete() {
-           if (!this.selection.length) {
-              this.$message({
-                message: this.$t('tips.noDataSelected'),
-                type: 'warning'
-              })
-              return
-            }
-            this.$confirm(this.$t('tips.confirmDelete'), this.$t('common.tips'), {
-                confirmButtonText: this.$t('common.confirm'),
-                cancelButtonText: this.$t('common.cancel'),
-                type: 'warning'
-            }).then(() => {
-                const thesisIds = []
-                this.selection.forEach((r) => {
-                    thesisIds.push(r.thesisId)
-                })
-                this.delete(thesisIds)
-            }).catch(() => {
-                this.clearSelections()
-            })
-        },
-      clearSelections() {
-            this.$refs.table.clearSelection()
-        },
-      delete(thesisIds) {
-            this.loading = true
-            this.$delete(`studio/thesis/${thesisIds}`).then(() => {
-                this.$message({
-                    message: this.$t('tips.deleteSuccess'),
-                    type: 'success'
-                })
-                this.search()
-            })
-        },
-      view(row) {
-            this.$refs.view.setThesis(row);
-            this.$refs.view.setUser(row)
-            this.userViewVisible = true
-        },
-      edit(row) {
+        return
+      }
+      this.$confirm(this.$t('tips.confirmDelete'), this.$t('common.tips'), {
+        confirmButtonText: this.$t('common.confirm'),
+        cancelButtonText: this.$t('common.cancel'),
+        type: 'warning'
+      }).then(() => {
+        const thesisIds = []
+        this.selection.forEach((r) => {
+          thesisIds.push(r.thesisId)
+        })
+        this.delete(thesisIds)
+      }).catch(() => {
+        this.clearSelections()
+      })
+    },
+    clearSelections() {
+      this.$refs.table.clearSelection()
+    },
+    delete(thesisIds) {
+      this.loading = true
+      this.$delete(`studio/thesis/${thesisIds}`).then(() => {
+        this.$message({
+          message: this.$t('tips.deleteSuccess'),
+          type: 'success'
+        })
+        this.search()
+      })
+    },
+    view(row) {
+      this.$refs.view.setThesis(row)
+      this.$refs.view.setUser(row)
+      this.userViewVisible = true
+    },
+    edit(row) {
       let roleId = []
       if (row.roleId && typeof row.roleId === 'string') {
         roleId = row.roleId.split(',')
@@ -323,17 +339,11 @@ export default {
       }
       // 这发送请求只是为了拿到部门，也是参数
       this.$get(`studio/thesis`).then((r) => {
-        //row.deptIds = r.data.data
         row.thesisIds = r.data.data
-        //this.$refs.edit.setUser(row)
         this.$refs.edit.setTasks(row)
         this.dialog.title = this.$t('common.edit')
         this.dialog.isVisible = true
       })
-      // 
-      //this.$refs.edit.setTasks(row)
-      //this.dialog.title = this.$t('common.edit')
-      //this.dialog.isVisible = true
     },
     fetch(params = {}) {
       params.pageSize = this.pagination.size
@@ -351,12 +361,12 @@ export default {
         this.list = data.rows
         this.loading = false
       })
-    },
-    sortChange(val) {
-         this.sort.field = val.prop
-         this.sort.order = val.order
-         this.search()
-     }
+    }
+    // sortChange(val) {
+    //      this.sort.field = val.prop
+    //      this.sort.order = val.order
+    //      this.search()
+    //  }
   }
 }
 </script>
