@@ -84,11 +84,11 @@
 </template>
 <script>
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import { validMobile } from '@/utils/my-validate'
-import Treeselect from '@riophae/vue-treeselect'
+// import { validMobile } from '@/utils/my-validate'
+// import Treeselect from '@riophae/vue-treeselect'
 export default {
   name: 'ThesisEdit',
-  components: { Treeselect },
+  // components: { Treeselect },
   props: {
     dialogVisible: {
       type: Boolean,
@@ -125,8 +125,7 @@ export default {
           { required: true, message: this.$t('rules.require'), trigger: 'blur' },
           { min: 2, max: 20, message: '长度为2-20', trigger: 'blur' }],
         state: { required: true, message: this.$t('rules.require'), trigger: 'blur' }
-        }
-      
+      }
     }
   },
   computed: {
@@ -154,13 +153,13 @@ export default {
         title: '',
         introduction: '',
         paper_type: 2,
-        url:'',
+        url: '',
         cost: 0.0,
-        state:'1',
+        state: 1,
         invoice: '',
-        reimbursement: '0',
+        reimbursement: 0,
         userId: '',
-        //time:'',
+        // time:'',
         m_state: []
       }
     },
@@ -205,8 +204,8 @@ export default {
         if (valid) {
           this.buttonLoading = true
           console.log(this.tasks.thesisId)
-          if(this.tasks.thesisId){
-              this.$put('studio/thesis', { ...this.tasks }).then((r) => {
+          if (this.tasks.thesisId) {
+            this.$put('studio/thesis', { ...this.tasks }).then((r) => {
               this.buttonLoading = false
               this.isVisible = false
               this.$message({
@@ -215,7 +214,7 @@ export default {
               })
               this.$emit('success')
             })
-          }else{
+          } else {
             this.tasks.userId = this.tasks.userId.join(',')
             this.tasks.m_state = this.tasks.m_state.join(',')
             this.$post('studio/thesis', { ...this.tasks }).then((r) => {
@@ -229,13 +228,10 @@ export default {
               this.$emit('success')
             })
           }
-          
           // if (!this.tasks.thesisId) {
-          //   // create
-         
+          // create
           // } else {
-          //   // update
-         
+          // update
           // }
         } else {
           return false

@@ -116,7 +116,7 @@ export default {
     }
   },
   filters: {
-    //论文类型
+    // 论文类型
     paper_typeFilter(paper_type) {
       const map = {
         1: '核心',
@@ -124,7 +124,7 @@ export default {
       }
       return map[paper_type]
     },
-    //状态
+    // 状态
     stateFilter(state){
         const map = {
             1: '进行中',
@@ -132,7 +132,7 @@ export default {
         }
          return map[state]
     },
-    //是否已报销
+    // 是否已报销
     reimbursementFilter(reimbursement){
       const map={
         0:'未报销',
@@ -152,9 +152,10 @@ export default {
   data() {
     return {
       user: {},
+      users: {},
       screenWidth: 0,
       width: this.initWidth(),
-      match: {}
+      thesis: {}
     }
   },
   computed: {
@@ -182,7 +183,7 @@ export default {
     }
   },
   methods: {
-    //获取成员
+    // 获取成员
     getName(i){
         let nameArr = new Array();
         this.$get(`studio/members/${i}`).then((r) => {
