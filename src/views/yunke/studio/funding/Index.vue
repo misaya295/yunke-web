@@ -64,49 +64,56 @@
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item><span class="table-operation" @click="handleBill">查看经费</span></el-dropdown-item>
           <el-dropdown-item><span class="table-operation" @click="handleImport">导入报销</span></el-dropdown-item>
+          <el-dropdown-item v-has-permission="['task:delete']" @click.native="batchDelete">{{ $t('table.delete') }}
+          </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
 
       <!-- 查询结果 -->
-      <el-table :data="fundingTableData" tooltip-effect="dark" style="width:100%" border>
+      <el-table ref="table" :data="fundingTableData" style="width:100%" border fit @selection-change="onSelectChange">
 
-        <el-table-column label="报销名称" align="center">
+        <el-table-column type="selection" align="center" width="40px" />
+        <el-table-column label="报销名称" align="center" min-width="130px" :show-overflow-tooltip="true">
           <template slot-scope="scope">
-            <span style="margin-left: 10px">{{ scope.row.name }}</span>
+            <span>{{ scope.row.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="申报状态" align="center"
+        <el-table-column label="申报状态"
           :filters="[{ text: '申请中', value: '1' }, { text: '报销中', value: '2' },{ text: '报销成功', value: '3' },{ text: '申请失败', value: '4' }]"
-          :filter-method="filterBXStatus" filter-placement="bottom-end">
-
+          :filter-method="filterBXStatus" align="center" min-width="100px">
           <template slot-scope="scope">
-            <el-tag :type="scope.row.state | BXStatusFilter" style="margin-left: 10px">
+            <el-tag :type="scope.row.state | BXStatusFilter">
               {{ scope.row.state | StateTextFilter }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="申请时间" align="center">
+        <el-table-column label="申请时间" align="center" min-width="150px" :show-overflow-tooltip="true">
           <template slot-scope="scope">
-            <span style="margin-left: 10px">{{ scope.row.applyTime }}</span>
+            <span>{{ scope.row.applyTime }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="报销金额" align="center">
+        <el-table-column label="报销金额" align="center" min-width="100px" :show-overflow-tooltip="true">
           <template slot-scope="scope">
-            <span style="margin-left: 10px">{{ scope.row.cost }}</span>
+            <span>{{ scope.row.cost }}</span>
           </template>
         </el-table-column>
         <el-table-column label="申请人姓名" align="center">
           <template slot-scope="scope">
-            <span style="margin-left: 10px">{{ scope.row.proposerName }}</span>
+            <span>{{ scope.row.proposerName }}</span>
           </template>
         </el-table-column>
-        
-        <el-table-column :label="$t('table.operation')" align="center" min-width="70px" class-name="small-padding fixed-width">
+
+        <el-table-column :label="$t('table.operation')" align="center" min-width="105px"
+          class-name="small-padding fixed-width">
           <template slot-scope="scope">
-                  <i v-hasPermission="['task:view']" class="el-icon-view table-operation" style="color: #87d068;" @click="handleView(scope.row)" />
-                  <i v-hasPermission="['task:update']" v-if="handleJudgeUpdate(scope.row)" class="el-icon-setting table-operation" style="color: #2db7f5;" @click="handleUpdate(scope.row)" />
-                  <i v-hasPermission="['task:delete']" v-if="handleJudgeDelete(scope.row)" class="el-icon-delete table-operation" style="color: #f50;" @click="handleDelete(scope.$index, scope.row)" />
+            <i v-hasPermission="['task:view']" class="el-icon-view table-operation" style="color: #87d068;"
+              @click="handleView(scope.row)" />
+            <i v-hasPermission="['task:update']" v-if="handleJudgeUpdate(scope.row)"
+              class="el-icon-setting table-operation" style="color: #2db7f5;" @click="handleUpdate(scope.row)" />
+            <i v-hasPermission="['task:delete']" v-if="handleJudgeDelete(scope.row)"
+              class="el-icon-delete table-operation" style="color: #f50;"
+              @click="handleDelete(scope.$index, scope.row)" />
           </template>
         </el-table-column>
       </el-table>
@@ -160,11 +167,8 @@
 
       </el-dialog>
 
-      <el-image-viewer
-           v-if="showViewer"
-           :on-close="closeViewer"
-           :url-list="srcList" />
-      
+      <el-image-viewer v-if="showViewer" :on-close="closeViewer" :url-list="srcList" />
+
       <el-dialog :title="temp.state | ViewTextFilter" :visible.sync="fundingViewVisible" :width="width">
         <el-row :gutter="10">
           <el-col :xs="24" :sm="12">
@@ -198,8 +202,9 @@
           </el-col>
           <el-col :xs="24" :sm="12">
             <div class="view-item">
-              <i class="el-icon-s-ticket" /> <span>发票: </span> <i class="el-icon-view table-operation" @click="onPreview"></i>
-             
+              <i class="el-icon-s-ticket" /> <span>发票: </span> <i class="el-icon-view table-operation"
+                @click="onPreview"></i>
+
             </div>
           </el-col>
         </el-row>
@@ -309,7 +314,7 @@
                 </el-select>
               </div>
             </el-col>
-            <el-col :xs="24" :sm="8"> 
+            <el-col :xs="24" :sm="8">
               <div class="view-item">
                 <el-button class="filter-item" type="primary" plain icon="el-icon-search" @click="handleTaskSearch">
                   搜索
@@ -372,9 +377,14 @@
     date
   } from 'jszip/lib/defaults';
   export default {
-    components:{ ElImageViewer, Pagination},
+    components: {
+      ElImageViewer,
+      Pagination
+    },
     data() {
       return {
+
+        selection: [],
         showViewer: false,
         url: '',
         srcList: [],
@@ -590,19 +600,23 @@
     },
     methods: {
       onPreview() {
-        if(!this.temp.invoice) {
+        if (!this.temp.invoice) {
           this.$message({
             message: '暂无数据',
             type: 'warning'
           })
-        }else{
+        } else {
           this.showViewer = true;
           this.fundingViewVisible = false;
         }
       },
+
       closeViewer() {
         this.showViewer = false;
         this.fundingViewVisible = true;
+      },
+      onSelectChange(selection) {
+        this.selection = selection
       },
       handleBeforeUpload(file) {
         if (file.size / 1024 > 5000) {
@@ -767,29 +781,54 @@
         })
       },
       handleDelete(index, row) {
-        this.$confirm('此操作将删除该项申报, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-          center: true
+        this.$refs.table.toggleRowSelection(row, true)
+        this.batchDelete()
+      },
+      batchDelete() {
+        if (!this.selection.length) {
+          this.$message({
+            message: this.$t('tips.noDataSelected'),
+            type: 'warning'
+          })
+          return
+        }
+        this.$confirm(this.$t('tips.confirmDelete'), this.$t('common.tips'), {
+          confirmButtonText: this.$t('common.confirm'),
+          cancelButtonText: this.$t('common.cancel'),
+          type: 'warning'
         }).then(() => {
-          this.$delete(`studio/funding/${row.id}`).then(() => {
+          const fundingIds = []
+          this.selection.forEach((r) => {
+            if (r.state == 4) fundingIds.push(r.id)
+          })
+          this.delete(fundingIds.join(","))
+        }).catch(() => {
+          this.clearSelections()
+        })
+      },
+      delete(fundingIds) {
+        this.loading = true
+        if (fundingIds == "") {
+          this.$message({
+            message: "未选择状态为'报销失败'的申报",
+            type: 'error'
+          })
+        } else {
+          this.$delete(`studio/funding/${fundingIds}`).then(() => {
             this.$message({
-              type: 'success',
-              message: '删除成功!'
-            });
+              message: this.$t('tips.deleteSuccess'),
+              type: 'success'
+            })
             this.handleSearchFunding();
           })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
+        }
+
       },
       handleView(row) {
         this.temp = Object.assign({}, row);
-        if(this.temp.invoice){ this.initImageSrcList(this.temp.invoice.split(',')); }
+        if (this.temp.invoice) {
+          this.initImageSrcList(this.temp.invoice.split(','));
+        }
         this.temp.date = new Date(this.temp.applyTime);
         this.fundingViewVisible = true;
       },
@@ -825,16 +864,18 @@
           //修改内容
           this.$put('/studio/funding/', {
             ...row
-          }).then(() => {this.handleSearchFunding();})
-          
+          }).then(() => {
+            this.handleSearchFunding();
+          })
+
         }).catch(() => {
           this.$message({
             type: 'info',
             message: '已取消'
           });
         });
-        
-        
+
+
         this.fundingViewVisible = false;
       },
       handleSizeChange(val) {
@@ -976,8 +1017,8 @@
       },
       initImageSrcList(arr) {
         let i;
-        this.srcList = [];       
-        for(i=0; i<arr.length; i++){
+        this.srcList = [];
+        for (i = 0; i < arr.length; i++) {
           this.$get(`/oss/content/download/${arr[i]}`).then((r) => {
             this.srcList.push(r.data.data);
           })
