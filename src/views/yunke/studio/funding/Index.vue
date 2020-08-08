@@ -121,7 +121,7 @@
 
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" background
           :current-page="page.param.pageNum" :page-sizes="[5, 10, 20, 30, 50]"
-          layout="total, sizes, prev, pager, next, jumper" :total="page.total">
+          layout="total, sizes, prev, pager, next, jumper" :total="page.total" :hide-on-single-page="fundingHidePage">
         </el-pagination>
 
       </div>
@@ -348,7 +348,8 @@
           <div style="margin-top: 30px;">
 
             <el-pagination @current-change="handleCurrentChange2" :current-page="task.pageNum" background
-              :page-size="task.pageSize" layout="total, prev, pager, next, jumper" :total="taskTotal">
+              :page-size="task.pageSize" layout="total, prev, pager, next, jumper" :total="taskTotal"
+              :hide-on-single-page="teskHidepage">
             </el-pagination>
 
           </div>
@@ -383,7 +384,8 @@
     },
     data() {
       return {
-
+        fundingHidePage: false,
+        teskHidepage: false,
         selection: [],
         showViewer: false,
         url: '',
@@ -693,6 +695,8 @@
         }).then((r) => {
           this.fundingTableData = r.data.data.rows;
           this.page.total = r.data.data.total;
+
+          this.fundingHidePage = this.page.total == 0 ? true : false;
         })
       },
 
@@ -712,7 +716,7 @@
         };
       },
       handleSearchFunding2() {
-        if (!this.judgeFundingNull(JSON.stringify(this.funding))) {
+        if (!this.judgeFundingNull(JSON.stringify(this.funding))) { //判断funding是null,则搜索所有内容并从第一页开始
           this.page.param.pageNum = 1;
         }
         this.handleSearchFunding();
@@ -720,6 +724,7 @@
       handleTaskSearch() {
         this.task.pageNum = 1;
         this.importFunding();
+
       },
       handleSearchFunding() {
         this.loadTable();
@@ -997,6 +1002,7 @@
         }).then((r) => {
           this.taskTotal = r.data.data.total;
           this.taskTableData = this.dealId(r.data.data.rows);
+          this.teskHidepage = this.taskTotal == 0 ? true : false;
         })
       },
       submitForm(formName) {
