@@ -46,10 +46,10 @@
           <div class="name">{{ item.fullName }} <span class="id">{{ item.userId }}</span></div>
         </template>
       </el-autocomplete>
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleSearchFunding2">
+      <el-button class="filter-item" type="primary" plain icon="el-icon-search" @click="handleSearchFunding2">
         搜索
       </el-button>
-      <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="handleCreate">
+      <el-button class="filter-item" type="warning" plain icon="el-icon-plus" @click="handleCreate">
         添加
       </el-button>
 
@@ -58,7 +58,7 @@
       </el-button> -->
 
       <el-dropdown class="filter-item">
-        <el-button type="primary">
+        <el-button>
           更多操作<i class="el-icon-arrow-down el-icon--right"></i>
         </el-button>
         <el-dropdown-menu slot="dropdown">
@@ -96,39 +96,23 @@
             <span style="margin-left: 10px">{{ scope.row.cost }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="50px" class-name="small-padding fixed-width">
+        <el-table-column label="申请人姓名" align="center">
           <template slot-scope="scope">
-            <el-dropdown>
-              <span>
-                <i class="el-icon-s-operation table-operation" style="color: 	#96CDCD;"></i>
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-if="handleJudgeUpdate(scope.row)" style="padding:0; width:40px">
-                  <div class="operator" style="color: #87d068;" @click="handleUpdate(scope.row)">
-                    <i class="el-icon-edit table-operation"></i>
-                  </div>
-                </el-dropdown-item>
-                <el-dropdown-item v-if="handleJudgeDelete(scope.row)" style="padding:0; width:40px">
-                  <div class="operator" style="color: #f50;" @click="handleDelete(scope.$index, scope.row)">
-                    <i class="el-icon-delete table-operation"></i>
-                  </div>
-                </el-dropdown-item>
-                <el-dropdown-item style="padding:0; width:40px">
-                  <div class="operator" style="color: #2db7f5;" @click="handleView(scope.row)">
-                    <i class="el-icon-view table-operation"></i>
-                  </div>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-
-
-
+            <span style="margin-left: 10px">{{ scope.row.proposerName }}</span>
+          </template>
+        </el-table-column>
+        
+        <el-table-column :label="$t('table.operation')" align="center" min-width="70px" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+                  <i v-hasPermission="['task:view']" class="el-icon-view table-operation" style="color: #87d068;" @click="handleView(scope.row)" />
+                  <i v-hasPermission="['task:update']" v-if="handleJudgeUpdate(scope.row)" class="el-icon-setting table-operation" style="color: #2db7f5;" @click="handleUpdate(scope.row)" />
+                  <i v-hasPermission="['task:delete']" v-if="handleJudgeDelete(scope.row)" class="el-icon-delete table-operation" style="color: #f50;" @click="handleDelete(scope.$index, scope.row)" />
           </template>
         </el-table-column>
       </el-table>
-      <div style="text-align: center;margin-top: 30px;">
+      <div style="margin-top: 30px;">
 
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" background
           :current-page="page.param.pageNum" :page-sizes="[5, 10, 20, 30, 50]"
           layout="total, sizes, prev, pager, next, jumper" :total="page.total">
         </el-pagination>
@@ -171,7 +155,7 @@
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submitForm('dataForm')">确 定</el-button>
+          <el-button type="primary" plain @click="submitForm('dataForm')">确 定</el-button>
         </span>
 
       </el-dialog>
@@ -282,10 +266,10 @@
 
         <div slot="footer" class="dialog-footer" v-if="handleJudgePass(temp)">
           <el-button @click="handleChangeState('fail')">驳回</el-button>
-          <el-button type="primary" @click="handleChangeState('pass')">通过</el-button>
+          <el-button type="primary" plain @click="handleChangeState('pass')">通过</el-button>
         </div>
         <div slot="footer" class="dialog-footer" v-if="handleJudgeSuccess(temp)">
-          <el-button type="success" @click="handleChangeState('success')">成功报销</el-button>
+          <el-button type="success" plain @click="handleChangeState('success')">成功报销</el-button>
         </div>
       </el-dialog>
 
@@ -325,9 +309,9 @@
                 </el-select>
               </div>
             </el-col>
-            <el-col :xs="24" :sm="8">
+            <el-col :xs="24" :sm="8"> 
               <div class="view-item">
-                <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleTaskSearch">
+                <el-button class="filter-item" type="primary" plain icon="el-icon-search" @click="handleTaskSearch">
                   搜索
                 </el-button>
               </div>
@@ -356,9 +340,9 @@
               </template>
             </el-table-column>
           </el-table>
-          <div style="text-align: center;margin-top: 30px;">
+          <div style="margin-top: 30px;">
 
-            <el-pagination @current-change="handleCurrentChange2" :current-page="task.pageNum"
+            <el-pagination @current-change="handleCurrentChange2" :current-page="task.pageNum" background
               :page-size="task.pageSize" layout="total, prev, pager, next, jumper" :total="taskTotal">
             </el-pagination>
 
@@ -374,6 +358,7 @@
 </template>
 <script>
   import ElImageViewer from 'element-ui/packages/image/src/image-viewer'
+  import Pagination from '@/components/Pagination'
   import {
     qiNiuUrl
   } from '@/settings'
@@ -387,7 +372,7 @@
     date
   } from 'jszip/lib/defaults';
   export default {
-    components:{ ElImageViewer },
+    components:{ ElImageViewer, Pagination},
     data() {
       return {
         showViewer: false,
@@ -681,7 +666,7 @@
       loadTable() {
         var param = Object.assign({}, this.page.param);
         let funding = Object.assign({}, this.funding);
-        funding = this.judgeFundingNull(JSON.stringify(funding)) ? null : funding;
+        funding = this.judgeFundingNull(JSON.stringify(funding)) ? null : funding; //后端是根据funding是不是null，判断是不是拿所有数据
         if (funding && (funding.applyTime != "" && funding.applyTime != null)) {
           funding.applyTime = funding.applyTime[0] + "," + funding.applyTime[1];
         }
@@ -827,6 +812,7 @@
         }).then(() => {
           row.state = this.stateMap[s];
           row.verifierId = this.currentUser.roleId;
+          //修改状态
           this.$put('/studio/funding/state', {
             ...row
           }).then(() => {
@@ -834,18 +820,21 @@
               type: 'success',
               message: '操作成功!'
             });
+            this.handleSearchFunding();
           })
+          //修改内容
           this.$put('/studio/funding/', {
             ...row
-          }).then(() => {})
-          this.handleSearchFunding()
-
+          }).then(() => {this.handleSearchFunding();})
+          
         }).catch(() => {
           this.$message({
             type: 'info',
             message: '已取消'
           });
         });
+        
+        
         this.fundingViewVisible = false;
       },
       handleSizeChange(val) {
@@ -932,7 +921,6 @@
             type: 'success'
           })
         })
-
         this.handleSearchFunding();
       },
       update(formName) {
