@@ -126,8 +126,8 @@
 
       </div>
       <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :width="width"
-        :close-on-click-modal="false" :close-on-press-escape="false" :before-close="handleClose">
-        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px">
+        :close-on-click-modal="true" :close-on-press-escape="false">
+        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px"  top="3vh">
           <el-form-item label="名称" prop="name">
             <el-input v-model="temp.name" placeholder="请输入报销名称" style="width:100%" />
           </el-form-item>
@@ -141,7 +141,6 @@
             </el-date-picker>
           </el-form-item>
           <el-form-item label="发票">
-            <!-- <el-input v-model="temp.invoice" placeholder="请输入报销发票" style="width:100%" /> -->
             <el-upload ref="upload" :before-upload="handleBeforeUpload" :before-remove="handleBeforeRemove"
               :on-success="handleSuccess" :file-list="fileList" :auto-upload="true" :action="uploadUrl"
               class="upload-demo" :headers="headers" multiple :limit="3" drag>
@@ -306,19 +305,10 @@
               <div class="filter-container">
                 <el-input v-model="task.title" placeholder="请输入标题" style="width:200px" class="filter-item">
                 </el-input>
-
-                <el-select v-model="taskType" placeholder="类型" style="width: 110px" class="filter-item"
-                  :command="handleTaskSearch">
+                <el-select v-model="taskType" placeholder="类型" style="width: 110px" class="filter-item">
                   <el-option v-for="item in taskTypeTable" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
-              </div>
-            </el-col>
-            <el-col :xs="24" :sm="8">
-              <div class="view-item">
-                <el-button class="filter-item" type="primary" plain icon="el-icon-search" @click="handleTaskSearch">
-                  搜索
-                </el-button>
               </div>
             </el-col>
           </el-row>
@@ -381,6 +371,12 @@
     components: {
       ElImageViewer,
       Pagination
+    },
+    watch: {
+      'taskType': 'handleTaskSearch',
+      'task.title': {
+        handler: 'handleTaskSearch',
+      }
     },
     data() {
       return {
@@ -894,13 +890,6 @@
       handleCurrentChange2(val) {
         this.task.pageNum = val;
         this.importFunding();
-      },
-      handleClose(done) {
-        this.$confirm('确认关闭？')
-          .then(_ => {
-            done();
-          })
-          .catch(_ => {});
       },
       resetTemp() {
         this.temp = {
