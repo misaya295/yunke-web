@@ -3,8 +3,8 @@
     <div class="filter-container">
       <!-- 输入框 -->
       <el-input
-        v-model="queryParams.assetsName"
-        placeholder="学校资产ID"
+        v-model="queryParams.propertyName"
+        placeholder="学校资产名称"
         class="filter-item search-item"
       />
       <el-input
@@ -13,8 +13,8 @@
         class="filter-item search-item"
       />
       <el-input
-        v-model="queryParams.repairProverUserInfoUuid"
-        placeholder="维修证明人ID"
+        v-model="queryParams.repairProverUserInfoName"
+        placeholder="维修证明人名称"
         class="filter-item search-item"
       />
       <el-button
@@ -26,11 +26,18 @@
       >搜索</el-button>
       <el-button type="warning" class="filter-item" plain @click="resetrepair">重置</el-button>
       <!-- table内容 -->
-      <el-table ref="tableref" :data="repairList" border fit style="width: 100%;">
+      <el-table
+        ref="tableref"
+        :data="repairList"
+        border
+        fit
+        style="width: 100%;"
+        @row-click="toogleExpand"
+      >
         <el-table-column type="selection" align="center" width="40px" />
         <el-table-column
-          label="学校资产ID"
-          prop="assetsName"
+          label="学校资产名称"
+          prop="propertyName"
           :show-overflow-tooltip="true"
           align="center"
           min-width="80px"
@@ -50,8 +57,8 @@
           min-width="120px"
         />
         <el-table-column
-          label="维修证明人ID"
-          prop="repairProverUserInfoUuid"
+          label="维修证明人名称"
+          prop="repairProverUserInfoName"
           :show-overflow-tooltip="true"
           align="center"
           min-width="120px"
@@ -74,7 +81,7 @@
               <i
                 class="el-icon-check table-operation"
                 style="color: #87d068;"
-                @click="changeReimbursement(slope.row)"
+                @click.stop="changeReimbursement(slope.row)"
               />
             </el-tooltip>
             <el-tooltip
@@ -88,21 +95,7 @@
               <i
                 class="el-icon-setting table-operation"
                 style="color: #2db7f5;"
-                @click="showEditDialog(slope.row)"
-              />
-            </el-tooltip>
-            <el-tooltip
-              v-hasPermission="['repair:get']"
-              class="item"
-              effect="dark"
-              content="查看详细信息"
-              placement="top"
-              :enterable="false"
-            >
-              <i
-                class="el-icon-info table-operation"
-                style="color: #909399;"
-                @click="toogleExpand(slope.row)"
+                @click.stop="showEditDialog(slope.row)"
               />
             </el-tooltip>
             <el-link
@@ -112,21 +105,21 @@
           </template>
         </el-table-column>
         <el-table-column type="expand" width="1">
-          <template slot-scope="props">
+          <template slot-scope="props" class="tableExpand">
             <el-form label-position="left" class="table-expand">
-              <el-form-item label="维修信息ID:">
-                <span>{{ props.row.id }}</span>
-              </el-form-item>
-              <el-form-item label="发票:">
-                <ul class="invoiceUl">
-                  <li
-                    v-for="(item, i) in (props.row.repairInvoice || '').split(',')"
-                    :key="i"
-                    class="invoiceLi"
-                    @click="showpreViewDialog(item)"
-                  >{{ item }}</li>
-                </ul>
-              </el-form-item>
+              <el-row>
+                <el-form-item label="发票:">
+                  <template v-if="props.row.repairInvoice !== null">
+                    <el-image
+                      v-for="(item, i) in props.row.repairInvoice.split(',')"
+                      :key="i"
+                      class="showImage"
+                      :src="item"
+                      @click="showpreViewDialog(item)"
+                    />
+                  </template>
+                </el-form-item>
+              </el-row>
             </el-form>
           </template>
         </el-table-column>
@@ -146,6 +139,7 @@
         title="修改维修信息"
         :visible.sync="editDialogVisible"
         width="50%"
+        top="3vh"
         @close="closeEditDialog"
       >
         <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="100px">
@@ -182,9 +176,9 @@
               :limit="3"
               :on-preview="handlePreview"
               list-type="picture-card"
-              :disabled="fileUrlList.length===3?true:false"
+              :disabled="editListLength===3?true:false"
             >
-              <i v-if="fileUrlList.length<3" class="el-icon-plus" />
+              <i v-if="editListLength<3" class="el-icon-plus" />
               <i v-else class="el-icon-close" />
               <div
                 slot="tip"
@@ -245,7 +239,7 @@ export default {
       // 绑定修改对话框中的表单数据
       editForm: {
         assetsName: '',
-        repairPrice: '',
+        repairPrice: 0,
         repairDate: '',
         repairInvoice: '',
         repairProverUserInfoUuid: '',
@@ -256,7 +250,7 @@ export default {
         repairPrice: [
           {
             validator(rule, value, callback) {
-              if (value === '') {
+              if (value === '' || value === null) {
                 callback()
               }
               if (Number.isInteger(Number(value)) && Number(value) > 0) {
@@ -283,7 +277,8 @@ export default {
       files: [],
       // 保存图片地址
       fileUrlList: [],
-      editFileList: []
+      editFileList: [],
+      editListLength: 0
     }
   },
   computed: {
@@ -408,8 +403,6 @@ export default {
       } else {
         this.fileUrlList = this.editForm.repairInvoice.split(',')
       }
-      console.log(this.fileUrlList)
-      console.log(typeof this.fileUrlList)
       if (this.fileUrlList !== null) {
         for (var i = 0; i < this.fileUrlList.length; i++) {
           var fileurl = this.fileUrlList[i]
@@ -421,6 +414,7 @@ export default {
           }
         }
       }
+      this.editListLength = this.fileUrlList.length
       this.editDialogVisible = true
     },
     // 提交修改对话框
@@ -446,12 +440,15 @@ export default {
       this.$refs.editFormRef.resetFields()
       this.fileUrlList = []
       this.editFileList = []
+      this.editListLength = 0
     },
     // 修改用户的发票上传成功后
     editHandleSuccess(response, file, fileList) {
       const uid = file.uid
       const id = response.data.contentId
       this.files.push({ uid, id })
+      this.editListLength++
+      console.log(this.editListLength)
       if (
         this.editForm.repairInvoice === '' ||
         this.editForm.repairInvoice === null
@@ -516,7 +513,7 @@ export default {
       this.previewVisible = false
     },
     // 手风琴效果
-    toogleExpand(row) {
+    toogleExpand(row, event, column) {
       const $table = this.$refs.tableref
       this.repairList.map((item) => {
         if (row.id !== item.id) {
@@ -547,6 +544,13 @@ export default {
   margin: 0;
 }
 .invoiceUl .invoiceLi {
+  cursor: pointer;
+}
+.showImage {
+  width: 100px;
+  height: 100px;
+  border: 1px solid black;
+  margin-right: 30px;
   cursor: pointer;
 }
 </style>

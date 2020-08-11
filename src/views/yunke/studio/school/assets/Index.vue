@@ -152,20 +152,6 @@
           <el-form-item label="资产价格" prop="price" type="number">
             <el-input v-model="addForm.price" />
           </el-form-item>
-          <el-form-item label="报废日期" prop="scrapDate">
-            <el-date-picker
-              v-model="addForm.scrapDate"
-              type="date"
-              placeholder="选择日期"
-              align="right"
-              format="yyyy-MM-dd"
-              value-format="yyyy-MM-dd"
-              style="width: 100%"
-            />
-          </el-form-item>
-          <el-form-item label="报废信息" prop="scrapDetail">
-            <el-input v-model="addForm.scrapDetail" />
-          </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="addDialogVisible = false">取 消</el-button>
@@ -193,11 +179,11 @@
           <el-form-item label="报废日期" prop="scrapDate">
             <el-date-picker
               v-model="editForm.scrapDate"
-              type="datetime"
+              type="date"
               placeholder="选择日期时间"
               align="right"
-              format="yyyy-MM-dd HH:mm:ss"
-              value-format="yyyy-MM-dd HH:mm:ss"
+              format="yyyy-MM-dd"
+              value-format="yyyy-MM-dd"
               style="width: 100%"
             />
           </el-form-item>
@@ -241,9 +227,7 @@ export default {
         assetsName: '',
         assetsNum: '',
         price: 0,
-        inclusionDate: '',
-        scrapDate: '',
-        scrapDetail: ''
+        inclusionDate: ''
       },
       // 添加对话框的验证规则
       addFormRules: {
@@ -273,13 +257,13 @@ export default {
       editDialogVisible: false,
       // 绑定修改对话框中的表单数据
       editForm: {
-        // id: 0,
-        // assetsName: "",
-        // assetsNum: "",
-        // price: "",
-        // inclusionDate: "",
-        // scrapDate: "",
-        // scrapDetail: "",
+        id: 0,
+        assetsName: '',
+        assetsNum: '',
+        price: '',
+        inclusionDate: '',
+        scrapDate: '',
+        scrapDetail: ''
       },
       // 修改对话框的验证规则
       editFormRules: {

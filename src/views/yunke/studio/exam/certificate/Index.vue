@@ -27,7 +27,14 @@
         @click="showAddDialog"
       >添加</el-button>
       <!-- table内容 -->
-      <el-table ref="tableref" :data="certificateList" border fit style="width: 100%;">
+      <el-table
+        ref="tableref"
+        :data="certificateList"
+        border
+        fit
+        style="width: 100%;"
+        @row-click="toogleExpand"
+      >
         <el-table-column type="selection" align="center" width="40px" />
         <el-table-column
           label="姓名"
@@ -122,7 +129,7 @@
               <i
                 class="el-icon-coin table-operation"
                 style="color: #87d068;"
-                @click="changeReimbursement(slope.row)"
+                @click.stop="changeReimbursement(slope.row)"
               />
             </el-tooltip>
             <el-tooltip
@@ -136,7 +143,7 @@
               <i
                 class="el-icon-setting table-operation"
                 style="color: #2db7f5;"
-                @click="showEditDialog(slope.row)"
+                @click.stop="showEditDialog(slope.row)"
               />
             </el-tooltip>
             <el-tooltip
@@ -150,21 +157,7 @@
               <i
                 class="el-icon-delete table-operation"
                 style="color: #F56C6C;"
-                @click="showDeleteDialog(slope.row)"
-              />
-            </el-tooltip>
-            <el-tooltip
-              v-hasPermission="['certificate:get']"
-              class="item"
-              effect="dark"
-              content="查看详情"
-              placement="top"
-              :enterable="false"
-            >
-              <i
-                class="el-icon-info table-operation"
-                style="color: #909399;"
-                @click="toogleExpand(slope.row)"
+                @click.stop="showDeleteDialog(slope.row)"
               />
             </el-tooltip>
             <el-link
@@ -174,24 +167,36 @@
           </template>
         </el-table-column>
         <el-table-column type="expand" width="1px">
-          <template slot-scope="props">
-            <el-form label-position="left" class="table-expand">
-              <el-form-item label="考证ID:">
-                <span>{{ props.row.id }}</span>
-              </el-form-item>
-              <el-form-item label="发票:">
-                <ul class="invoiceUl">
-                  <li
-                    v-for="(item, i) in props.row.invoice.split(',')"
-                    :key="i"
-                    class="invoiceLi"
-                    @click="showpreViewDialog(item)"
-                  >{{ item }}</li>
-                </ul>
-              </el-form-item>
-              <el-form-item label="证书:">
-                <span>{{ props.row.certificate }}</span>
-              </el-form-item>
+          <template slot-scope="props" class="tableExpand">
+            <el-form label-position="left" class="table-expand" inline>
+              <el-row>
+                <el-col :span="12">
+                  <el-form-item label="发票:">
+                    <template v-if="props.row.invoice.length>0">
+                      <el-image
+                        v-for="(item, i) in props.row.invoice.split(',')"
+                        :key="i"
+                        class="showImage"
+                        :src="item"
+                        @click="showpreViewDialog(item)"
+                      />
+                    </template>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="证书:">
+                    <template v-if="props.row.certificate.length>0">
+                      <el-image
+                        v-for="(item, i) in props.row.certificate.split(',')"
+                        :key="i"
+                        class="showImage"
+                        :src="item"
+                        @click="showpreViewDialog(item)"
+                      />
+                    </template>
+                  </el-form-item>
+                </el-col>
+              </el-row>
             </el-form>
           </template>
         </el-table-column>
@@ -206,8 +211,14 @@
         @pagination="search"
       />
 
-      <!-- 添加考证抽屉 -->
-      <el-drawer title="添加考证" :visible.sync="drawerVisible" size="50%" @close="closeAddDialog">
+      <!-- 添加考证表单 -->
+      <el-dialog
+        title="添加考证"
+        :visible.sync="drawerVisible"
+        size="50%"
+        top="3vh"
+        @close="closeAddDialog"
+      >
         <!-- 步骤条区域 -->
         <el-steps
           :space="200"
@@ -217,7 +228,7 @@
           class="addFormSteps"
         >
           <el-step title="基本信息" />
-          <el-step title="发票上传" />
+          <el-step title="发票，证书图片上传" />
         </el-steps>
         <el-form
           ref="addFormRef"
@@ -251,11 +262,9 @@
                   style="width: 100%"
                 />
               </el-form-item>
-              <el-form-item label="证书" prop="certificate">
-                <el-input v-model="addForm.certificate" />
-              </el-form-item>
               <el-form-item label="通过状态" prop="success">
                 <el-radio-group v-model="addForm.success">
+                  <el-radio :label="2">未知</el-radio>
                   <el-radio :label="0">失败</el-radio>
                   <el-radio :label="1">成功</el-radio>
                 </el-radio-group>
@@ -273,29 +282,55 @@
                 </el-select>
               </el-form-item>
             </el-tab-pane>
-            <el-tab-pane label="发票上传" name="1">
-              <el-upload
-                :before-upload="handleBeforeUpload"
-                :before-remove="handleBeforeRemove"
-                :on-success="addHandleSuccess"
-                :file-list="fileList"
-                :action="uploadUrl"
-                class="upload-demo"
-                :headers="headers"
-                multiple
-                :limit="3"
-                :on-preview="handlePreview"
-                list-type="picture-card"
-                :disabled="files.length===3?true:false"
-              >
-                <i v-if="files.length<3" class="el-icon-plus" />
-                <i v-else class="el-icon-close" />
-                <div
-                  slot="tip"
-                  style="display: block;"
-                  class="el-upload__tip"
-                >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
-              </el-upload>
+            <el-tab-pane label="发票，证书图片上传" name="1">
+              <el-form-item label="发票：" prop="invoice">
+                <el-upload
+                  :before-upload="handleBeforeUpload"
+                  :before-remove="invoiceBeforeRemove"
+                  :on-success="invoiceSuccess"
+                  :file-list="invoiceFileList"
+                  :action="uploadUrl"
+                  class="upload-demo"
+                  :headers="headers"
+                  multiple
+                  :limit="3"
+                  :on-preview="handlePreview"
+                  list-type="picture-card"
+                  :disabled="invoiceFiles.length===3?true:false"
+                >
+                  <i v-if="invoiceFiles.length<3" class="el-icon-plus" />
+                  <i v-else class="el-icon-close" />
+                  <div
+                    slot="tip"
+                    style="display: block;"
+                    class="el-upload__tip"
+                  >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+                </el-upload>
+              </el-form-item>
+              <el-form-item label="证书：" prop="certificate">
+                <el-upload
+                  :before-upload="handleBeforeUpload"
+                  :before-remove="certificateBeforeRemove"
+                  :on-success="certificateSuccess"
+                  :file-list="certificateFileList"
+                  :action="uploadUrl"
+                  class="upload-demo"
+                  :headers="headers"
+                  multiple
+                  :limit="3"
+                  :on-preview="handlePreview"
+                  list-type="picture-card"
+                  :disabled="certificateFiles.length===3?true:false"
+                >
+                  <i v-if="certificateFiles.length<3" class="el-icon-plus" />
+                  <i v-else class="el-icon-close" />
+                  <div
+                    slot="tip"
+                    style="display: block;"
+                    class="el-upload__tip"
+                  >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+                </el-upload>
+              </el-form-item>
               <el-form-item class="formbutton">
                 <el-button class="addFormButton" @click="addDialogVisible = false">取 消</el-button>
                 <el-button type="primary" class="addFormButton" @click="addCertificate">添 加</el-button>
@@ -303,13 +338,14 @@
             </el-tab-pane>
           </el-tabs>
         </el-form>
-      </el-drawer>
+      </el-dialog>
 
       <!-- 修改对话框 -->
       <el-dialog
         title="修改考证信息"
         :visible.sync="editDialogVisible"
         width="50%"
+        top="3vh"
         @close="closeEditDialog"
       >
         <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="100px">
@@ -336,11 +372,9 @@
               style="width: 100%"
             />
           </el-form-item>
-          <el-form-item label="证书" prop="certificate">
-            <el-input v-model="editForm.certificate" />
-          </el-form-item>
           <el-form-item label="通过状态" prop="success">
             <el-radio-group v-model="editForm.success">
+              <el-radio :label="2">未知</el-radio>
               <el-radio :label="0">失败</el-radio>
               <el-radio :label="1">成功</el-radio>
             </el-radio-group>
@@ -354,9 +388,9 @@
           <el-form-item label="发票" prop="invoice">
             <el-upload
               :before-upload="handleBeforeUpload"
-              :before-remove="handleBeforeRemove"
-              :on-success="editHandleSuccess"
-              :file-list="editFileList"
+              :before-remove="invoiceBeforeRemove"
+              :on-success="editInvoiceSuccess"
+              :file-list="editInvoiceFileList"
               :action="uploadUrl"
               class="upload-demo"
               :headers="headers"
@@ -364,9 +398,33 @@
               :limit="3"
               :on-preview="handlePreview"
               list-type="picture-card"
-              :disabled="editFileList.length===3?true:false"
+              :disabled="editInvoiceListLength===3?true:false"
             >
-              <i v-if="editFileList.length<3" class="el-icon-plus" />
+              <i v-if="editInvoiceListLength<3" class="el-icon-plus" />
+              <i v-else class="el-icon-close" />
+              <div
+                slot="tip"
+                style="display: block;"
+                class="el-upload__tip"
+              >请勿上传违法文件，可同时上传3个附件，且文件不超过5M，已上传的文件无法删除！</div>
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="证书" prop="certificate">
+            <el-upload
+              :before-upload="handleBeforeUpload"
+              :before-remove="certificateBeforeRemove"
+              :on-success="editCertificateSuccess"
+              :file-list="editCertificateFileList"
+              :action="uploadUrl"
+              class="upload-demo"
+              :headers="headers"
+              multiple
+              :limit="3"
+              :on-preview="handlePreview"
+              list-type="picture-card"
+              :disabled="editCertificateListLength===3?true:false"
+            >
+              <i v-if="editCertificateListLength<3" class="el-icon-plus" />
               <i v-else class="el-icon-close" />
               <div
                 slot="tip"
@@ -441,7 +499,7 @@ export default {
         time: '',
         invoice: '',
         certificate: '',
-        success: 0,
+        success: 2,
         reimbursement: 0,
         state: undefined,
         userId: 0
@@ -489,7 +547,7 @@ export default {
         time: '',
         invoice: '',
         certificate: '',
-        success: 0,
+        success: 2,
         reimbursement: 0,
         state: undefined,
         userId: 0
@@ -506,7 +564,7 @@ export default {
               if (value === '') {
                 callback()
               }
-              if (Number.isInteger(Number(value)) && Number(value) > 0) {
+              if (Number.isInteger(Number(value)) && Number(value) >= 0) {
                 callback()
               } else {
                 callback(new Error('请输入有效数字'))
@@ -543,11 +601,17 @@ export default {
       },
       // 上传图片的URL地址
       uploadUrl: qiNiuUrl,
-      fileList: [],
-      files: [],
+      invoiceFileList: [],
+      invoiceFiles: [],
+      certificateFileList: [],
+      certificateFiles: [],
       // 保存图片地址
-      fileUrlList: [],
-      editFileList: []
+      invoiceUrlList: [],
+      editInvoiceFileList: [],
+      editInvoiceListLength: 0,
+      certificateUrlList: [],
+      editCertificateFileList: [],
+      editCertificateListLength: 0
     }
   },
   computed: {
@@ -630,7 +694,7 @@ export default {
           time: '',
           invoice: '',
           certificate: '',
-          success: 0,
+          success: 2,
           reimbursement: 0,
           state: undefined,
           userId: 0
@@ -643,9 +707,10 @@ export default {
       this.activeIndex = '0'
       this.fileList = []
       this.drawerVisible = false
-      for (let i = 0; i < this.files.length; i++) {
-        this.$delete(`oss/content/${this.files[i].id}`)
-      }
+      this.invoiceFileList = []
+      this.invoiceFiles = []
+      this.certificateFileList = []
+      this.certificateFiles = []
     },
     // 搜索证书
     searchCertificate() {
@@ -716,14 +781,11 @@ export default {
       this.Funding.proposerId = row.userId
       this.Funding.name = '考' + row.title + '证书报销'
       console.log(this.Funding)
-      this.$post('studio/funding', {
-        ...this.Funding
-      }).then((r) => {
-        console.log(r)
-        if (r.status === 200) {
-          this.$message.success('报销成功!')
-        } else {
-          this.$message.error('报销失败！')
+      // 把funding作为参数，跳转到经费管理
+      this.$router.push({
+        name: '经费管理',
+        params: {
+          Funding: this.Funding
         }
       })
     },
@@ -739,21 +801,38 @@ export default {
       // 浅克隆，同一源里的数值也会改变
       // this.editForm = row;
       this.editForm = Object.assign({}, row)
+      // 手动填充修改表单的发票图片数据
       if (this.editForm.invoice.length > 1) {
-        this.fileUrlList = this.editForm.invoice.split(',')
+        this.invoiceUrlList = this.editForm.invoice.split(',')
       } else {
-        this.fileUrlList = this.editForm.invoice
+        this.invoiceUrlList = this.editForm.invoice
       }
-      for (var i = 0; i < this.fileUrlList.length; i++) {
-        var fileurl = this.fileUrlList[i]
-        if (fileurl !== null || fileurl !== '') {
-          this.editFileList.push({
-            name: fileurl.substring(28),
-            url: fileurl
+      for (let i = 0; i < this.invoiceUrlList.length; i++) {
+        var invoicefileurl = this.invoiceUrlList[i]
+        if (invoicefileurl !== null || invoicefileurl !== '') {
+          this.editInvoiceFileList.push({
+            name: invoicefileurl.substring(28),
+            url: invoicefileurl
           })
         }
       }
-      console.log(this.editFileList)
+      this.editInvoiceListLength = this.invoiceUrlList.length
+      // 手动填充修改表单的证书图片数据
+      if (this.editForm.certificate.length > 1) {
+        this.certificateUrlList = this.editForm.certificate.split(',')
+      } else {
+        this.certificateUrlList = this.editForm.certificate
+      }
+      for (let k = 0; k < this.certificateUrlList.length; k++) {
+        var certificatefileurl = this.certificateUrlList[k]
+        if (certificatefileurl !== null || certificatefileurl !== '') {
+          this.editCertificateFileList.push({
+            name: certificatefileurl.substring(28),
+            url: certificatefileurl
+          })
+        }
+      }
+      this.editCertificateListLength = this.certificateUrlList.length
       this.editDialogVisible = true
     },
     // 提交修改对话框
@@ -777,11 +856,15 @@ export default {
         })
       })
     },
-    // 监听关闭对话框事件
+    // 监听关闭修改对话框事件
     closeEditDialog() {
       this.$refs.editFormRef.resetFields()
-      this.fileUrlList = []
-      this.editFileList = []
+      this.invoiceUrlList = []
+      this.editInvoiceFileList = []
+      this.editInvoiceListLength = 0
+      this.certificateUrlList = []
+      this.editCertificateFileList = []
+      this.editCertificateListLength = 0
     },
     // 切换tab时判断是否填完基本信息
     beforeTabLeave(activeName, oldActiveName) {
@@ -823,10 +906,10 @@ export default {
       this.previewVisible = true
     },
     // 新建用户的发票上传成功后
-    addHandleSuccess(response, file, fileList) {
+    invoiceSuccess(response, file, fileList) {
       const uid = file.uid
       const id = response.data.contentId
-      this.files.push({ uid, id })
+      this.invoiceFiles.push({ uid, id })
       if (this.addForm.invoice === '' || this.addForm.invoice === null) {
         this.addForm.invoice = response.data.url
       } else {
@@ -834,21 +917,22 @@ export default {
       }
     },
     // 修改用户的发票上传成功后
-    editHandleSuccess(response, file, fileList) {
+    editInvoiceSuccess(response, file, fileList) {
       const uid = file.uid
       const id = response.data.contentId
-      this.files.push({ uid, id })
+      this.invoiceFiles.push({ uid, id })
+      this.editInvoiceListLength++
       if (this.editForm.invoice === '' || this.editForm.invoice === null) {
         this.editForm.invoice = response.data.url
       } else {
         this.editForm.invoice = this.editForm.invoice + ',' + response.data.url
       }
     },
-    // 删除上传的图片
-    handleBeforeRemove(file, fileList) {
-      for (let i = 0; i < this.files.length; i++) {
-        if (this.files[i].uid === file.uid) {
-          this.$delete(`oss/content/${this.files[i].id}`).then(() => {
+    // 删除上传的发票图片
+    invoiceBeforeRemove(file, fileList) {
+      for (let j = 0; j < this.invoiceFiles.length; j++) {
+        if (this.invoiceFiles[j].uid === file.uid) {
+          this.$delete(`oss/content/${this.invoiceFiles[j].id}`).then(() => {
             this.$message({
               message: '删除成功',
               type: 'success'
@@ -904,7 +988,9 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('取消了删除')
       }
-      this.$delete(`studio/certificate/${row.id}`).then((r) => {
+      const idStr = row.id + ''
+      console.log(typeof idStr)
+      this.$delete(`studio/certificate/${idStr}`).then((r) => {
         console.log(r)
         if (r.status === 200) {
           this.$message.success('删除成功!')
@@ -915,7 +1001,7 @@ export default {
       })
     },
     // 手风琴效果
-    toogleExpand(row) {
+    toogleExpand(row, event, column) {
       const $table = this.$refs.tableref
       this.certificateList.map((item) => {
         if (row.id !== item.id) {
@@ -923,6 +1009,53 @@ export default {
         }
       })
       $table.toggleRowExpansion(row)
+    },
+    // 新建用户的证书上传成功后
+    certificateSuccess(response, file, fileList) {
+      const uid = file.uid
+      const id = response.data.contentId
+      this.certificateFiles.push({ uid, id })
+      if (
+        this.addForm.certificate === '' ||
+        this.addForm.certificate === null
+      ) {
+        this.addForm.certificate = response.data.url
+      } else {
+        this.addForm.certificate =
+          this.addForm.certificate + ',' + response.data.url
+      }
+    },
+    // 修改用户的证书上传成功后
+    editCertificateSuccess(response, file, fileList) {
+      const uid = file.uid
+      const id = response.data.contentId
+      this.certificateFiles.push({ uid, id })
+      this.editCertificateListLength++
+      if (
+        this.editForm.certificate === '' ||
+        this.editForm.certificate === null
+      ) {
+        this.editForm.certificate = response.data.url
+      } else {
+        this.editForm.certificate =
+          this.editForm.certificate + ',' + response.data.url
+      }
+    },
+    // 删除上传的证书图片
+    certificateBeforeRemove(file, fileList) {
+      for (let l = 0; l < this.certificateFiles.length; l++) {
+        if (this.certificateFiles[l].uid === file.uid) {
+          this.$delete(`oss/content/${this.certificateFiles[l].id}`).then(
+            () => {
+              this.$message({
+                message: '删除成功',
+                type: 'success'
+              })
+            }
+          )
+          return true
+        }
+      }
     }
   }
 }
@@ -941,25 +1074,28 @@ export default {
   margin-bottom: 0;
   width: 100%;
 }
-.addFormButton {
+/* .addFormButton {
   text-align: center;
 }
 
 .formbutton {
   margin-top: 20px;
   padding-left: 290px;
-}
+} */
 .addFormSteps {
   margin: 0 0 20px 150px;
 }
 .previewImg {
   width: 100%;
 }
-.invoiceUl {
-  list-style: none;
-  margin: 0;
-}
-.invoiceUl .invoiceLi {
+.showImage {
+  width: 100px;
+  height: 100px;
+  border: 1px solid black;
+  margin-right: 30px;
   cursor: pointer;
+}
+.el-table__expanded-cell {
+  background: rgb(70, 50, 50);
 }
 </style>
