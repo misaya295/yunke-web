@@ -19,7 +19,7 @@
       <div class="filter-item">
         <el-date-picker v-model="funding.successTime" type="daterange" :range-separator="null" start-placeholder="通过日期"
           end-placeholder="通过日期" style="width:240px" value-format="yyyy-MM-dd">>
-        </el-date-picker>
+        </el-date-picker>bo
       </div>
 
       <el-select v-model="otherId" placeholder="其他信息" style="width: 103px" class="filter-item">
@@ -269,7 +269,7 @@
         </el-row>
 
         <div slot="footer" class="dialog-footer" v-if="handleJudgePass(temp)">
-          <el-button @click="handleChangeState('fail')">驳回</el-button>
+          <el-button type="danger" plain @click="handleChangeState('fail')">驳回</el-button>
           <el-button type="primary" plain @click="handleChangeState('pass')">通过</el-button>
         </div>
         <div slot="footer" class="dialog-footer" v-if="handleJudgeSuccess(temp)">
