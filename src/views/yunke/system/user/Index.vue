@@ -1,8 +1,16 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="queryParams.username" :placeholder="$t('table.user.username')" class="filter-item search-item" />
-      <el-input v-model="queryParams.deptName" :placeholder="$t('table.user.dept')" class="filter-item search-item" />
+      <el-input
+        v-model="queryParams.username"
+        :placeholder="$t('table.user.username')"
+        class="filter-item search-item"
+      />
+      <el-input
+        v-model="queryParams.deptName"
+        :placeholder="$t('table.user.dept')"
+        class="filter-item search-item"
+      />
       <el-date-picker
         v-model="queryParams.timeRange"
         :range-separator="null"
@@ -11,21 +19,49 @@
         class="filter-item search-item date-range-item"
         type="daterange"
       />
-      <el-button class="filter-item" type="primary" plain @click="search">
-        {{ $t('table.search') }}
-      </el-button>
-      <el-button class="filter-item" type="warning" plain @click="reset">
-        {{ $t('table.reset') }}
-      </el-button>
-      <el-dropdown v-has-any-permission="['user:add','user:delete','user:reset','user:export']" trigger="click" class="filter-item">
+      <el-date-picker
+        v-model="queryParams.grade"
+        placeholder="  入学年份"
+        value-format="yyyy"
+        class="filter-item search-item date-range-item"
+        type="year"
+      />
+      <el-select v-model="queryParams.profession" placeholder="请选择">
+        <el-option
+          v-for="item in professionList"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+      <el-button class="filter-item" type="primary" plain @click="search">{{ $t('table.search') }}</el-button>
+      <el-button class="filter-item" type="warning" plain @click="reset">{{ $t('table.reset') }}</el-button>
+      <el-dropdown
+        v-has-any-permission="['user:add','user:delete','user:reset','user:export']"
+        trigger="click"
+        class="filter-item"
+      >
         <el-button>
-          {{ $t('table.more') }}<i class="el-icon-arrow-down el-icon--right" />
+          {{ $t('table.more') }}
+          <i class="el-icon-arrow-down el-icon--right" />
         </el-button>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item v-has-permission="['user:add']" @click.native="add">{{ $t('table.add') }}</el-dropdown-item>
-          <el-dropdown-item v-has-permission="['user:delete']" @click.native="batchDelete">{{ $t('table.delete') }}</el-dropdown-item>
-          <el-dropdown-item v-has-permission="['user:reset']" @click.native="resetPassword">{{ $t('table.resetPassword') }}</el-dropdown-item>
-          <el-dropdown-item v-has-permission="['user:export']" @click.native="exportExcel">{{ $t('table.export') }}</el-dropdown-item>
+          <el-dropdown-item
+            v-has-permission="['user:add']"
+            @click.native="add"
+          >{{ $t('table.add') }}</el-dropdown-item>
+          <el-dropdown-item
+            v-has-permission="['user:delete']"
+            @click.native="batchDelete"
+          >{{ $t('table.delete') }}</el-dropdown-item>
+          <el-dropdown-item
+            v-has-permission="['user:reset']"
+            @click.native="resetPassword"
+          >{{ $t('table.resetPassword') }}</el-dropdown-item>
+          <el-dropdown-item
+            v-has-permission="['user:export']"
+            @click.native="exportExcel"
+          >{{ $t('table.export') }}</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -41,12 +77,24 @@
       @sort-change="sortChange"
     >
       <el-table-column type="selection" align="center" width="40px" />
-      <el-table-column :label="$t('table.user.username')" prop="username" :show-overflow-tooltip="true" align="center" min-width="120px">
+      <el-table-column
+        :label="$t('table.user.username')"
+        prop="username"
+        :show-overflow-tooltip="true"
+        align="center"
+        min-width="120px"
+      >
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.user.fullName')" prop="fullName" :show-overflow-tooltip="true" align="center" min-width="120px">
+      <el-table-column
+        :label="$t('table.user.fullName')"
+        prop="fullName"
+        :show-overflow-tooltip="true"
+        align="center"
+        min-width="120px"
+      >
         <template slot-scope="scope">
           <span>{{ scope.row.fullName }}</span>
         </template>
@@ -58,12 +106,15 @@
         class-name="status-col"
       >
         <template slot-scope="{row}">
-          <el-tag :type="row.sex | sexFilter">
-            {{ transSex(row.sex) }}
-          </el-tag>
+          <el-tag :type="row.sex | sexFilter">{{ transSex(row.sex) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.user.email')" :show-overflow-tooltip="true" align="center" min-width="150px">
+      <el-table-column
+        :label="$t('table.user.email')"
+        :show-overflow-tooltip="true"
+        align="center"
+        min-width="150px"
+      >
         <template slot-scope="scope">
           <span>{{ scope.row.email }}</span>
         </template>
@@ -80,28 +131,61 @@
         class-name="status-col"
       >
         <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status === '1' ? $t('common.status.valid') : $t('common.status.invalid') }}
-          </el-tag>
+          <el-tag
+            :type="row.status | statusFilter"
+          >{{ row.status === '1' ? $t('common.status.valid') : $t('common.status.invalid') }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.user.createTime')" prop="createTime" align="center" min-width="180px" sortable="custom">
+      <el-table-column
+        :label="$t('table.user.createTime')"
+        prop="createTime"
+        align="center"
+        min-width="180px"
+        sortable="custom"
+      >
         <template slot-scope="scope">
           <span>{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.operation')" align="center" min-width="150px" class-name="small-padding fixed-width">
+      <el-table-column
+        :label="$t('table.operation')"
+        align="center"
+        min-width="150px"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="{row}">
-          <i v-hasPermission="['user:view']" class="el-icon-view table-operation" style="color: #87d068;" @click="view(row)" />
-          <i v-hasPermission="['user:update']" class="el-icon-setting table-operation" style="color: #2db7f5;" @click="edit(row)" />
-          <i v-hasPermission="['user:delete']" class="el-icon-delete table-operation" style="color: #f50;" @click="singleDelete(row)" />
-          <el-link v-has-no-permission="['user:view','user:update','user:delete']" class="no-perm">
-            {{ $t('tips.noPermission') }}
-          </el-link>
+          <i
+            v-hasPermission="['user:view']"
+            class="el-icon-view table-operation"
+            style="color: #87d068;"
+            @click="view(row)"
+          />
+          <i
+            v-hasPermission="['user:update']"
+            class="el-icon-setting table-operation"
+            style="color: #2db7f5;"
+            @click="edit(row)"
+          />
+          <i
+            v-hasPermission="['user:delete']"
+            class="el-icon-delete table-operation"
+            style="color: #f50;"
+            @click="singleDelete(row)"
+          />
+          <el-link
+            v-has-no-permission="['user:view','user:update','user:delete']"
+            class="no-perm"
+          >{{ $t('tips.noPermission') }}</el-link>
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="pagination.num" :limit.sync="pagination.size" @pagination="search" />
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="pagination.num"
+      :limit.sync="pagination.size"
+      @pagination="search"
+    />
     <user-edit
       ref="edit"
       :dialog-visible="dialog.isVisible"
@@ -109,11 +193,7 @@
       @success="editSuccess"
       @close="editClose"
     />
-    <user-view
-      ref="view"
-      :dialog-visible="userViewVisible"
-      @close="viewClose"
-    />
+    <user-view ref="view" :dialog-visible="userViewVisible" @close="viewClose" />
   </div>
 </template>
 
@@ -153,13 +233,39 @@ export default {
       loading: false,
       list: null,
       total: 0,
-      queryParams: {},
+      queryParams: {
+        grade: '',
+        profession: '___'
+      },
       sort: {},
       selection: [],
       pagination: {
         size: 10,
         num: 1
-      }
+      },
+      // 专业列表
+      professionList: [
+        {
+          value: '044',
+          label: '计算机科学与技术'
+        },
+        {
+          value: '064',
+          label: '网络工程'
+        },
+        {
+          value: '074',
+          label: '软件工程'
+        },
+        {
+          value: '094',
+          label: '大数据'
+        },
+        {
+          value: '___',
+          label: '其他'
+        }
+      ]
     }
   },
   computed: {
@@ -206,18 +312,25 @@ export default {
       })
     },
     reset() {
-      this.queryParams = {}
+      this.queryParams = {
+        grade: '',
+        profession: '___'
+      }
       this.sort = {}
       this.$refs.table.clearSort()
       this.$refs.table.clearFilter()
       this.search()
     },
     exportExcel() {
-      this.$download('system/user/excel', {
-        pageSize: this.pagination.size,
-        pageNum: this.pagination.num,
-        ...this.queryParams
-      }, `user_${new Date().getTime()}.xlsx`)
+      this.$download(
+        'system/user/excel',
+        {
+          pageSize: this.pagination.size,
+          pageNum: this.pagination.num,
+          ...this.queryParams
+        },
+        `user_${new Date().getTime()}.xlsx`
+      )
     },
     add() {
       this.dialog.title = this.$t('common.add')
@@ -231,27 +344,33 @@ export default {
         })
         return
       }
-      this.$confirm(this.$t('tips.confirmRestPassword'), this.$t('common.tips'), {
-        confirmButtonText: this.$t('common.confirm'),
-        cancelButtonText: this.$t('common.cancel'),
-        type: 'warning'
-      }).then(() => {
-        const userNames = []
-        this.selection.forEach((u) => {
-          userNames.push(u.username)
-        })
-        this.$put('system/user/password/reset', {
-          usernames: userNames.join(',')
-        }).then(() => {
-          this.$message({
-            message: this.$t('tips.resetPasswordSuccess'),
-            type: 'success'
+      this.$confirm(
+        this.$t('tips.confirmRestPassword'),
+        this.$t('common.tips'),
+        {
+          confirmButtonText: this.$t('common.confirm'),
+          cancelButtonText: this.$t('common.cancel'),
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          const userNames = []
+          this.selection.forEach((u) => {
+            userNames.push(u.username)
           })
+          this.$put('system/user/password/reset', {
+            usernames: userNames.join(',')
+          }).then(() => {
+            this.$message({
+              message: this.$t('tips.resetPasswordSuccess'),
+              type: 'success'
+            })
+            this.clearSelections()
+          })
+        })
+        .catch(() => {
           this.clearSelections()
         })
-      }).catch(() => {
-        this.clearSelections()
-      })
     },
     singleDelete(row) {
       this.$refs.table.toggleRowSelection(row, true)
@@ -270,27 +389,29 @@ export default {
         confirmButtonText: this.$t('common.confirm'),
         cancelButtonText: this.$t('common.cancel'),
         type: 'warning'
-      }).then(() => {
-        const userIds = []
-        this.selection.forEach((u) => {
-          if (u.userId === this.currentUser.userId) {
-            contain = true
-            return
-          }
-          userIds.push(u.userId)
-        })
-        if (contain) {
-          this.$message({
-            message: this.$t('tips.containCurrentUser'),
-            type: 'warning'
-          })
-          this.clearSelections()
-        } else {
-          this.delete(userIds)
-        }
-      }).catch(() => {
-        this.clearSelections()
       })
+        .then(() => {
+          const userIds = []
+          this.selection.forEach((u) => {
+            if (u.userId === this.currentUser.userId) {
+              contain = true
+              return
+            }
+            userIds.push(u.userId)
+          })
+          if (contain) {
+            this.$message({
+              message: this.$t('tips.containCurrentUser'),
+              type: 'warning'
+            })
+            this.clearSelections()
+          } else {
+            this.delete(userIds)
+          }
+        })
+        .catch(() => {
+          this.clearSelections()
+        })
     },
     clearSelections() {
       this.$refs.table.clearSelection()
@@ -323,12 +444,24 @@ export default {
       })
     },
     fetch(params = {}) {
+      console.log(this.queryParams.profession)
+      console.log(this.queryParams.grade)
       params.pageSize = this.pagination.size
       params.pageNum = this.pagination.num
       if (this.queryParams.timeRange) {
         params.createTimeFrom = this.queryParams.timeRange[0]
         params.createTimeTo = this.queryParams.timeRange[1]
       }
+      if (this.queryParams.grade === '' || this.queryParams.grade === null) {
+        params.grade = '____'
+      }
+      if (
+        this.queryParams.profession === '' ||
+        this.queryParams.profession === null
+      ) {
+        params.profession = '___'
+      }
+      console.log(params)
       this.loading = true
       this.$get('system/user', {
         ...params
