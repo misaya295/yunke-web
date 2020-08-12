@@ -19,7 +19,7 @@
       <div class="filter-item">
         <el-date-picker v-model="funding.successTime" type="daterange" :range-separator="null" start-placeholder="通过日期"
           end-placeholder="通过日期" style="width:240px" value-format="yyyy-MM-dd">>
-        </el-date-picker>bo
+        </el-date-picker>
       </div>
 
       <el-select v-model="otherId" placeholder="其他信息" style="width: 103px" class="filter-item">
@@ -27,11 +27,11 @@
         </el-option>
       </el-select>
       <!-- 报销名称 -->
-      <el-input v-model="funding.name" v-show="otherId=='1'" placeholder="请输入报销名称" style="width:155px"
+      <el-input v-model="funding.name" v-show="otherId==='1'" placeholder="请输入报销名称" style="width:155px"
         class="filter-item"></el-input>
 
       <!-- 申请人 -->
-      <el-autocomplete popper-class="my-autocomplete" v-model="funding.proposerName" v-show="otherId=='2'"
+      <el-autocomplete popper-class="my-autocomplete" v-model="funding.proposerName" v-show="otherId==='2'"
         :fetch-suggestions="querySearch" placeholder="请选择申请人" @select="handleSelect1" style="width: 155px"
         class="filter-item">
         <template slot-scope="{ item }">
@@ -39,7 +39,7 @@
         </template>
       </el-autocomplete>
       <!-- 审核人 -->
-      <el-autocomplete popper-class="my-autocomplete" v-model="funding.verifierName" v-show="otherId=='3'"
+      <el-autocomplete popper-class="my-autocomplete" v-model="funding.verifierName" v-show="otherId==='3'"
         :fetch-suggestions="querySearch2" placeholder="请选择审核人" @select="handleSelect2" style="width: 155px"
         class="filter-item">
         <template slot-scope="{ item }">
@@ -127,7 +127,7 @@
       </div>
       <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :width="width"
         :close-on-click-modal="true" :close-on-press-escape="false">
-        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px"  top="3vh">
+        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" top="3vh">
           <el-form-item label="名称" prop="name">
             <el-input v-model="temp.name" placeholder="请输入报销名称" style="width:100%" />
           </el-form-item>
@@ -141,12 +141,19 @@
             </el-date-picker>
           </el-form-item>
           <el-form-item label="发票">
-            <el-upload ref="upload" :before-upload="handleBeforeUpload" :before-remove="handleBeforeRemove"
+            <!-- <el-upload ref="upload" :before-upload="handleBeforeUpload" :before-remove="handleBeforeRemove"
               :on-success="handleSuccess" :file-list="fileList" :auto-upload="true" :action="uploadUrl"
               class="upload-demo" :headers="headers" multiple :limit="3" drag>
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
               <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+            </el-upload> -->
+            <el-upload :before-upload="handleBeforeUpload" :before-remove="handleBeforeRemove"
+              :on-success="handleSuccess" :file-list="editFileList" :action="uploadUrl" class="upload-demo"
+              :headers="headers" multiple :limit="3" :on-preview="handlePreview" list-type="picture-card"
+            >
+              <i class="el-icon-plus" />
+              <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
             </el-upload>
           </el-form-item>
           <el-form-item label="银行卡号">
@@ -346,7 +353,10 @@
         </div>
       </el-dialog>
     </div>
-
+    <!-- 图片预览 -->
+    <el-dialog title="图片预览" :visible.sync="previewVisible" width="40%" @close="previewDialogClose">
+      <el-image :src="previewPath" alt class="previewImg" />
+    </el-dialog>
   </div>
 
 
@@ -380,16 +390,29 @@
     },
     data() {
       return {
+        // 保存预览图片路径
+        previewPath: '',
+        //预览窗口显示与影藏
+        previewVisible: false,
+        //funding分页是否隐藏
         fundingHidePage: false,
+        //tesk分页是否隐藏
         teskHidepage: false,
+        //已选funding
         selection: [],
+
         showViewer: false,
-        url: '',
         srcList: [],
-        files: [],
-        currentFiles: [],
-        fileList: [],
+
+        // 保存图片地址
+        fileUrlList: [],
+        editFileList: [],
+
+        // 上传图片的URL地址
         uploadUrl: qiNiuUrl,
+        fileList: [],
+        files: [],
+
         headers: {
           Authorization: `bearer ${getToken()}`
         },
@@ -597,6 +620,22 @@
       }
     },
     methods: {
+      
+      // 修改时的图片预览效果
+      handlePreview(file) {
+        if ('url' in file) {
+          this.previewPath = file.url
+        } else {
+          this.previewPath = file.response.data.url
+        }
+        this.previewVisible = true
+      },
+      // 图片预览关闭
+      previewDialogClose() {
+        this.previewPath = ''
+        this.previewVisible = false
+      },
+      //查看时的图片预览
       onPreview() {
         if (!this.temp.invoice) {
           this.$message({
@@ -635,8 +674,13 @@
         }
       },
       handleBeforeRemove(file, fileList) {
+        // console.log(file)
+        // console.log(this.temp)
+        // console.log(this.files)
+
         for (let i = 0; i < this.files.length; i++) {
           if (this.files[i].uid === file.uid) {
+            // console.log(this.files[i])
             this.$delete(`oss/content/${this.files[i].id}`).then(() => {
               this.$message({
                 message: '删除成功',
@@ -654,8 +698,17 @@
           uid,
           id
         })
-        this.currentFiles.push(id)
-        this.temp.invoice = this.currentFiles;
+        if (
+          this.temp.invoice === '' ||
+          this.temp.invoice === null
+        ) {
+          this.temp.invoice = response.data.url
+        } else {
+          this.temp.invoice =
+            this.temp.invoice + ',' + response.data.url
+        }
+
+
       },
       initWidth() {
         this.screenWidth = document.body.clientWidth
@@ -668,6 +721,7 @@
         }
       },
       loadUser() {
+        //fundingId = -1 接口返回申请人和审核人的信息
         const fundingId = -1;
         this.$get(`/studio/funding/${fundingId}`).then((r) => {
           this.proposersTable = r.data.data[0];
@@ -679,10 +733,10 @@
         var param = Object.assign({}, this.page.param);
         let funding = Object.assign({}, this.funding);
         funding = this.judgeFundingNull(JSON.stringify(funding)) ? null : funding; //后端是根据funding是不是null，判断是不是拿所有数据
-        if (funding && (funding.applyTime != "" && funding.applyTime != null)) {
+        if (funding && (funding.applyTime !== "" && funding.applyTime !== null)) {
           funding.applyTime = funding.applyTime[0] + "," + funding.applyTime[1];
         }
-        if (funding && (funding.successTime != "" && funding.successTime != null)) {
+        if (funding && (funding.successTime !== "" && funding.successTime !== null)) {
           funding.successTime = funding.successTime[0] + "," + funding.successTime[1];
         }
         this.$get('studio/funding', {
@@ -726,6 +780,7 @@
         this.loadTable();
       },
       handleSearchBill() {
+        //获取从建校到现在所有的经费开销、入账、剩余
         var bd1 = "2001-5-1," + this.formatDate(new Date()) + ",-1";
         var bd2 = "2001-5-1," + this.formatDate(new Date()) + ",0";
         var bd3 = "2001-5-1," + this.formatDate(new Date()) + ",1"
@@ -748,11 +803,11 @@
         return false;
       },
       handleJudgeDelete(row) {
-        if (row.state != 4) return false;
+        if (row.state !== 4) return false;
         else return true;
       },
       handleJudgeUpdate(row) {
-        if (row.state == 1 || row.state == 4) return true;
+        if (row.state === 1 || row.state === 4) return true;
         else return false;
       },
       handleSelect1(item) {
@@ -769,12 +824,31 @@
       handleSelect4(item) {
         this.temp.proposerId = item.id;
       },
-      handleIconClick(ev) {},
       handleUpdate(row) {
-        this.currentFiles = [];
-        this.fileList = [];
         this.temp = Object.assign({}, row)
         this.temp.applyTime = this.formatDate(new Date(this.temp.applyTime))
+        //this.editFileList 设为空数组，不然会出现图片重复的情况
+        this.editFileList = [];
+
+        if (
+          this.temp.invoice === null ||
+          this.temp.invoice === ''
+        ) {
+          this.fileUrlList = []
+        } else {
+          this.fileUrlList = this.temp.invoice.split(',')
+        }
+        if (this.fileUrlList !== null) {
+          for (var i = 0; i < this.fileUrlList.length; i++) {
+            var fileurl = this.fileUrlList[i]
+            if (fileurl !== null || fileurl !== '') {
+              this.editFileList.push({
+                name: fileurl.substring(28), //以后域名改了会有bug，因为这里获取名字是从固定的位置开始取
+                url: fileurl
+              })
+            }
+          }
+        }
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
         this.$nextTick(() => {
@@ -800,7 +874,7 @@
         }).then(() => {
           const fundingIds = []
           this.selection.forEach((r) => {
-            if (r.state == 4) fundingIds.push(r.id)
+            if (r.state === 4) fundingIds.push(r.id)
           })
           this.delete(fundingIds.join(","))
         }).catch(() => {
@@ -809,7 +883,7 @@
       },
       delete(fundingIds) {
         this.loading = true
-        if (fundingIds == "") {
+        if (fundingIds === "") {
           this.$message({
             message: "未选择状态为'报销失败'的申报",
             type: 'error'
@@ -827,9 +901,11 @@
       },
       handleView(row) {
         this.temp = Object.assign({}, row);
+        //有发票信息就初始化图片地址
         if (this.temp.invoice) {
           this.initImageSrcList(this.temp.invoice.split(','));
         }
+
         this.temp.date = new Date(this.temp.applyTime);
         this.fundingViewVisible = true;
       },
@@ -913,11 +989,15 @@
       },
       handleCreate(row) {
         this.resetTemp()
+        //根据是否有id判断操作是不是：导入报销
         if (row.id) {
           this.getStaskInFo(row.id)
         }
-        this.fileList = [];
-        this.currentFiles = [];
+        //根据row是否为undefined判断操作是不是：从考证过来的
+        if(row){
+          this.temp = Object.assign({},row)
+        }
+        this.editFileList = [];
         this.dialogStatus = 'create'
         this.dialogFormVisible = true
         this.$nextTick(() => {
@@ -925,10 +1005,12 @@
         })
       },
       filterBXStatus(value, row) {
-        return row.state == value
+        return row.state === value
       },
       create(formName) {
+        //申请人为当前登录用户
         this.temp.proposerId = this.currentUser.userId;
+
         const funding = this.temp;
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -947,21 +1029,10 @@
           }
         });
       },
-      updateAttr() {
-        this.$put('/studio/funding/', {
-          ...this.temp
-        }).then(() => {
-          this.$message({
-            message: '直接操作成功',
-            type: 'success'
-          })
-        })
-        this.handleSearchFunding();
-      },
       update(formName) {
         const funding = this.temp;
         //如果是申报失败，重新申报的，需要修改一下状态
-        if (funding.state == "4") {
+        if (funding.state === "4") {
           funding.state = "1";
           this.$put('/studio/funding/state', {
             ...funding
@@ -991,13 +1062,13 @@
         }).then((r) => {
           this.taskTotal = r.data.data.total;
           this.taskTableData = this.dealId(r.data.data.rows);
-          this.teskHidepage = this.taskTotal == 0 ? true : false;
+          this.teskHidepage = this.taskTotal === 0 ? true : false;
         })
       },
       submitForm(formName) {
-        if (this.dialogStatus == 'update') {
+        if (this.dialogStatus === 'update') {
           this.update(formName);
-        } else if (this.dialogStatus == 'create') {
+        } else if (this.dialogStatus === 'create') {
           this.create(formName);
         }
       },
@@ -1014,20 +1085,20 @@
         let i;
         this.srcList = [];
         for (i = 0; i < arr.length; i++) {
-          this.$get(`/oss/content/download/${arr[i]}`).then((r) => {
-            this.srcList.push(r.data.data);
-          })
+            this.srcList.push(arr[i]);
         }
       },
       formatDate(date) {
+        //格式化日期
         var d = new Date(date);
         return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
       },
       judgeFundingNull(f) {
-        if (f.applyTime == "" && f.card == "" && f.certifierId == "" && f.certifierName == "" &&
-          f.cost == "" && f.id == "" && f.invoice == "" && f.name == "" && f.proposerId == "" && f.proposerName == "" &&
-          f.state == "" && f.successTime == "" && f.taskId == "" && f.type == "" &&
-          f.verifierName == "" && f.verifierId == "") return true;
+        //判断查询内容是否为空
+        if (f.applyTime === "" && f.card === "" && f.certifierId === "" && f.certifierName === "" &&
+          f.cost === "" && f.id === "" && f.invoice === "" && f.name === "" && f.proposerId === "" && f.proposerName === "" &&
+          f.state === "" && f.successTime === "" && f.taskId === "" && f.type === "" &&
+          f.verifierName === "" && f.verifierId === "") return true;
         else return false;
       },
       getStaskInFo(id) {
@@ -1036,6 +1107,7 @@
         })
       },
       dealId(r) {
+        //改变数据格式，方便调用
         return JSON.parse(JSON.stringify(r).replace(/thesisId/g, 'id').replace(/matchId/g, 'id')
           .replace(/itemsId/g, 'id').replace(/copyrightId/g, 'id').replace(/thesis_id/g, 'id').replace(/match_id/g,
             'id')
@@ -1051,9 +1123,23 @@
       },
       handleCommand(command) {
         this.$message('click on item ' + command);
+      },
+      getParams(){
+        // 取到路由带过来的参数
+        const routerParams = this.$route.params.Funding
+        //重置一下temp
+        this.resetTemp();
+        if(routerParams) {
+          //赋值
+          this.temp.name = routerParams.name; this.temp.applyTime = routerParams.applyTime;
+          //打开表单 什么都不传会报错： Cannot read property 'id' of undefined"
+          this.handleCreate(this.temp);
+          
+        }
       }
     },
     mounted() {
+      this.getParams()
       this.initUsers();
       this.initCurrentUser();
       this.initTableData();
