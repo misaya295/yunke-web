@@ -26,6 +26,7 @@
         plain
         @click="showAddDialog"
       >添加</el-button>
+
       <!-- table内容 -->
       <el-table
         ref="tableref"
@@ -157,6 +158,20 @@
                 @click.stop="showDeleteDialog(slope.row)"
               />
             </el-tooltip>
+            <el-tooltip
+              v-hasPermission="['certificate:get']"
+              class="item"
+              effect="dark"
+              content="查看详情"
+              placement="top"
+              :enterable="false"
+            >
+              <i
+                class="el-icon-info table-operation"
+                style="color: #909399;"
+                @click.stop="toogleExpand(slope.row)"
+              />
+            </el-tooltip>
             <el-link
               v-has-no-permission="['certificate:get','certificate:put','certificate:delete']"
               class="no-perm"
@@ -209,12 +224,7 @@
       />
 
       <!-- 添加考证表单 -->
-      <el-dialog
-        title="添加考证"
-        :visible.sync="drawerVisible"
-        top="3vh"
-        @close="closeAddDialog"
-      >
+      <el-dialog title="添加考证" :visible.sync="drawerVisible" top="3vh" @close="closeAddDialog">
         <!-- 步骤条区域 -->
         <el-steps
           :space="200"
@@ -909,6 +919,11 @@ export default {
       const uid = file.uid
       const id = response.data.contentId
       this.invoiceFiles.push({ uid, id })
+
+      this.$get(`oss/content/${uid}`).then((r) => {
+        console.log(r)
+      })
+
       if (this.addForm.invoice === '' || this.addForm.invoice === null) {
         this.addForm.invoice = response.data.url
       } else {
