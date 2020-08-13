@@ -344,9 +344,7 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('取消了删除')
       }
-      const idStr = row.id + ''
-      console.log(typeof idStr)
-      this.$delete(`studio/graduated/corporation/${idStr}`).then((r) => {
+      this.$delete(`studio/graduated/corporation/${row.userId}`).then((r) => {
         console.log(r)
         if (r.status === 200) {
           this.$message.success('删除成功!')

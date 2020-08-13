@@ -142,7 +142,7 @@
       />
 
       <!-- 添加对话框 -->
-      <el-dialog title="添加考研" :visible.sync="addDialogVisible" width="50%" @close="closeAddDialog">
+      <el-dialog title="添加考研" :visible.sync="addDialogVisible" @close="closeAddDialog">
         <el-form ref="addFormRef" :model="addForm" :rules="addFormRules" label-width="100px">
           <el-form-item label="姓名" prop="fullName">
             <el-input v-model="addForm.fullName" disabled />
@@ -175,10 +175,10 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="状态" prop="state">
-            <el-select v-model="addForm.state" placeholder="请选择状态" style="width:100%">
-              <el-option label="正在考取" :value="0" />
-              <el-option label="已完成" :value="1" />
-            </el-select>
+            <el-radio-group v-model="addForm.state">
+              <el-radio :label="0">正在考取</el-radio>
+              <el-radio :label="1">已完成</el-radio>
+            </el-radio-group>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -189,9 +189,8 @@
 
       <!-- 修改对话框 -->
       <el-dialog
-        title="修改考证信息"
+        title="修改考研信息"
         :visible.sync="editDialogVisible"
-        width="50%"
         @close="closeEditDialog"
       >
         <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="100px">
@@ -199,7 +198,15 @@
             <el-input v-model="editForm.fullName" disabled />
           </el-form-item>
           <el-form-item label="报考时间" prop="type">
-            <el-input v-model="editForm.time" />
+            <el-date-picker
+              v-model="editForm.time"
+              type="date"
+              placeholder="选择日期"
+              align="right"
+              format="yyyy-MM-dd"
+              value-format="yyyy-MM-dd"
+              style="width: 100%"
+            />
           </el-form-item>
           <el-form-item label="报考学校" prop="school">
             <el-input v-model="editForm.school" />
@@ -218,10 +225,10 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="状态" prop="state">
-            <el-select v-model="editForm.state" placeholder="请选择状态" style="width:100%">
-              <el-option label="正在考取" :value="0" />
-              <el-option label="已完成" :value="1" />
-            </el-select>
+            <el-radio-group v-model="editForm.state">
+              <el-radio :label="0">正在考取</el-radio>
+              <el-radio :label="1">已完成</el-radio>
+            </el-radio-group>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -274,7 +281,7 @@ export default {
         orientation: '',
         exam: '',
         success: 2,
-        state: undefined
+        state: 0
       },
       // 添加对话框的验证规则
       addFormRules: {
@@ -296,7 +303,7 @@ export default {
         orientation: '',
         exam: '',
         success: '',
-        state: undefined
+        state: 0
       },
       // 修改对话框的验证规则
       editFormRules: {
@@ -359,6 +366,12 @@ export default {
         if (this.addForm.state === 0 && this.addForm.success === 1) {
           return this.$message.error('考试还未结束，无法将通过状态设置为成功!')
         }
+        if (this.addForm.state === 0 && this.addForm.success === 0) {
+          return this.$message.error('考试还未结束，无法将通过状态设置为失败!')
+        }
+        if (this.addForm.state === 1 && this.addForm.success === 2) {
+          return this.$message.error('考试已结束，无法将通过状态设置为未知!')
+        }
         this.$post('studio/postgraduate', {
           ...this.addForm
         }).then((r) => {
@@ -377,7 +390,7 @@ export default {
           orientation: '',
           exam: '',
           success: 2,
-          state: undefined
+          state: 0
         }
         this.addDialogVisible = false
       })
@@ -419,6 +432,7 @@ export default {
     // 修改考证对话框
     showEditDialog(row) {
       // 判断是否有资格修改
+      console.log('1123')
       if (this.currentUser.userId !== row.userId) {
         if (this.currentUser.roleId !== '1') {
           return this.$message.info('仅允许本人或管理员操作！')
@@ -437,8 +451,12 @@ export default {
         // 判断通过状态和考试状态是否冲突
         if (this.editForm.state === 0 && this.editForm.success === 1) {
           return this.$message.error('考试还未结束，无法将通过状态设置为成功!')
-          // 把考证ID转为字符串
-          // this.editForm.id = this.editForm.id - 0
+        }
+        if (this.editForm.state === 0 && this.editForm.success === 0) {
+          return this.$message.error('考试还未结束，无法将通过状态设置为失败!')
+        }
+        if (this.editForm.state === 1 && this.editForm.success === 2) {
+          return this.$message.error('考试已结束，无法将通过状态设置为未知!')
         }
         this.$put('studio/postgraduate', { ...this.editForm }).then((r) => {
           if (r.status === 200) {

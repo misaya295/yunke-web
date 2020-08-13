@@ -3,7 +3,7 @@
     <div class="filter-container">
       <!-- 输入框 -->
       <el-input v-model="queryParams.fullName" placeholder="姓名" class="filter-item search-item" />
-      <el-select v-model="queryParams.state" placeholder="请选择考试状态" class="filter-item search-item">
+      <el-select v-model="queryParams.state" placeholder="考试状态" class="filter-item search-item">
         <el-option
           v-for="(item,i) in stateOptions"
           :key="i"
@@ -11,6 +11,8 @@
           :value="item.value"
         />
       </el-select>
+      <el-input v-model="queryParams.fullName" placeholder="类型" class="filter-item search-item" />
+      <el-input v-model="queryParams.fullName" placeholder="证书" class="filter-item search-item" />
       <el-button
         v-hasPermission="['certificate:get']"
         type="primary"
@@ -282,10 +284,10 @@
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="考试状态" prop="state">
-                <el-select v-model="addForm.state" placeholder="请选择状态" style="width:100%">
-                  <el-option label="正在考取" :value="0" />
-                  <el-option label="已完成" :value="1" />
-                </el-select>
+                <el-radio-group v-model="addForm.state">
+                  <el-radio :label="0">正在考取</el-radio>
+                  <el-radio :label="1">已完成</el-radio>
+                </el-radio-group>
               </el-form-item>
             </el-tab-pane>
             <el-tab-pane label="发票，证书图片上传" name="1">
@@ -385,10 +387,10 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="状态" prop="state">
-            <el-select v-model="editForm.state" placeholder="请选择状态" style="width:100%">
-              <el-option label="正在考取" :value="0" />
-              <el-option label="已完成" :value="1" />
-            </el-select>
+            <el-radio-group v-model="editForm.state">
+              <el-radio :label="0">正在考取</el-radio>
+              <el-radio :label="1">已完成</el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="发票" prop="invoice">
             <el-upload
@@ -504,7 +506,7 @@ export default {
         certificate: '',
         success: 2,
         reimbursement: 0,
-        state: undefined,
+        state: 0,
         userId: 0
       },
       // 添加对话框的验证规则
@@ -552,7 +554,7 @@ export default {
         certificate: '',
         success: 2,
         reimbursement: 0,
-        state: undefined,
+        state: 0,
         userId: 0
       },
       // 修改对话框的验证规则
@@ -669,6 +671,9 @@ export default {
         if (this.addForm.state === 0 && this.addForm.success === 1) {
           return this.$message.error('考试还未结束，无法将通过状态设为成功!')
         }
+        if (this.addForm.state === 0 && this.addForm.success === 0) {
+          return this.$message.error('考试还未结束，无法将通过状态设为失败!')
+        }
         if (this.addForm.state === 1 && this.addForm.success === 2) {
           return this.$message.error('考试已结束，无法将通过状态设为未知!')
         }
@@ -702,7 +707,7 @@ export default {
           certificate: '',
           success: 2,
           reimbursement: 0,
-          state: undefined,
+          state: 0,
           userId: 0
         }
       })
@@ -848,6 +853,9 @@ export default {
         // 判断通过状态和考试状态是否冲突
         if (this.editForm.state === 0 && this.editForm.success === 1) {
           return this.$message.error('考试还未结束，无法将通过状态设为成功!')
+        }
+        if (this.editForm.state === 0 && this.editForm.success === 0) {
+          return this.$message.error('考试还未结束，无法将通过状态设为失败!')
         }
         if (this.editForm.state === 1 && this.editForm.success === 2) {
           return this.$message.error('考试已结束，无法将通过状态设为未知!')

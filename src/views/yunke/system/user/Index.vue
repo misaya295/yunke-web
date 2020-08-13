@@ -7,7 +7,7 @@
         class="filter-item search-item"
       />
       <el-input
-        v-model="queryParams.realName"
+        v-model="queryParams.fullName"
         :placeholder="$t('table.user.realName')"
         class="filter-item search-item"
       />
@@ -255,6 +255,10 @@ export default {
       // 专业列表
       professionList: [
         {
+          value: '___',
+          label: '所有'
+        },
+        {
           value: '044',
           label: '计算机科学与技术'
         },
@@ -269,10 +273,6 @@ export default {
         {
           value: '094',
           label: '大数据'
-        },
-        {
-          value: '___',
-          label: '其他'
         }
       ]
     }
