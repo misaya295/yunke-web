@@ -2,11 +2,11 @@
  <div class="app-container">
     <div class="filter-container">
         <!-- 比赛名称 -->
-        <el-input v-model="queryParams.title" placeholder="比赛名称"  class="filter-item search-item"/>
+        <el-input v-model="queryParams.title" placeholder="比赛名称" class="filter-item search-item"/>
         <!-- 真实姓名 -->
-        <el-input v-model="queryParams.fullName" placeholder="真实姓名"  class="filter-item search-item"/>
+        <el-input v-model="queryParams.fullName" placeholder="真实姓名" class="filter-item search-item"/>
         <!-- 是否已报销 -->
-        <el-select  v-model="queryParams.reimbursement"  value="" placeholder="是否已报销">
+        <el-select  v-model="queryParams.reimbursement"  value="" placeholder="是否已报销" class="filter-item search-item">
           <el-option
             v-for="match in whether"
             :key="match.id"
@@ -14,6 +14,15 @@
             :value="match.id"
           />
         </el-select>
+        <!-- 比赛时间 -->
+        <el-date-picker
+        v-model="queryParams.time"
+        :range-separator="null"
+        :start-placeholder="$t('table.user.createTime')"
+        value-format="yyyy-MM-dd"
+        class="filter-item search-item date-range-item"
+        type="daterange"
+      /><br/>
         <!-- 搜索 -->
         <el-button class="filter-item" type="primary" plain @click="search">
             {{ $t('table.search') }}
@@ -46,6 +55,7 @@
       @selection-change="onSelectChange"
       @sort-change="sortChange"
       @expand-change="getTeam"
+      @row-click="toogleExpand"
     >
          <!-- 展开区域 -->
         <el-table-column label="详情" type="expand" width="40px">
@@ -240,7 +250,7 @@
               placement="top"
               :enterable="false"
             >
-              <i v-hasPermission="['task:view']" class="el-icon-info table-operation" style="color: #909399;" @click="toogleExpand(row)" />
+              <i v-hasPermission="['task:view']" class="el-icon-info table-operation" style="color: #909399;" @row-click="toogleExpand(row)" />
             </el-tooltip>
             <el-link v-has-no-permission="['task:add','task:view','task:update','task:delete']" class="no-perm">
               {{ $t('tips.noPermission') }}
