@@ -102,6 +102,39 @@
       </el-col>
     </el-row>
   </el-dialog>
+  <!-- 负责人 -->
+            <!-- <el-form-item label="负责人" >
+              <el-select :disabled="tasks.thesisId === '' ? false : true" v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
+                <el-option
+                  v-for="thesis in userRoles"
+                  :key="thesis.userId"
+                  :label="thesis.fullName"
+                  :value="String(thesis.userId)"
+                />
+              </el-select>
+            </el-form-item> -->
+            <!-- 成员 -->
+            <!-- <el-form-item label="成员" >
+              <el-select :disabled="tasks.thesisId === '' ? false : true" v-model="team.member" multiple value="" placeholder="成员" style="width:100%">
+                <el-option
+                  v-for="thesis in userRoles"
+                  :key="thesis.userId"
+                  :label="thesis.fullName"
+                  :value="String(thesis.userId)"
+                />
+              </el-select>
+            </el-form-item> -->
+            <!-- 指导老师 -->
+            <!-- <el-form-item label="指导老师" >
+              <el-select :disabled="tasks.thesisId === '' ? false : true" v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
+                <el-option
+                  v-for="thesis in teacherRoles"
+                  :key="thesis.userId"
+                  :label="thesis.fullName"
+                  :value="String(thesis.userId)"
+                />
+              </el-select>
+            </el-form-item> -->
 </template>
 <script>
 import Index from "./Index.vue";
