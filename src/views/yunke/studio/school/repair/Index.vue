@@ -4,7 +4,7 @@
       <!-- 输入框 -->
       <el-input
         v-model="queryParams.propertyName"
-        placeholder="学校资产名称"
+        placeholder="资产名称"
         class="filter-item search-item"
       />
       <el-input
@@ -14,7 +14,7 @@
       />
       <el-input
         v-model="queryParams.repairProverUserInfoName"
-        placeholder="维修证明人名称"
+        placeholder="维修证明人"
         class="filter-item search-item"
       />
       <el-button
@@ -36,7 +36,7 @@
       >
         <el-table-column type="selection" align="center" width="40px" />
         <el-table-column
-          label="学校资产名称"
+          label="资产名称"
           prop="propertyName"
           :show-overflow-tooltip="true"
           align="center"
@@ -57,7 +57,7 @@
           min-width="120px"
         />
         <el-table-column
-          label="维修证明人名称"
+          label="维修证明人"
           prop="repairProverUserInfoName"
           :show-overflow-tooltip="true"
           align="center"

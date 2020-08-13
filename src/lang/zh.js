@@ -51,7 +51,10 @@ export default {
       newPassword: '新密码',
       confirmPassword: '再次确认',
       social: '第三方账号',
-      dataPermission: '数据权限'
+      dataPermission: '数据权限',
+      realName: '姓名',
+      joinTime: '加入时间',
+      grade: '  入学年份'
     },
     role: {
       roleName: '角色名称',

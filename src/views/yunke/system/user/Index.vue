@@ -7,26 +7,35 @@
         class="filter-item search-item"
       />
       <el-input
+        v-model="queryParams.realName"
+        :placeholder="$t('table.user.realName')"
+        class="filter-item search-item"
+      />
+      <el-input
         v-model="queryParams.deptName"
         :placeholder="$t('table.user.dept')"
         class="filter-item search-item"
       />
       <el-date-picker
         v-model="queryParams.timeRange"
-        :range-separator="null"
-        :start-placeholder="$t('table.user.createTime')"
+        :placeholder="$t('table.user.joinTime')"
         value-format="yyyy-MM-dd"
         class="filter-item search-item date-range-item"
-        type="daterange"
+        type="date"
       />
       <el-date-picker
         v-model="queryParams.grade"
-        placeholder="  入学年份"
+        :placeholder="$t('table.user.grade')"
         value-format="yyyy"
         class="filter-item search-item date-range-item"
         type="year"
       />
-      <el-select v-model="queryParams.profession" placeholder="请选择">
+      <el-select
+        v-model="queryParams.profession"
+        placeholder="请选择"
+        class="filter-item search-item"
+        style="width:220px"
+      >
         <el-option
           v-for="item in professionList"
           :key="item.value"
@@ -89,7 +98,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        :label="$t('table.user.fullName')"
+        :label="$t('table.user.realName')"
         prop="fullName"
         :show-overflow-tooltip="true"
         align="center"
@@ -137,7 +146,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        :label="$t('table.user.createTime')"
+        :label="$t('table.user.joinTime')"
         prop="createTime"
         align="center"
         min-width="180px"
@@ -444,24 +453,23 @@ export default {
       })
     },
     fetch(params = {}) {
-      console.log(this.queryParams.profession)
-      console.log(this.queryParams.grade)
       params.pageSize = this.pagination.size
       params.pageNum = this.pagination.num
       if (this.queryParams.timeRange) {
         params.createTimeFrom = this.queryParams.timeRange[0]
         params.createTimeTo = this.queryParams.timeRange[1]
       }
-      if (this.queryParams.grade === '' || this.queryParams.grade === null) {
+      if (this.queryParams.grade === '' || this.queryParams.grade === null ||
+        this.queryParams.grade === '____') {
         params.grade = '____'
       }
       if (
         this.queryParams.profession === '' ||
-        this.queryParams.profession === null
+        this.queryParams.profession === null ||
+        this.queryParams.profession === '___'
       ) {
         params.profession = '___'
       }
-      console.log(params)
       this.loading = true
       this.$get('system/user', {
         ...params
