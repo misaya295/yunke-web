@@ -76,27 +76,24 @@
           prop="success"
           :show-overflow-tooltip="true"
           align="center"
-          min-width="70px"
+          min-width="80px"
         >
           <template slot-scope="scope">
-            <i v-if="scope.row.success === 1" class="el-icon-success" style="color: lightgreen" />
-            <i v-else class="el-icon-error" style="color: red" />
+            <el-tag v-if="scope.row.success === 1" type="success">已通过</el-tag>
+            <el-tag v-else-if="scope.row.success === 2" type="warning">未 知</el-tag>
+            <el-tag v-else type="danger">未通过</el-tag>
           </template>
         </el-table-column>
         <el-table-column
-          label="是否已报销"
+          label="报销状态"
           prop="reimbursement"
           :show-overflow-tooltip="true"
           align="center"
           min-width="80px"
         >
           <template slot-scope="scope">
-            <i
-              v-if="scope.row.reimbursement === 1"
-              class="el-icon-success"
-              style="color: lightgreen"
-            />
-            <i v-else class="el-icon-error" style="color: red" />
+            <el-tag v-if="scope.row.reimbursement === 1" type="success">已报销</el-tag>
+            <el-tag v-else type="danger">未报销</el-tag>
           </template>
         </el-table-column>
         <el-table-column
@@ -215,7 +212,6 @@
       <el-dialog
         title="添加考证"
         :visible.sync="drawerVisible"
-        size="50%"
         top="3vh"
         @close="closeAddDialog"
       >
@@ -269,7 +265,7 @@
                   <el-radio :label="1">成功</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="是否已报销" prop="reimbursement">
+              <el-form-item label="报销状态" prop="reimbursement">
                 <el-radio-group v-model="addForm.reimbursement">
                   <el-radio :label="0">否</el-radio>
                   <el-radio :label="1">是</el-radio>
@@ -344,7 +340,6 @@
       <el-dialog
         title="修改考证信息"
         :visible.sync="editDialogVisible"
-        width="50%"
         top="3vh"
         @close="closeEditDialog"
       >
@@ -463,8 +458,6 @@ export default {
   components: { Pagination },
   data() {
     return {
-      // 输入框的值
-      input: '',
       // 存放查询数据
       certificateList: null,
       // 存放查询数目
@@ -532,7 +525,7 @@ export default {
           { required: true, message: '请填写通过状态！', trigger: 'blur' }
         ],
         reimbursement: [
-          { required: true, message: '请填写是否已报销！', trigger: 'blur' }
+          { required: true, message: '请填写报销状态！', trigger: 'blur' }
         ],
         state: [{ required: true, message: '请填写状态！', trigger: 'blur' }]
       },
@@ -580,7 +573,7 @@ export default {
           { required: true, message: '请填写通过状态！', trigger: 'blur' }
         ],
         reimbursement: [
-          { required: true, message: '请填写是否已报销！', trigger: 'blur' }
+          { required: true, message: '请填写报销状态！', trigger: 'blur' }
         ],
         state: [{ required: true, message: '请填写状态！', trigger: 'blur' }]
       },
@@ -664,7 +657,10 @@ export default {
         if (!valid) return
         // 判断通过状态和考试状态是否冲突
         if (this.addForm.state === 0 && this.addForm.success === 1) {
-          return this.$message.error('考试还未结束，无法将通过状态设置为成功!')
+          return this.$message.error('考试还未结束，无法将通过状态设为成功!')
+        }
+        if (this.addForm.state === 1 && this.addForm.success === 2) {
+          return this.$message.error('考试已结束，无法将通过状态设为未知!')
         }
         // 如果费用为空，则把它转为数字类型
         if (this.addForm.cost === '') {
@@ -841,7 +837,10 @@ export default {
         if (!valid) return
         // 判断通过状态和考试状态是否冲突
         if (this.editForm.state === 0 && this.editForm.success === 1) {
-          return this.$message.error('考试还未结束，无法将通过状态设置为成功!')
+          return this.$message.error('考试还未结束，无法将通过状态设为成功!')
+        }
+        if (this.editForm.state === 1 && this.editForm.success === 2) {
+          return this.$message.error('考试已结束，无法将通过状态设为未知!')
         }
         // 把考证ID转为字符串
         this.editForm.id = this.editForm.id - 0
@@ -905,7 +904,7 @@ export default {
       }
       this.previewVisible = true
     },
-    // 新建用户的发票上传成功后
+    // 新建用户的发票图片上传成功后
     invoiceSuccess(response, file, fileList) {
       const uid = file.uid
       const id = response.data.contentId
@@ -916,7 +915,7 @@ export default {
         this.addForm.invoice = this.addForm.invoice + ',' + response.data.url
       }
     },
-    // 修改用户的发票上传成功后
+    // 修改用户的发票图片上传成功后
     editInvoiceSuccess(response, file, fileList) {
       const uid = file.uid
       const id = response.data.contentId
@@ -1010,7 +1009,7 @@ export default {
       })
       $table.toggleRowExpansion(row)
     },
-    // 新建用户的证书上传成功后
+    // 新建用户的证书图片上传成功后
     certificateSuccess(response, file, fileList) {
       const uid = file.uid
       const id = response.data.contentId
@@ -1025,7 +1024,7 @@ export default {
           this.addForm.certificate + ',' + response.data.url
       }
     },
-    // 修改用户的证书上传成功后
+    // 修改用户的证书图片上传成功后
     editCertificateSuccess(response, file, fileList) {
       const uid = file.uid
       const id = response.data.contentId

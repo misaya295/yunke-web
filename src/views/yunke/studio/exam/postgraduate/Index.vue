@@ -69,11 +69,12 @@
           prop="success"
           :show-overflow-tooltip="true"
           align="center"
-          min-width="70px"
+          min-width="80px"
         >
           <template slot-scope="scope">
-            <i v-if="scope.row.success === 1" class="el-icon-success" style="color: lightgreen" />
-            <i v-else class="el-icon-error" style="color: red" />
+            <el-tag v-if="scope.row.success === 1" type="success">已通过</el-tag>
+            <el-tag v-else-if="scope.row.success === 2" type="warning">未 知</el-tag>
+            <el-tag v-else type="danger">未通过</el-tag>
           </template>
         </el-table-column>
         <el-table-column
@@ -168,6 +169,7 @@
           </el-form-item>
           <el-form-item label="通过状态" prop="success">
             <el-radio-group v-model="addForm.success">
+              <el-radio :label="2">未知</el-radio>
               <el-radio :label="0">失败</el-radio>
               <el-radio :label="1">成功</el-radio>
             </el-radio-group>
@@ -210,6 +212,7 @@
           </el-form-item>
           <el-form-item label="通过状态" prop="success">
             <el-radio-group v-model="editForm.success">
+              <el-radio :label="2">未知</el-radio>
               <el-radio :label="0">失败</el-radio>
               <el-radio :label="1">成功</el-radio>
             </el-radio-group>
@@ -270,7 +273,7 @@ export default {
         school: '',
         orientation: '',
         exam: '',
-        success: 0,
+        success: 2,
         state: undefined
       },
       // 添加对话框的验证规则
@@ -366,6 +369,16 @@ export default {
           }
           this.fetch()
         })
+        this.addForm = {
+          fullName: '',
+          userId: 0,
+          time: '',
+          school: '',
+          orientation: '',
+          exam: '',
+          success: 2,
+          state: undefined
+        }
         this.addDialogVisible = false
       })
     },
