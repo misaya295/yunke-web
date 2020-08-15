@@ -92,7 +92,7 @@
               <i
                 class="el-icon-coin table-operation"
                 style="color: #87d068;"
-                @click="fixAssets(slope.row)"
+                @click="showFixDialog(slope.row)"
               />
             </el-tooltip>
             <el-tooltip
@@ -196,6 +196,22 @@
           <el-button type="primary" @click="editAssets">修 改</el-button>
         </span>
       </el-dialog>
+
+      <!-- 申请维修-->
+      <el-dialog title="申请维修" :visible.sync="fixDialogVisible" width="50%" @close="closeFixDialog">
+        <el-form ref="fixFormRef" :model="fixForm" :rules="fixFormRules" label-width="100px">
+          <el-form-item label="资产名称" prop="assetsName">
+            <el-input v-model="fixForm.propertyName" disabled />
+          </el-form-item>
+          <el-form-item label="维修信息" prop="repairMessage">
+            <el-input v-model="fixForm.repairMessage" />
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="fixDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="fixAssets">申 请</el-button>
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -292,7 +308,23 @@ export default {
       // 报修所需的对象
       schoolAssetsRepair: {
         assetsName: '',
-        repairProverUserInfoUuid: 0
+        repairProverUserInfoUuid: 0,
+        repairMessage: ''
+      },
+      // 申请维修对话框的显示与隐藏
+      fixDialogVisible: false,
+      // 绑定申请维修对话框中的表单数据
+      fixForm: {
+        propertyName: '',
+        assetsName: '',
+        repairProverUserInfoUuid: 0,
+        repairMessage: ''
+      },
+      // 申请维修对话框的验证规则
+      fixFormRules: {
+        repairMessage: [
+          { required: true, message: '请填写维修信息！', trigger: 'blur' }
+        ]
       }
     }
   },
@@ -393,51 +425,42 @@ export default {
       return _this.nowDate
     },
     // 弹出申请维修确认框
-    // 检查报修报500
-    async fixAssets(row) {
-      console.log(row)
-      // 检查资产是否填写了报废日期和信息
-      if (row.scrapDate === '' || row.scrapDate === null) {
-        return this.$message.info('请填写报废日期后再报修！')
-      }
-      if (row.scrapDetail === '' || row.scrapDetail === null) {
-        return this.$message.info('请填写报废信息后再报修！')
-      }
+    showFixDialog(row) {
       // 检查是否已经报修
       const searchByAssetsName = {}
       searchByAssetsName.assetsName = row.id
       this.$get('studio/school/assets/repair', { ...searchByAssetsName }).then(
-        async(r) => {
+        (r) => {
           console.log(r)
           if (r.data.data.total !== 0) {
             return this.$message.info('该资产已申请报修!')
+          } else {
+            this.fixForm.propertyName = row.assetsName
+            this.fixForm.assetsName = row.id
+            this.fixForm.repairProverUserInfoUuid = this.currentUser.userId
+            this.fixDialogVisible = true
           }
-
-          // 符合条件，弹出报修对话框
-          const confirmResult = await this.$confirm('是否确认报修?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).catch((err) => err)
-
-          if (confirmResult !== 'confirm') {
-            return this.$message.info('取消了报修')
-          }
-
-          this.schoolAssetsRepair.assetsName = row.id
-          this.schoolAssetsRepair.repairProverUserInfoUuid = this.currentUser.userId
-          console.log(this.schoolAssetsRepair)
-          this.$post('studio/school/assets/repair', {
-            ...this.schoolAssetsRepair
-          }).then((r) => {
-            if (r.status === 200) {
-              this.$message.success('报修成功!')
-            } else {
-              this.$message.error('报修失败！')
-            }
-          })
         }
       )
+    },
+    // 监听关闭对话框事件
+    closeFixDialog() {
+      this.$refs.fixFormRef.resetFields()
+    },
+    // 提交申请维修表单
+    fixAssets(row) {
+      console.log('123123123')
+      console.log(this.fixForm)
+      this.$post('studio/school/assets/repair', {
+        ...this.fixForm
+      }).then((r) => {
+        if (r.status === 200) {
+          this.$message.success('报修成功!')
+        } else {
+          this.$message.error('报修失败！')
+        }
+        this.fixDialogVisible = false
+      })
     },
     // 修改证书对话框
     showEditDialog(row) {

@@ -59,11 +59,11 @@
         />
       </el-form-item>
       <el-form-item :label="$t('table.user.sex')" prop="sex">
-        <el-select v-model="user.sex" value="" placeholder="" style="width:100%">
-          <el-option value="0" :label="$t('common.sex.male') " />
-          <el-option value="1" :label="$t('common.sex.female') " />
-          <el-option value="2" :label="$t('common.sex.secret') " />
-        </el-select>
+        <el-radio-group v-model="user.sex">
+          <el-radio label="0">{{ $t('common.sex.male') }}</el-radio>
+          <el-radio label="1">{{ $t('common.sex.female') }}</el-radio>
+          <el-radio label="2">{{ $t('common.sex.secret') }}</el-radio>
+        </el-radio-group>
       </el-form-item>
       <el-form-item :label="$t('table.user.status')" prop="status">
         <el-radio-group v-model="user.status">
