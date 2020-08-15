@@ -11,8 +11,8 @@
           :value="item.value"
         />
       </el-select>
-      <el-input v-model="queryParams.fullName" placeholder="类型" class="filter-item search-item" />
-      <el-input v-model="queryParams.fullName" placeholder="证书" class="filter-item search-item" />
+      <el-input v-model="queryParams.type" placeholder="类型" class="filter-item search-item" />
+      <el-input v-model="queryParams.title" placeholder="证书名称" class="filter-item search-item" />
       <el-button
         v-hasPermission="['certificate:get']"
         type="primary"

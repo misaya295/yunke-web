@@ -43,6 +43,13 @@
           min-width="80px"
         />
         <el-table-column
+          label="维修信息"
+          prop="repairMessage"
+          :show-overflow-tooltip="true"
+          align="center"
+          min-width="100px"
+        />
+        <el-table-column
           label="维修价格"
           prop="repairPrice"
           :show-overflow-tooltip="true"
@@ -54,19 +61,19 @@
           prop="repairDate"
           :show-overflow-tooltip="true"
           align="center"
-          min-width="120px"
+          min-width="70px"
         />
         <el-table-column
           label="维修证明人"
           prop="repairProverUserInfoName"
           :show-overflow-tooltip="true"
           align="center"
-          min-width="120px"
+          min-width="50px"
         />
         <el-table-column
           label="操作"
           align="center"
-          min-width="80px"
+          min-width="50px"
           class-name="small-padding fixed-width"
         >
           <template slot-scope="slope">
@@ -151,6 +158,9 @@
           </el-form-item>
           <el-form-item label="维修价格" prop="repairPrice" type="number">
             <el-input v-model.number="editForm.repairPrice" />
+          </el-form-item>
+          <el-form-item label="维修信息" prop="repairMessage">
+            <el-input v-model="editForm.repairMessage" />
           </el-form-item>
           <el-form-item label="维修日期" prop="repairDate">
             <el-date-picker
@@ -243,7 +253,8 @@ export default {
         repairDate: '',
         repairInvoice: '',
         repairProverUserInfoUuid: '',
-        id: 0
+        id: 0,
+        repairMessage: ''
       },
       // 修改对话框的验证规则
       editFormRules: {
