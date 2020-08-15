@@ -2,32 +2,32 @@
   <div class="app-container">
     <div class="filter-container">
       <!-- 状态码 -->
-      <el-select v-model="funding.state" placeholder="状态" style="width: 110px" class="filter-item">
+      <el-select v-model="funding.state" placeholder="状态"  class="filter-item search-item" style="width:255px">
         <el-option v-for="item in statusTable" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
 
       <!-- 申请时间 -->
       <div class="filter-item">
-        <el-date-picker v-model="funding.applyTime" type="daterange" :range-separator="null" start-placeholder="申请日期"
-          end-placeholder="申请日期" style="width:240px" value-format="yyyy-MM-dd">
+        <el-date-picker v-model="funding.applyTime" type="daterange" :range-separator="null" start-placeholder="提交申报日期"
+          end-placeholder="提交申报日期"  value-format="yyyy-MM-dd" class="search-item" style="width:255px">
         </el-date-picker>
       </div>
 
 
       <!-- 申请成功时间 -->
       <div class="filter-item">
-        <el-date-picker v-model="funding.successTime" type="daterange" :range-separator="null" start-placeholder="通过日期"
-          end-placeholder="通过日期" style="width:240px" value-format="yyyy-MM-dd">>
+        <el-date-picker v-model="funding.successTime" type="daterange" :range-separator="null" start-placeholder="申报完成日期"
+          end-placeholder="申报完成日期"  value-format="yyyy-MM-dd" class="search-item" style="width:255px">
         </el-date-picker>
       </div>
-
-      <el-select v-model="otherId" placeholder="其他信息" style="width: 103px" class="filter-item">
+      <!-- 其他信息 -->
+      <el-select v-model="otherId" placeholder="其他信息"  class="filter-item" style="width:100px;">
         <el-option v-for="item in otherInfoTable" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
       <!-- 报销名称 -->
-      <el-input v-model="funding.name" v-show="otherId==='1'" placeholder="请输入报销名称" style="width:155px"
+      <el-input v-model="funding.name" v-show="otherId==='1'" placeholder="请输入报销名称" style="width:155px;"
         class="filter-item"></el-input>
 
       <!-- 申请人 -->
@@ -46,18 +46,22 @@
           <div class="name">{{ item.fullName }} <span class="id">{{ item.userId }}</span></div>
         </template>
       </el-autocomplete>
+      <br>
       <el-button class="filter-item" type="primary" plain icon="el-icon-search" @click="handleSearchFunding2">
         搜索
       </el-button>
-      <el-button class="filter-item" type="warning" plain icon="el-icon-plus" @click="handleCreate">
+      <el-button class="filter-item" type="warning" plain icon="el-icon-plus" @click="handleReset">
+        重置
+      </el-button>
+      <el-button class="filter-item" type="success" plain icon="el-icon-plus" @click="handleCreate">
         添加
       </el-button>
-
+      
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         下载
       </el-button> -->
 
-      <el-dropdown class="filter-item">
+      <el-dropdown class="filter-item" trigger="click">
         <el-button>
           更多操作<i class="el-icon-arrow-down el-icon--right"></i>
         </el-button>
@@ -162,8 +166,8 @@
           <el-form-item label="任务ID">
             <el-input v-model="temp.taskId" placeholder="请输入对应任务ID" style="width:100%" />
           </el-form-item>
-          <el-form-item label="金额">
-            <el-input v-model="temp.cost" style="width:100%" placeholder="请输入报销金额   如:+10.0" />
+          <el-form-item label="金额" prop="cost">
+            <el-input v-model="temp.cost" style="width:100%" placeholder="请输入报销金额   如:+1.0 或 -1.0" />
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -416,7 +420,7 @@
         headers: {
           Authorization: `bearer ${getToken()}`
         },
-        otherId: '',
+        otherId: '1',
         taskTotal: 0,
         taskType: "thesis",
         BillDate: null,
@@ -572,19 +576,17 @@
             message: '报销时间未选择',
             trigger: 'blur'
           }],
-          proposerName: [{
-            required: true,
-            message: '申请人不能为空',
-            trigger: 'change'
-          }],
-          verifierName: [{
-            required: true,
-            message: '审核人不能为空',
-            trigger: 'change'
-          }],
           cost: [{
-            required: true,
-            message: '报销金额不能为空',
+            validator(rule, value, callback) {
+              if (value === '') {
+                callback()
+              }
+              if (Number.isInteger(Number(value))) {
+                callback()
+              } else {
+                callback(new Error('请输入有效数字'))
+              }
+            },
             trigger: 'blur'
           }],
         },
@@ -1003,6 +1005,17 @@
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
+      },
+      //重置
+      handleReset(){
+        this.funding.name = "";
+        this.funding.state = "";
+        this.funding.applyTime = "";
+        this.funding.successTime = "";
+        this.funding.proposerId = "";
+        this.funding.proposerName = "";
+        this.funding.certifierId = "";
+        this.funding.certifierName = "";
       },
       filterBXStatus(value, row) {
         return row.state === value
