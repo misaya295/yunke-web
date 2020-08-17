@@ -32,12 +32,12 @@ export default {
   },
   table: {
     user: {
-      username: '学号',
+      username: '账号',
       password: '密码',
       fullName: '真实姓名',
       sex: '性别',
       email: '邮箱',
-      dept: '方向',
+      dept: '部门',
       role: '角色',
       mobile: '电话',
       status: '状态',
@@ -45,7 +45,7 @@ export default {
       updateTime: '修改时间',
       lastLoginTime: '最后登录时间',
       noteId: '备注编号',
-      noteName: '备注',
+      noteName: '身份',
       desc: '个人描述',
       oldPassword: '旧密码',
       newPassword: '新密码',
@@ -54,7 +54,7 @@ export default {
       dataPermission: '数据权限',
       realName: '姓名',
       joinTime: '加入时间',
-      grade: '  入学年份'
+      grade: '  入校年份'
     },
     role: {
       roleName: '角色名称',

@@ -9,14 +9,14 @@
   >
     <el-form ref="form" :model="user" :rules="rules" label-position="right" label-width="100px">
       <el-form-item :label="$t('table.user.username')" prop="username">
-        <el-input v-model="user.username" :readonly="user.userId === '' ? false : 'readonly'" disabled />
+        <el-input v-model="user.username" :readonly="user.userId === '' ? false : 'readonly'" :disabled="user.userId === '' ? false : true" />
       </el-form-item>
       <el-form-item :label="$t('table.user.fullName')" prop="fullName">
-        <el-input v-model="user.fullName" :readonly="user.userId === '' ? false : 'readonly'" disabled />
+        <el-input v-model="user.fullName" :readonly="user.userId === '' ? false : 'readonly'" :disabled="user.userId === '' ? false : true" />
       </el-form-item>
       <el-form-item v-show="user.userId === ''" :label="$t('table.user.password')" prop="password">
         <el-tooltip class="item" :enterable="false" effect="dark" :content="$t('tips.defaultPassword')" placement="top-start">
-          <el-input value="123456" type="password" :disabled="true" />
+          <el-input v-model="user.password" value="123456" type="password" />
         </el-tooltip>
       </el-form-item>
       <el-form-item :label="$t('table.user.email')" prop="email">

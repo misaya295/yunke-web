@@ -179,13 +179,13 @@
             v-hasPermission="['user:update']"
             class="el-icon-setting table-operation"
             style="color: #2db7f5;"
-            @click="edit(row)"
+            @click.stop="edit(row)"
           />
           <i
             v-hasPermission="['user:delete']"
             class="el-icon-delete table-operation"
             style="color: #f50;"
-            @click="singleDelete(row)"
+            @click.stop="singleDelete(row)"
           />
           <el-link
             v-has-no-permission="['user:view','user:update','user:delete']"
@@ -546,11 +546,11 @@ export default {
         params.profession = '___'
       }
       console.log(typeof this.queryParams.deptId)
-      console.log('123')
       if (typeof this.queryParams.deptId === 'string') {
-        console.log('123123')
         params.deptId = this.queryParams.deptId - 0
-        console.log(params)
+      }
+      if (typeof this.queryParams.deptId === 'undefined') {
+        params.deptId = '%'
       }
       this.loading = true
       this.$get('system/user', {
