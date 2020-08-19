@@ -31,25 +31,25 @@
       <!-- 摘要 -->
       <el-col :xs="24" :sm="12">
         <div class="view-item">
-          <i class="el-icon-bangzhu" /> <span>{{ '摘要' +'：' }}</span> {{ thesis.introduction}}
+          <i class="el-icon-bangzhu" /> <span>{{ '摘要' +'：' }}</span> {{ thesis.introduction }}
         </div>
       </el-col>
-       <!-- 论文类型 -->
-       <el-col :xs="24" :sm="12">
+      <!-- 论文类型 -->
+      <el-col :xs="24" :sm="12">
         <div class="view-item">
           <i class="el-icon-phone-outline" /> <span>{{ '论文类型' +'：' }}</span> {{ thesis.paper_type | paper_typeFilter }}
         </div>
-       </el-col>
-     </el-row>
-     <el-row :gutter="10">
+      </el-col>
+    </el-row>
+    <el-row :gutter="10">
       <!-- 更新时间 -->
-      <el-col :xs="24" :sm="12"> 
+      <el-col :xs="24" :sm="12">
         <div class="view-item">
           <i class="el-icon-bell" /> <span>{{ '更新时间' +'：' }}</span> {{ thesis.time }}
         </div>
       </el-col>
       <!-- 论文下载 -->
-       <el-col :xs="24" :sm="12">
+      <el-col :xs="24" :sm="12">
         <div class="view-item">
           <i class="el-icon-suitcase" /> <span>{{ '论文下载' +'：' }}</span> {{ thesis.url }}
         </div>
@@ -62,7 +62,7 @@
           <i class="el-icon-time" /> <span>{{ '花费' +'：' }}</span> {{ thesis.cost }}
         </div>
       </el-col>
-       <!-- 发票 -->
+      <!-- 发票 -->
       <el-col :xs="24" :sm="12">
         <div class="view-item">
           <i class="el-icon-bell" /> <span>{{ '发票' +'：' }}</span>
@@ -70,7 +70,7 @@
         </div>
       </el-col>
     </el-row>
-   
+
     <el-row :gutter="10">
       <!-- 状态 -->
       <el-col :xs="24" :sm="12">
@@ -86,11 +86,11 @@
         </div>
       </el-col>
     </el-row>
-     <el-row :gutter="10">
+    <el-row :gutter="10">
       <!-- 比赛角色 -->
       <el-col :xs="24" :sm="12">
         <div class="view-item">
-          <i class="el-icon-document" /> <span>{{ '比赛角色' +'：' }}</span> {{ thesis.user_state | userStateFilter}}
+          <i class="el-icon-document" /> <span>{{ '比赛角色' +'：' }}</span> {{ thesis.user_state | userStateFilter }}
         </div>
       </el-col>
       <el-col :xs="24" :sm="12">
@@ -137,17 +137,10 @@
             </el-form-item> -->
 </template>
 <script>
-import Index from "./Index.vue";
+import Index from './Index.vue'
 export default {
-  
+
   name: 'ThesisView',
-  props: {
-    taskId: Number,
-    dialogVisible: {
-      type: Boolean,
-      default: false
-    }
-  },
   filters: {
     // 论文类型
     paper_typeFilter(paper_type) {
@@ -173,13 +166,20 @@ export default {
       }
       return map[reimbursement]
     },
-    userStateFilter(thesis_state){
-       const map = {
+    userStateFilter(thesis_state) {
+      const map = {
         1: '负责人',
         2: '成员',
-        3: '指导老师',
+        3: '指导老师'
       }
       return map[thesis_state]
+    }
+  },
+  props: {
+    taskId: Number,
+    dialogVisible: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -227,9 +227,9 @@ export default {
           this.users = nameArr.join("、");
         })
     },
-    reInitTask(t){
+    reInitTask(t) {
       this.$get(`studio/thesis/${t.thesisId}`).then((r) => {
-        this.thesis = r.data.data;
+        this.thesis = r.data.data
       })
     },
     initWidth() {
@@ -248,7 +248,7 @@ export default {
       this.user = { ...val }
     },
     setThesis(val) {
-     this.reInitTask(val);
+      this.reInitTask(val)
     },
     close() {
       this.$emit('close')

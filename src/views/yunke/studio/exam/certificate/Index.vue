@@ -294,20 +294,19 @@
               <el-form-item label="发票：" prop="invoice">
                 <el-upload
                   :before-upload="handleBeforeUpload"
-                  :before-remove="invoiceBeforeRemove"
+                  :before-remove="addInvoiceBeforeRemove"
                   :on-success="invoiceSuccess"
+                  :on-change="addInvoiceChange"
+                  :on-preview="handlePreview"
                   :file-list="invoiceFileList"
                   :action="uploadUrl"
-                  class="upload-demo"
+                  :class="{hideupload:addinvoicehideupload}"
                   :headers="headers"
                   multiple
-                  :limit="3"
-                  :on-preview="handlePreview"
+                  :limit="uploadPicLimit"
                   list-type="picture-card"
-                  :disabled="invoiceFiles.length===3?true:false"
                 >
-                  <i v-if="invoiceFiles.length<3" class="el-icon-plus" />
-                  <i v-else class="el-icon-close" />
+                  <i class="el-icon-plus" />
                   <div
                     slot="tip"
                     style="display: block;"
@@ -318,20 +317,19 @@
               <el-form-item label="证书：" prop="certificate">
                 <el-upload
                   :before-upload="handleBeforeUpload"
-                  :before-remove="certificateBeforeRemove"
+                  :before-remove="addCertificateBeforeRemove"
                   :on-success="certificateSuccess"
+                  :on-change="addCertificateChange"
+                  :on-preview="handlePreview"
                   :file-list="certificateFileList"
                   :action="uploadUrl"
-                  class="upload-demo"
+                  :class="{hideupload:addcertificatehideupload}"
                   :headers="headers"
                   multiple
-                  :limit="3"
-                  :on-preview="handlePreview"
+                  :limit="uploadPicLimit"
                   list-type="picture-card"
-                  :disabled="certificateFiles.length===3?true:false"
                 >
-                  <i v-if="certificateFiles.length<3" class="el-icon-plus" />
-                  <i v-else class="el-icon-close" />
+                  <i class="el-icon-plus" />
                   <div
                     slot="tip"
                     style="display: block;"
@@ -395,49 +393,47 @@
           <el-form-item label="发票" prop="invoice">
             <el-upload
               :before-upload="handleBeforeUpload"
-              :before-remove="invoiceBeforeRemove"
+              :before-remove="editInvoiceBeforeRemove"
               :on-success="editInvoiceSuccess"
+              :on-change="editInvoiceChange"
+              :on-preview="handlePreview"
               :file-list="editInvoiceFileList"
               :action="uploadUrl"
-              class="upload-demo"
+              :class="{hideupload:editinvoicehideupload}"
               :headers="headers"
               multiple
-              :limit="3"
-              :on-preview="handlePreview"
+              :limit="uploadPicLimit"
               list-type="picture-card"
-              :disabled="editInvoiceListLength===3?true:false"
             >
-              <i v-if="editInvoiceListLength<3" class="el-icon-plus" />
-              <i v-else class="el-icon-close" />
+              <i class="el-icon-plus" />
               <div
                 slot="tip"
                 style="display: block;"
                 class="el-upload__tip"
-              >请勿上传违法文件，可同时上传3个附件，且文件不超过5M，已上传的文件无法删除！</div>
+              >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
             </el-upload>
           </el-form-item>
           <el-form-item label="证书" prop="certificate">
             <el-upload
               :before-upload="handleBeforeUpload"
-              :before-remove="certificateBeforeRemove"
+              :before-remove="editCertificateBeforeRemove"
               :on-success="editCertificateSuccess"
+              :on-change="editCertificateChange"
+              :on-preview="handlePreview"
               :file-list="editCertificateFileList"
               :action="uploadUrl"
-              class="upload-demo"
+              :class="{hideupload:editcertificatehideupload}"
               :headers="headers"
               multiple
-              :limit="3"
-              :on-preview="handlePreview"
+              :limit="uploadPicLimit"
               list-type="picture-card"
-              :disabled="editCertificateListLength===3?true:false"
             >
-              <i v-if="editCertificateListLength<3" class="el-icon-plus" />
-              <i v-else class="el-icon-close" />
+              <i class="el-icon-plus" />
               <div
                 slot="tip"
                 style="display: block;"
                 class="el-upload__tip"
-              >请勿上传违法文件，可同时上传3个附件，且文件不超过5M，已上传的文件无法删除！</div>
+              >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
             </el-upload>
           </el-form-item>
         </el-form>
@@ -463,7 +459,7 @@
 <script>
 import { qiNiuUrl } from '@/settings'
 import { getToken } from '@/utils/auth'
-import { validateFileExt } from '@/utils/my-validate'
+import { validatePicExt } from '@/utils/my-validate'
 import Pagination from '@/components/Pagination'
 export default {
   name: 'Index',
@@ -616,7 +612,16 @@ export default {
       editInvoiceListLength: 0,
       certificateUrlList: [],
       editCertificateFileList: [],
-      editCertificateListLength: 0
+      editCertificateListLength: 0,
+      addInvoiceListLength: 0,
+      addCertificateListLength: 0,
+      // 上传图片数量限制
+      uploadPicLimit: 3,
+      // 超过图片数量限制时隐藏上传组件
+      addinvoicehideupload: false,
+      addcertificatehideupload: false,
+      editinvoicehideupload: false,
+      editcertificatehideupload: false
     }
   },
   computed: {
@@ -660,6 +665,8 @@ export default {
       // 获得id
       this.addForm.fullName = this.currentUser.fullName
       this.addForm.userId = this.currentUser.userId
+      this.addInvoiceChange()
+      this.addCertificateChange()
       this.drawerVisible = true
       this.addDialogVisible = true
     },
@@ -844,6 +851,8 @@ export default {
         }
       }
       this.editCertificateListLength = this.certificateUrlList.length
+      this.editInvoiceChange()
+      this.editCertificateChange()
       this.editDialogVisible = true
     },
     // 提交修改对话框
@@ -927,16 +936,13 @@ export default {
       const uid = file.uid
       const id = response.data.contentId
       this.invoiceFiles.push({ uid, id })
-
-      this.$get(`oss/content/${uid}`).then((r) => {
-        console.log(r)
-      })
-
+      this.addInvoiceListLength++
       if (this.addForm.invoice === '' || this.addForm.invoice === null) {
         this.addForm.invoice = response.data.url
       } else {
         this.addForm.invoice = this.addForm.invoice + ',' + response.data.url
       }
+      console.log(this.addInvoiceListLength)
     },
     // 修改用户的发票图片上传成功后
     editInvoiceSuccess(response, file, fileList) {
@@ -949,17 +955,102 @@ export default {
       } else {
         this.editForm.invoice = this.editForm.invoice + ',' + response.data.url
       }
+      this.editInvoiceFileList.push({
+        name: response.data.url.substring(28),
+        url: response.data.url
+      })
     },
-    // 删除上传的发票图片
-    invoiceBeforeRemove(file, fileList) {
+    // 删除添加表单上传的发票图片，写死的（图片长度限定为3）
+    addInvoiceBeforeRemove(file, fileList) {
+      const fileUrl = file.response.data.url
       for (let j = 0; j < this.invoiceFiles.length; j++) {
         if (this.invoiceFiles[j].uid === file.uid) {
-          this.$delete(`oss/content/${this.invoiceFiles[j].id}`).then(() => {
-            this.$message({
-              message: '删除成功',
-              type: 'success'
-            })
-          })
+          this.$delete(`oss/content/${this.invoiceFiles[j].id}`)
+
+          // 根据图片数量分别执行删除的功能
+          if (this.invoiceFiles.length === 1) {
+            console.log('111')
+            this.addForm.invoice = ''
+          } else if (this.invoiceFiles.length === 2) {
+            console.log('222')
+            if (j === 0) {
+              this.addForm.invoice = this.addForm.invoice.split(
+                fileUrl + ','
+              )[1]
+            } else {
+              this.addForm.invoice = this.addForm.invoice.split(
+                ',' + fileUrl
+              )[0]
+            }
+          } else {
+            if (j === 0) {
+              this.addForm.invoice = this.addForm.invoice.split(
+                fileUrl + ','
+              )[1]
+            } else if (j === 1) {
+              const firsturl = this.addForm.invoice.split(',' + fileUrl)[0]
+              const lasturl = this.addForm.invoice.split(',' + fileUrl)[1]
+              this.addForm.invoice = firsturl + lasturl
+            } else {
+              this.addForm.invoice = this.addForm.invoice.split(
+                ',' + fileUrl
+              )[0]
+            }
+          }
+          this.addInvoiceListLength--
+          console.log(this.addInvoiceListLength)
+          this.addInvoiceChange()
+          return true
+        }
+      }
+    },
+    // 删除修改表单上传的发票图片，写死的（图片长度限定为3）
+    editInvoiceBeforeRemove(file, fileList) {
+      for (let n = 0; n < this.editInvoiceFileList.length; n++) {
+        if (this.editInvoiceFileList[n].uid === file.uid) {
+          const fileUrl = this.editInvoiceFileList[n].url
+          const fileName = this.editInvoiceFileList[n].url
+            .substring(28)
+            .split('.')[0]
+          this.$delete(`oss/content`, { fileName: fileName })
+          // 根据图片数量分别执行删除的功能
+          if (this.editInvoiceFileList.length === 1) {
+            console.log('111')
+            this.editForm.invoice = ''
+            this.editInvoiceFileList = []
+          } else if (this.editInvoiceFileList.length === 2) {
+            console.log('222')
+            if (n === 0) {
+              this.editForm.invoice = this.editForm.invoice.split(
+                fileUrl + ','
+              )[1]
+              this.editInvoiceFileList.shift()
+            } else {
+              this.editForm.invoice = this.editForm.invoice.split(
+                ',' + fileUrl
+              )[0]
+              this.editInvoiceFileList.pop()
+            }
+          } else {
+            if (n === 0) {
+              this.editForm.invoice = this.editForm.invoice.split(
+                fileUrl + ','
+              )[1]
+              this.editInvoiceFileList.shift()
+            } else if (n === 1) {
+              const firsturl = this.editForm.invoice.split(',' + fileUrl)[0]
+              const lasturl = this.editForm.invoice.split(',' + fileUrl)[1]
+              this.editForm.invoice = firsturl + lasturl
+              this.editInvoiceFileList.splice(n, 1)
+            } else {
+              this.editForm.invoice = this.editForm.invoice.split(
+                ',' + fileUrl
+              )[0]
+              this.editInvoiceFileList.pop()
+            }
+          }
+          this.editInvoiceListLength--
+          this.editInvoiceChange()
           return true
         }
       }
@@ -974,7 +1065,7 @@ export default {
         return false
       } else {
         const ext = file.name.replace(/.+\./, '')
-        if (!validateFileExt(ext)) {
+        if (!validatePicExt(ext)) {
           this.$message({
             type: 'error',
             message: '禁止上传' + ext + '类型的附件'
@@ -1037,6 +1128,7 @@ export default {
       const uid = file.uid
       const id = response.data.contentId
       this.certificateFiles.push({ uid, id })
+      this.addCertificateListLength++
       if (
         this.addForm.certificate === '' ||
         this.addForm.certificate === null
@@ -1062,22 +1154,124 @@ export default {
         this.editForm.certificate =
           this.editForm.certificate + ',' + response.data.url
       }
+      this.editCertificateFileList.push({
+        name: response.data.url.substring(28),
+        url: response.data.url
+      })
     },
-    // 删除上传的证书图片
-    certificateBeforeRemove(file, fileList) {
+    // 删除添加表单上传的证书图片
+    addCertificateBeforeRemove(file, fileList) {
+      const fileUrl = file.response.data.url
       for (let l = 0; l < this.certificateFiles.length; l++) {
         if (this.certificateFiles[l].uid === file.uid) {
-          this.$delete(`oss/content/${this.certificateFiles[l].id}`).then(
-            () => {
-              this.$message({
-                message: '删除成功',
-                type: 'success'
-              })
+          this.$delete(`oss/content/${this.certificateFiles[l].id}`)
+
+          // 根据图片数量分别执行删除的功能
+          if (this.certificateFiles.length === 1) {
+            console.log('111')
+            this.addForm.certificate = ''
+          } else if (this.certificateFiles.length === 2) {
+            console.log('222')
+            if (l === 0) {
+              this.addForm.certificate = this.addForm.certificate.split(
+                fileUrl + ','
+              )[1]
+            } else {
+              this.addForm.certificate = this.addForm.certificate.split(
+                ',' + fileUrl
+              )[0]
             }
-          )
+          } else {
+            if (l === 0) {
+              this.addForm.certificate = this.addForm.certificate.split(
+                fileUrl + ','
+              )[1]
+            } else if (l === 1) {
+              const firsturl = this.addForm.certificate.split(',' + fileUrl)[0]
+              const lasturl = this.addForm.certificate.split(',' + fileUrl)[1]
+              this.addForm.certificate = firsturl + lasturl
+            } else {
+              this.addForm.certificate = this.addForm.certificate.split(
+                ',' + fileUrl
+              )[0]
+            }
+          }
+          this.addCertificateListLength--
+          this.addCertificateChange()
           return true
         }
       }
+    },
+    // 删除修改表单上传的证书图片，写死的（图片长度限定为3）
+    editCertificateBeforeRemove(file, fileList) {
+      for (let m = 0; m < this.editCertificateFileList.length; m++) {
+        if (this.editCertificateFileList[m].uid === file.uid) {
+          const fileUrl = this.editCertificateFileList[m].url
+          const fileName = this.editCertificateFileList[m].url
+            .substring(28)
+            .split('.')[0]
+          this.$delete(`oss/content`, { fileName: fileName })
+          // 根据图片数量分别执行删除的功能
+          if (this.editCertificateFileList.length === 1) {
+            console.log('111')
+            this.editForm.certificate = ''
+            this.editCertificateFileList = []
+          } else if (this.editCertificateFileList.length === 2) {
+            console.log('222')
+            if (m === 0) {
+              this.editForm.certificate = this.editForm.certificate.split(
+                fileUrl + ','
+              )[1]
+              this.editCertificateFileList.shift()
+            } else {
+              this.editForm.certificate = this.editForm.certificate.split(
+                ',' + fileUrl
+              )[0]
+              this.editCertificateFileList.pop()
+            }
+          } else {
+            if (m === 0) {
+              this.editForm.certificate = this.editForm.certificate.split(
+                fileUrl + ','
+              )[1]
+              this.editCertificateFileList.shift()
+            } else if (m === 1) {
+              const firsturl = this.editForm.certificate.split(',' + fileUrl)[0]
+              const lasturl = this.editForm.certificate.split(',' + fileUrl)[1]
+              this.editForm.certificate = firsturl + lasturl
+              this.editCertificateFileList.splice(m, 1)
+            } else {
+              this.editForm.certificate = this.editForm.certificate.split(
+                ',' + fileUrl
+              )[0]
+              this.editCertificateFileList.pop()
+            }
+          }
+          this.editCertificateListLength--
+          this.editCertificateChange()
+          return true
+        }
+      }
+    },
+    // 监听发票图片数量是否超过限制，从而隐藏上传框
+    addInvoiceChange() {
+      this.addinvoicehideupload =
+        this.addInvoiceListLength >= this.uploadPicLimit
+    },
+    // 监听证书图片数量是否超过限制，从而隐藏上传框
+    addCertificateChange() {
+      this.addcertificatehideupload =
+        this.addCertificateListLength >= this.uploadPicLimit
+    },
+    // 监听发票图片数量是否超过限制，从而隐藏上传框
+    editInvoiceChange() {
+      this.editinvoicehideupload =
+        this.editInvoiceListLength >= this.uploadPicLimit
+    },
+    // 监听证书图片数量是否超过限制，从而隐藏上传框
+    editCertificateChange() {
+      this.editcertificatehideupload =
+        this.editCertificateListLength >= this.uploadPicLimit
     }
   }
 }

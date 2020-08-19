@@ -108,3 +108,8 @@ export function validateFileExt(ext) {
   if (ext === null || ext === '') return false
   return ['jpg', 'png', 'txt', 'jpeg', 'pdf', 'doc', 'docx', 'xlsx', 'xls'].indexOf(ext.toLowerCase()) !== -1
 }
+
+export function validatePicExt(ext) {
+  if (ext === null || ext === '') return false
+  return ['jpg', 'png', 'jpeg', 'gif', 'bmp'].indexOf(ext.toLowerCase()) !== -1
+}

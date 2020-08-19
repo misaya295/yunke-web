@@ -9,7 +9,7 @@
   >
     <el-form ref="form" :model="copyright" :rules="rules" label-position="right" label-width="100px">
       <el-form-item label="标题" prop="title">
-        <el-input v-model="copyright.title"  />
+        <el-input v-model="copyright.title" />
       </el-form-item>
       <el-form-item label="摘要" >
         <el-input v-model="copyright.introduction"  />
