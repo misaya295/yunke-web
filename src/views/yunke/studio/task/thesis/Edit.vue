@@ -1,131 +1,131 @@
 <template>
-  <el-dialog
-    :title="title"
-    :width="width"
-    top="20px"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :visible.sync="isVisible"
-  >
-    <el-form ref="form" :model="tasks" :rules="rules" label-position="right" label-width="100px">
-      <!-- 标题 -->
-      <el-form-item label="标题" prop="title">
-        <el-input v-model="tasks.title" />
-      </el-form-item>
-      <!-- 摘要 -->
-      <el-form-item label="摘要" prop="introduction">
-        <el-input v-model="tasks.introduction" />
-      </el-form-item>
-      <!-- 论文类型 -->
-      <el-form-item label="论文类型" prop="paperType">
-        <el-radio-group v-model="tasks.paperType">
-          <el-radio :label="1">核心</el-radio>
-          <el-radio :label="2">普通</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <!-- 负责人 -->
-      <el-form-item label="负责人">
-        <el-select v-model="team.reliable" value="" placeholder="负责人" style="width:100%">
-          <el-option
-            v-for="thesis in userRoles"
-            :key="thesis.userId"
-            :label="thesis.fullName"
-            :value="String(thesis.userId)"
-          />
-        </el-select>
-      </el-form-item>
-      <!-- 成员 -->
-      <el-form-item label="成员">
-        <el-select v-model="team.member" multiple value="" placeholder="成员(不包括负责人)" style="width:100%">
-          <el-option
-            v-for="thesis in userRoles"
-            :key="thesis.userId"
-            :label="thesis.fullName"
-            :value="String(thesis.userId)"
-          />
-        </el-select>
-      </el-form-item>
-      <!-- 指导老师 -->
-      <el-form-item label="指导老师">
-        <el-select v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
-          <el-option
-            v-for="thesis in teacherRoles"
-            :key="thesis.userId"
-            :label="thesis.fullName"
-            :value="String(thesis.userId)"
-          />
-        </el-select>
-      </el-form-item>
-      <!-- 上传论文 -->
-      <el-form-item label="上传论文" prop="url">
-        <el-upload
-          :before-upload="handleBeforeUpload"
-          :before-remove="handleBeforeRemove"
-          :on-success="handleSuccessUrl"
-          :file-list="fileList"
-          :action="uploadUrl"
-          class="upload-demo"
-          :headers="headers"
-          multiple
-          :limit="1"
-          :disabled="files.length===1?true:false"
-          drag
-        >
-          <i class="el-icon-upload" />
-          <i v-if="files.length<1" class="el-icon-plus" />
-          <i v-else class="el-icon-close" />
-          <div class="el-upload__text">只能上传一个附件</div>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，<b>只能上传 1 个附件</b>，且文件不超过5M</div>
-        </el-upload>
-      </el-form-item>
-      <!-- 花费 -->
-      <el-form-item label="花费" prop="cost">
-        <el-input v-model="tasks.cost" />
-      </el-form-item>
-      <!-- 状态 -->
-      <el-form-item label="状态" prop="state">
-        <el-radio-group v-model="tasks.state">
-          <el-radio :label="1">进行中</el-radio>
-          <el-radio :label="2">已完成</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <!-- 发票 -->
-      <el-form-item label="发票" prop="invoice">
-        <el-upload
-          :before-upload="handleBeforeUpload"
-          :before-remove="handleBeforeRemove"
-          :on-success="handleSuccess"
-          :file-list="fileList"
-          :action="uploadUrl"
-          class="upload-demo"
-          :headers="headers"
-          multiple
-          :limit="3"
-          drag
-        >
-          <i class="el-icon-upload" />
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
-        </el-upload>
-      </el-form-item>
-      <!-- 是否已报销 -->
-      <el-form-item label="是否已报销" prop="reimbursement">
-        <el-radio-group v-model="tasks.reimbursement">
-          <el-radio :label="0">否</el-radio>
-          <el-radio :label="1">是</el-radio>
-        </el-radio-group>
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button type="warning" plain :loading="buttonLoading" @click="isVisible = false">
-        {{ $t('common.cancel') }}
-      </el-button>
-      <el-button type="primary" plain :loading="buttonLoading" @click="submitForm">
-        {{ $t('common.confirm') }}
-      </el-button>
-    </div>
-  </el-dialog>
+    <el-dialog
+      :title="title"
+      :width="width"
+      top="20px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :visible.sync="isVisible"
+    >
+        <el-form ref="form" :model="tasks" :rules="rules" label-position="right" label-width="100px">
+            <!-- 标题 -->
+            <el-form-item label="标题" prop="title">
+                <el-input v-model="tasks.title"  />
+            </el-form-item>
+            <!-- 摘要 -->
+            <el-form-item label="摘要" prop="introduction">
+                <el-input v-model="tasks.introduction"  />
+            </el-form-item>
+            <!-- 论文类型 -->
+            <el-form-item label="论文类型" prop="paperType">
+                <el-radio-group v-model="tasks.paperType">
+                    <el-radio :label='1'>核心</el-radio>
+                    <el-radio :label='2'>普通</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <!-- 负责人 -->
+            <el-form-item label="负责人" >
+              <el-select v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
+                <el-option
+                  v-for="thesis in userRoles"
+                  :key="thesis.userId"
+                  :label="thesis.fullName"
+                  :value="String(thesis.userId)"
+                />
+              </el-select>
+            </el-form-item>
+            <!-- 成员 -->
+            <el-form-item label="成员" >
+              <el-select v-model="team.member" multiple value="" placeholder="成员(不包括负责人)" style="width:100%">
+                <el-option
+                  v-for="thesis in userRoles"
+                  :key="thesis.userId"
+                  :label="thesis.fullName"
+                  :value="String(thesis.userId)"
+                />
+              </el-select>
+            </el-form-item>
+            <!-- 指导老师 -->
+            <el-form-item label="指导老师" >
+              <el-select v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
+                <el-option
+                  v-for="thesis in teacherRoles"
+                  :key="thesis.userId"
+                  :label="thesis.fullName"
+                  :value="String(thesis.userId)"
+                />
+              </el-select>
+            </el-form-item>
+            <!-- 上传论文 -->
+            <el-form-item label="上传论文" prop="url">
+              <el-upload
+                :before-upload="handleBeforeUpload"
+                :before-remove="handleBeforeRemove"
+                :on-success="handleSuccessUrl"
+                :file-list="fileList"
+                :action="uploadUrl"
+                class="upload-demo"
+                :headers="headers"
+                multiple
+                :limit="1"
+                :disabled="files.length===1?true:false"
+                drag
+              >
+                <i class="el-icon-upload" />
+                <i v-if="files.length<1" class="el-icon-plus" />
+                <i v-else class="el-icon-close" />
+                <div class="el-upload__text">只能上传一个附件</div>
+                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，<b>只能上传 1 个附件</b>，且文件不超过5M</div>
+              </el-upload>
+            </el-form-item>
+            <!-- 花费 -->
+            <el-form-item label="花费" prop="cost">
+                <el-input v-model="tasks.cost"  />
+            </el-form-item>
+            <!-- 状态 -->
+            <el-form-item label="状态" prop="state">
+                <el-radio-group v-model="tasks.state">
+                    <el-radio :label='1'>进行中</el-radio>
+                    <el-radio :label='2'>已完成</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <!-- 发票 -->
+            <el-form-item label="发票" prop="invoice">
+              <el-upload
+                :before-upload="handleBeforeUpload"
+                :before-remove="handleBeforeRemove"
+                :on-success="handleSuccess"
+                :file-list="fileList"
+                :action="uploadUrl"
+                class="upload-demo"
+                :headers="headers"
+                multiple
+                :limit="3"
+                drag
+              >
+                <i class="el-icon-upload" />
+                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+              </el-upload>
+            </el-form-item>
+            <!-- 是否已报销 -->
+            <el-form-item label="是否已报销" prop="reimbursement">
+                <el-radio-group v-model="tasks.reimbursement">
+                    <el-radio :label='0'>否</el-radio>
+                    <el-radio :label='1'>是</el-radio>
+                </el-radio-group>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="warning" plain :loading="buttonLoading" @click="isVisible = false">
+                {{ $t('common.cancel') }}
+            </el-button>
+            <el-button type="primary" plain :loading="buttonLoading" @click="submitForm">
+                {{ $t('common.confirm') }}
+            </el-button>
+        </div>
+    </el-dialog>
 </template>
 <script>
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -333,8 +333,8 @@ export default {
           if (!this.tasks.thesisId) {
             // create
             // 调用getDge
-            const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
-            if (flag) {
+            const {a, b, flag} = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
+            if(flag) {
               this.buttonLoading = false
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
@@ -358,8 +358,8 @@ export default {
           } else {
             // update
             // 调用getDge
-            const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
-            if (flag) {
+            const {a, b, flag} = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
+            if(flag) {
               this.buttonLoading = false
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
@@ -387,10 +387,10 @@ export default {
       // 负责人
       if (reliable.length > 0) {
         reliableArr.push('1')
-      }
+        }
       // 成员
       member.forEach((v, i) => {
-        memberArr.push('2')
+         memberArr.push('2')
       })
       // 指导老师
       teacher.forEach((v, i) => {
@@ -400,12 +400,12 @@ export default {
       const b = [...reliableArr, ...memberArr, ...teacherArr].join(',')
       // 进行判断是否多次选择同一个人
       let flag = false
-      var obj = {}
+      var obj ={}
       for (var i = 0; i < a.length; i++) {
-        if (obj[a[i]]) flag = true
+        if (obj[a[i]])  flag = true
         obj[a[i]] = true
       }
-      a = a.join(',')
+      a=a.join(',')
       return {
         a,
         b,

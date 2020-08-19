@@ -119,6 +119,13 @@ import Index from './Index.vue'
 export default {
 
   name: 'MatchView',
+  props: {
+    taskId: Number,
+    dialogVisible: {
+      type: Boolean,
+      default: false
+    }
+  },
   filters: {
     // 比赛等级
     levelFilter(level) {
@@ -154,7 +161,7 @@ export default {
 
       // return u;
     },
-    userStateFilter(userState) {
+    userStateFilter(userState){
       const map = {
         1: '负责人',
         2: '成员',
