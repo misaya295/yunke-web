@@ -150,11 +150,11 @@
         @close="closeEditDialog"
       >
         <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="100px">
-          <el-form-item label="学校资产ID" prop="assetsName">
-            <el-input v-model="editForm.assetsName" disabled />
+          <el-form-item label="资产名称" prop="propertyName">
+            <el-input v-model="editForm.propertyName" disabled />
           </el-form-item>
-          <el-form-item label="维修证明人ID" prop="repairProverUserInfoUuid">
-            <el-input v-model="editForm.repairProverUserInfoUuid" disabled />
+          <el-form-item label="证明人名称" prop="repairProverUserInfoName">
+            <el-input v-model="editForm.repairProverUserInfoName" disabled />
           </el-form-item>
           <el-form-item label="维修价格" prop="repairPrice" type="number">
             <el-input v-model.number="editForm.repairPrice" />
@@ -178,18 +178,17 @@
               :before-upload="handleBeforeUpload"
               :before-remove="handleBeforeRemove"
               :on-success="editHandleSuccess"
+              :on-change="editRepairInvoiceChange"
+              :on-preview="handlePreview"
               :file-list="editFileList"
               :action="uploadUrl"
-              class="upload-demo"
+              :class="{hideupload:editrepairinvoicehideupload}"
               :headers="headers"
               multiple
-              :limit="3"
-              :on-preview="handlePreview"
+              :limit="uploadPicLimit"
               list-type="picture-card"
-              :disabled="editListLength===3?true:false"
             >
-              <i v-if="editListLength<3" class="el-icon-plus" />
-              <i v-else class="el-icon-close" />
+              <i class="el-icon-plus" />
               <div
                 slot="tip"
                 style="display: block;"
@@ -220,7 +219,7 @@
 <script>
 import { qiNiuUrl } from '@/settings'
 import { getToken } from '@/utils/auth'
-import { validateFileExt } from '@/utils/my-validate'
+import { validatePicExt } from '@/utils/my-validate'
 import Pagination from '@/components/Pagination'
 export default {
   name: 'Index',
@@ -289,7 +288,11 @@ export default {
       // 保存图片地址
       fileUrlList: [],
       editFileList: [],
-      editListLength: 0
+      editListLength: 0,
+      // 上传图片数量限制
+      uploadPicLimit: 3,
+      // 超过图片数量限制时隐藏上传组件
+      editrepairinvoicehideupload: false
     }
   },
   computed: {
@@ -326,7 +329,6 @@ export default {
         ...this.sort
       })
     },
-
     // 搜索证书
     searchrepair() {
       console.log(this.queryParams)
@@ -404,8 +406,7 @@ export default {
       // 浅克隆，同一源里的数值也会改变
       // this.editForm = row;
       this.editForm = Object.assign({}, row)
-      console.log(this.editForm.repairInvoice)
-      console.log(typeof this.editForm.repairInvoice)
+      // console.log(this.editForm.repairInvoice);
       if (
         this.editForm.repairInvoice === null ||
         this.editForm.repairInvoice === ''
@@ -426,6 +427,7 @@ export default {
         }
       }
       this.editListLength = this.fileUrlList.length
+      this.editRepairInvoiceChange()
       this.editDialogVisible = true
     },
     // 提交修改对话框
@@ -459,7 +461,6 @@ export default {
       const id = response.data.contentId
       this.files.push({ uid, id })
       this.editListLength++
-      console.log(this.editListLength)
       if (
         this.editForm.repairInvoice === '' ||
         this.editForm.repairInvoice === null
@@ -469,17 +470,59 @@ export default {
         this.editForm.repairInvoice =
           this.editForm.repairInvoice + ',' + response.data.url
       }
+      this.editFileList.push({
+        name: response.data.url.substring(28),
+        url: response.data.url
+      })
     },
-    // 删除上传的图片
+    // 删除上传的图片，写死的（图片长度限定为3）
     handleBeforeRemove(file, fileList) {
-      for (let i = 0; i < this.files.length; i++) {
-        if (this.files[i].uid === file.uid) {
-          this.$delete(`oss/content/${this.files[i].id}`).then(() => {
-            this.$message({
-              message: '删除成功',
-              type: 'success'
-            })
-          })
+      for (let n = 0; n < this.editFileList.length; n++) {
+        if (this.editFileList[n].uid === file.uid) {
+          console.log(this.editFileList)
+          const fileUrl = this.editFileList[n].url
+          const fileName = this.editFileList[n].url
+            .substring(28)
+            .split('.')[0]
+          this.$delete(`oss/content`, { fileName: fileName })
+          // 根据图片数量分别执行删除的功能
+          if (this.editFileList.length === 1) {
+            console.log('111')
+            this.editForm.repairInvoice = null
+            this.editFileList = []
+          } else if (this.editFileList.length === 2) {
+            console.log('222')
+            if (n === 0) {
+              this.editForm.repairInvoice = this.editForm.repairInvoice.split(
+                fileUrl + ','
+              )[1]
+              this.editFileList.shift()
+            } else {
+              this.editForm.repairInvoice = this.editForm.repairInvoice.split(
+                ',' + fileUrl
+              )[0]
+              this.editFileList.pop()
+            }
+          } else {
+            if (n === 0) {
+              this.editForm.repairInvoice = this.editForm.repairInvoice.split(
+                fileUrl + ','
+              )[1]
+              this.editFileList.shift()
+            } else if (n === 1) {
+              const firsturl = this.editForm.repairInvoice.split(',' + fileUrl)[0]
+              const lasturl = this.editForm.repairInvoice.split(',' + fileUrl)[1]
+              this.editForm.repairInvoice = firsturl + lasturl
+              this.editFileList.splice(n, 1)
+            } else {
+              this.editForm.repairInvoice = this.editForm.repairInvoice.split(
+                ',' + fileUrl
+              )[0]
+              this.editFileList.pop()
+            }
+          }
+          this.editListLength--
+          this.editRepairInvoiceChange()
           return true
         }
       }
@@ -504,7 +547,7 @@ export default {
         return false
       } else {
         const ext = file.name.replace(/.+\./, '')
-        if (!validateFileExt(ext)) {
+        if (!validatePicExt(ext)) {
           this.$message({
             type: 'error',
             message: '禁止上传' + ext + '类型的附件'
@@ -532,6 +575,11 @@ export default {
         }
       })
       $table.toggleRowExpansion(row)
+    },
+    // 监听发票图片数量是否超过限制，从而隐藏上传框
+    editRepairInvoiceChange() {
+      this.editrepairinvoicehideupload =
+        this.editListLength >= this.uploadPicLimit
     }
   }
 }

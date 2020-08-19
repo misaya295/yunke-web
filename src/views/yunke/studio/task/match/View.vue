@@ -28,15 +28,15 @@
     </el-row>
 
     <el-row :gutter="10">
-      
-    <!-- 比赛等级 -->
+
+      <!-- 比赛等级 -->
       <el-col :xs="24" :sm="12">
         <div class="view-item">
           <i class="el-icon-trophy" /> <span>{{ '比赛等级' +'：' }}</span> {{ match.level | levelFilter }}
         </div>
       </el-col>
-      
-    <!-- 比赛类型 -->
+
+      <!-- 比赛类型 -->
       <el-col :xs="24" :sm="12">
         <div class="view-item">
           <i class="el-icon-phone-outline" /> <span>{{ '比赛类型' +'：' }}</span> {{ match.type | typeFilter }}
@@ -53,7 +53,7 @@
       <!-- 比赛时间 -->
       <el-col :xs="24" :sm="12">
         <div class="view-item">
-          <i class="el-icon-bangzhu" /> <span>{{ '比赛时间' +'：' }}</span> {{ match.time}}
+          <i class="el-icon-bangzhu" /> <span>{{ '比赛时间' +'：' }}</span> {{ match.time }}
         </div>
       </el-col>
     </el-row>
@@ -64,7 +64,7 @@
           <i class="el-icon-time" /> <span>{{ '花费' +'：' }}</span> {{ match.cost }}
         </div>
       </el-col>
-       <!-- 发票 -->
+      <!-- 发票 -->
       <el-col :xs="24" :sm="12">
         <div class="view-item">
           <i class="el-icon-bell" /> <span>{{ '发票' +'：' }}</span>
@@ -72,7 +72,7 @@
         </div>
       </el-col>
     </el-row>
-   
+
     <el-row :gutter="10">
       <!-- 状态 -->
       <el-col :xs="24" :sm="12">
@@ -88,12 +88,12 @@
         </div>
       </el-col>
     </el-row>
-    
+
     <el-row :gutter="10">
       <!-- 比赛角色 -->
       <el-col :xs="24" :sm="12">
         <div class="view-item">
-          <i class="el-icon-document" /> <span>{{ '比赛角色' +'：' }}</span> {{ match.user_state | userStateFilter}}
+          <i class="el-icon-document" /> <span>{{ '比赛角色' +'：' }}</span> {{ match.user_state | userStateFilter }}
         </div>
       </el-col>
       <el-col :xs="24" :sm="12">
@@ -104,7 +104,7 @@
         </div>
       </el-col>
     </el-row>
-     <el-row :gutter="10">
+    <el-row :gutter="10">
       <!-- 证书 -->
       <el-col :xs="24" :sm="12">
         <div class="view-item">
@@ -115,44 +115,38 @@
   </el-dialog>
 </template>
 <script>
-import Index from "./Index.vue";
+import Index from './Index.vue'
 export default {
-  
+
   name: 'MatchView',
-  props: {
-    dialogVisible: {
-      type: Boolean,
-      default: false
-    }
-  },
   filters: {
-    //比赛等级
+    // 比赛等级
     levelFilter(level) {
       const map = {
-        0: '',
-        1: '',
-        2: ''
+        0: '国家级',
+        1: '省级',
+        2: '校级'
       }
       return map[level]
     },
-    //比赛类型
+    // 比赛类型
     typeFilter(type) {
       const map = {
-        0: '',
-        1: ''
+        0: '个人',
+        1: '团队'
       }
       return map[type]
     },
-    
+
     usersFilter(userIds) {
       // let u = [];
-      
+
       // if(typeof userIds == "string"){
       //   this.get(`${userIds}`).then((r) => {
       //     u = r.data.data.name
       //   })
       // }else if(typeof userIds == "object"){
-            // }
+      // }
       // u = [1,2,3];
       // u.forEach(function (item){
       //   console.log(item)
@@ -160,29 +154,36 @@ export default {
 
       // return u;
     },
-    userStateFilter(state){
+    userStateFilter(userState) {
       const map = {
         1: '负责人',
         2: '成员',
-        3: '指导老师',
+        3: '指导老师'
+      }
+      return map[userState]
+    },
+    // 状态
+    stateFilter(state) {
+      const map = {
+        1: '进行中',
+        2: '已完成'
       }
       return map[state]
     },
-    //状态
-    stateFilter(state){
-        const map = {
-            1: "进行中",
-            2: "已完成",
-        }
-         return map[state]
-    },
-    //是否已报销
-    reimbursementFilter(reimbursement){
-      const map={
-        0:'未报销',
-        1:'已报销'
+    // 是否已报销
+    reimbursementFilter(reimbursement) {
+      const map = {
+        0: '未报销',
+        1: '已报销'
       }
       return map[reimbursement]
+    }
+  },
+  props: {
+    taskId: Number,
+    dialogVisible: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -219,19 +220,19 @@ export default {
     }
   },
   methods: {
-    getName(i){
-        let nameArr = new Array();
-        this.$get(`studio/members/${i}`).then((r) => {
-          let tmp=r.data.data.rows;
-          for(i=0; i<tmp.length; i++){
-            nameArr.push(tmp[i].full_name)  
-          }
-          this.users = nameArr.join("、");
-        })
+    getName(i) {
+      const nameArr = new Array()
+      this.$get(`studio/members/${i}`).then((r) => {
+        const tmp = r.data.data.rows
+        for (i = 0; i < tmp.length; i++) {
+          nameArr.push(tmp[i].full_name)
+        }
+        this.users = nameArr.join('、')
+      })
     },
-    reInitTask(t){
+    reInitTask(t) {
       this.$get(`studio/match/${t.matchId}`).then((r) => {
-        this.match = r.data.data;
+        this.match = r.data.data
       })
     },
     initWidth() {
@@ -250,7 +251,7 @@ export default {
       this.user = { ...val }
     },
     setMatch(val) {
-     this.reInitTask(val);
+      this.reInitTask(val)
     },
     close() {
       this.$emit('close')
