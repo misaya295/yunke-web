@@ -1,38 +1,38 @@
 <template>
- <div class="app-container">
+  <div class="app-container">
     <div class="filter-container">
-        <!-- 比赛名称 -->
-        <el-input v-model="queryParams.title" placeholder="比赛名称" class="filter-item search-item"/>
-        <!-- 真实姓名 -->
-        <el-input v-model="queryParams.fullName" placeholder="真实姓名" class="filter-item search-item"/>
-        <!-- 是否已报销 -->
-        <el-select  v-model="queryParams.reimbursement"  value="" placeholder="是否已报销" class="filter-item search-item">
-          <el-option
-            v-for="match in whether"
-            :key="match.id"
-            :label="match.name"
-            :value="match.id"
-          />
-        </el-select>
-        <!-- 比赛时间 -->
-        <el-date-picker
+      <!-- 比赛名称 -->
+      <el-input v-model="queryParams.title" placeholder="比赛名称" class="filter-item search-item" />
+      <!-- 真实姓名 -->
+      <el-input v-model="queryParams.fullName" placeholder="真实姓名" class="filter-item search-item" />
+      <!-- 是否已报销 -->
+      <el-select v-model="queryParams.reimbursement" value="" placeholder="是否已报销" class="filter-item search-item">
+        <el-option
+          v-for="match in whether"
+          :key="match.id"
+          :label="match.name"
+          :value="match.id"
+        />
+      </el-select>
+      <!-- 比赛时间 -->
+      <el-date-picker
         v-model="queryParams.time"
         :range-separator="null"
         :start-placeholder="$t('table.user.createTime')"
         value-format="yyyy-MM-dd"
         class="filter-item search-item date-range-item"
         type="daterange"
-      /><br/>
-        <!-- 搜索 -->
-        <el-button class="filter-item" type="primary" plain @click="search">
-            {{ $t('table.search') }}
-        </el-button>
-        <!-- 重置 -->
-        <el-button class="filter-item" type="warning" plain @click="reset">
-            {{ $t('table.reset') }}
-        </el-button>
-        <!-- 更多操作 -->
-        <el-dropdown v-has-any-permission="['task:add','task:delete','task:export']" trigger="click" class="filter-item">
+      /><br>
+      <!-- 搜索 -->
+      <el-button class="filter-item" type="primary" plain @click="search">
+        {{ $t('table.search') }}
+      </el-button>
+      <!-- 重置 -->
+      <el-button class="filter-item" type="warning" plain @click="reset">
+        {{ $t('table.reset') }}
+      </el-button>
+      <!-- 更多操作 -->
+      <el-dropdown v-has-any-permission="['task:add','task:delete','task:export']" trigger="click" class="filter-item">
         <el-button>
           {{ $t('table.more') }}<i class="el-icon-arrow-down el-icon--right" />
         </el-button>
@@ -57,206 +57,206 @@
       @expand-change="getTeam"
       @row-click="toogleExpand"
     >
-         <!-- 展开区域 -->
-        <el-table-column label="详情" type="expand" width="40px">
-          <template slot-scope="props">
-            <el-form label-position="left" class="table-expand">
-              <el-row>
-                <el-col :span="4">
-                  <el-form-item label="负责人:">
-                    <span>{{ team.reliable }}</span>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="5">
-                  <el-form-item label="成员:">
-                    <span>{{ team.member }}</span>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="5">
-                  <el-form-item label="指导老师:">
-                    <span>{{ team.teacher }}</span>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col>
-                  <el-form-item label="发票:">
-                    <div class="demo-image" v-if="props.row.invoice">
-                      <div class="block" v-for="(item, i) in props.row.invoice.split(',')" :key="i">
-                        <el-image
-                          :src="item"
-                          @click="showpreViewDialog(item)">
-                        </el-image>
-                      </div>
+      <!-- 展开区域 -->
+      <el-table-column label="详情" type="expand" width="40px">
+        <template slot-scope="props">
+          <el-form label-position="left" class="table-expand">
+            <el-row>
+              <el-col :span="4">
+                <el-form-item label="负责人:">
+                  <span>{{ team.reliable }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="5">
+                <el-form-item label="成员:">
+                  <span>{{ team.member }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="5">
+                <el-form-item label="指导老师:">
+                  <span>{{ team.teacher }}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col>
+                <el-form-item label="发票:">
+                  <div v-if="props.row.invoice" class="demo-image">
+                    <div v-for="(item, i) in props.row.invoice.split(',')" :key="i" class="block">
+                      <el-image
+                        :src="item"
+                        @click="showpreViewDialog(item)"
+                      />
                     </div>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col>
-                  <el-form-item label="证书:">
-                    <div class="demo-image" v-if="props.row.invoice">
-                      <div class="block" v-for="(item, i) in props.row.certificate.split(',')" :key="i">
-                        <el-image
-                          :src="item"
-                          @click="showpreViewDialog(item)">
-                        </el-image>
-                      </div>
+                  </div>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col>
+                <el-form-item label="证书:">
+                  <div v-if="props.row.invoice" class="demo-image">
+                    <div v-for="(item, i) in props.row.certificate.split(',')" :key="i" class="block">
+                      <el-image
+                        :src="item"
+                        @click="showpreViewDialog(item)"
+                      />
                     </div>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </el-form>
-          </template>
-        </el-table-column>
-        <el-table-column type="selection" align="center" width="45px" />
-        <!-- 比赛名称 -->
-        <el-table-column label="比赛名称" prop="title" :show-overflow-tooltip="true" align="center" min-width="120px">
-            <template slot-scope="scope">
-                <span>{{ scope.row.title }}</span>
-            </template>
-        </el-table-column>
-        <!-- 比赛等级 -->
-        <el-table-column 
-            label="比赛等级" 
-            :filters="[{text: '国家级', value: '0'},{ text: '省级', value: '1' },{ text: '校级', value: '2' }]"
-            :filter-method="filterLevel"
-            class-name="level-col"
-            align="center"
-            min-width="90px"
-        >
-             <template slot-scope="{row}">
-                <el-tag :type="row.level | levelFilter">
-                    <span>{{transLevel(row.level)}}</span> 
-                </el-tag>
-            </template>
-
-        </el-table-column>
-        <!-- 比赛类型 -->
-        <el-table-column
-            label="比赛类型"
-            :filters="[{text: '个人', value: '0'},{ text: '团队', value: '1' }]"
-            :filter-method="filterType"
-            class-name="type-col"
-            align="center"
-            min-width="90px"
-        >
-            <template slot-scope="{row}">
-                <el-tag :type="row.type | typeFilter">
-                    {{ row.type === 1 ? '团队' : '个人' }}
-                </el-tag>
-            </template>
-        </el-table-column>
-        <!-- 申请书 -->
-        <el-table-column label="申请书" prop="applicationForm" :show-overflow-tooltip="true" type="primary" align="center" min-width="110px">
-            <template slot-scope="scope">
-                <a @click="upload(scope.row.applicationForm)" class="el-link el-link--primary">{{scope.row.applicationForm}}</a>
-            </template>
-        </el-table-column>
-        <!-- 比赛时间 -->
-        <el-table-column label="比赛时间" prop="time" :show-overflow-tooltip="true" align="center" min-width="100px">
-            <template slot-scope="scope">
-                <span>{{ scope.row.time }}</span>
-            </template>
-        </el-table-column>
-        <!-- 花费 -->
-        <el-table-column label="花费" prop="cost" :show-overflow-tooltip="true" align="center" min-width="50px">
-            <template slot-scope="scope">
-                <span>{{ scope.row.cost }}</span>
-            </template>
-        </el-table-column>
-        <!-- 比赛名次 -->
-        <el-table-column 
-            label="比赛名次" 
-            :filters="[{text: '一等奖', value: '1'},{ text: '二等奖', value: '2' },{ text: '三等奖', value: '3' },{ text: '特等奖', value: '4' },{ text: '优胜奖', value: '5' },{ text: '无', value: '6' }]"
-            :filter-method="filterRankCode"
-            class-name="rankCode-col"
-            align="center"
-            min-width="90px"
-        >
-            <template slot-scope="{row}">
-              <el-tag :type="row.rankCode | rankCodeFilter">
-                <span>{{transRankCode(row.rankCode)}}</span> 
-              </el-tag>
-            </template>
-        </el-table-column>
-        <!-- 状态 -->
-        <el-table-column
-            label="状态"
-            :filters="[{text: '进行中', value: '1'},{ text: '已完成', value: '2' }]"
-            :filter-method="filterState"
-            class-name="state-col"
-            align="center"
-            min-width="80px"
-        >
-            <template slot-scope="{row}">
-                <el-tag :type="row.state | stateFilter">
-                  {{ row.state === 2 ? '已完成' : '进行中' }}
-                </el-tag>
-            </template>
+                  </div>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </template>
       </el-table-column>
-        <!-- 是否已报销 -->
-        <el-table-column
-          label="报销"
-          :filters="[{text: '未报销', value: '0'},{ text: '已报销', value: '1' }]"
-          :filter-method="filterReimbursement"
-          class-name="reimbursement-col"
-          align="center"
-        >
-          <template slot-scope="{row}">
-            <el-tag :type="row.reimbursement | reimbursementFilter">
-              {{ row.reimbursement === 1 ? '已报销' : '未报销' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <!-- 操作-->
-        <el-table-column :label="$t('table.operation')" align="center" min-width="150px" class-name="small-padding fixed-width">
-          <template slot-scope="{row}">
-            <el-tooltip
-              v-hasPermission="['task:add']"
-              class="item"
-              effect="dark"
-              content="申请报销"
-              placement="top"
-              :enterable="false"
-            >
-              <i v-hasPermission="['task:add']" class="el-icon-coin table-operation" style="color: #87d068;" @click="changeReimbursement(row)" />
-            </el-tooltip>
-            <el-tooltip
-              v-hasPermission="['task:update']"
-              class="item"
-              effect="dark"
-              content="修改比赛"
-              placement="top"
-              :enterable="false"
-            >
-              <i v-hasPermission="['task:update']" class="el-icon-setting table-operation" style="color: #2db7f5;" @click="edit(row)" />
-            </el-tooltip>
-            <el-tooltip
-              v-hasPermission="['task:delete']"
-              class="item"
-              effect="dark"
-              content="删除比赛"
-              placement="top"
-              :enterable="false"
-            >
-              <i v-hasPermission="['task:delete']" class="el-icon-delete table-operation" style="color: #f50;" @click="singleDelete(row)" />
-            </el-tooltip>
-            <el-tooltip
-              v-hasPermission="['task:view']"
-              class="item"
-              effect="dark"
-              content="查看详情"
-              placement="top"
-              :enterable="false"
-            >
-              <i v-hasPermission="['task:view']" class="el-icon-info table-operation" style="color: #909399;" @row-click="toogleExpand(row)" />
-            </el-tooltip>
-            <el-link v-has-no-permission="['task:add','task:view','task:update','task:delete']" class="no-perm">
-              {{ $t('tips.noPermission') }}
-            </el-link>
-          </template>
-        </el-table-column>
+      <el-table-column type="selection" align="center" width="45px" />
+      <!-- 比赛名称 -->
+      <el-table-column label="比赛名称" prop="title" :show-overflow-tooltip="true" align="center" min-width="120px">
+        <template slot-scope="scope">
+          <span>{{ scope.row.title }}</span>
+        </template>
+      </el-table-column>
+      <!-- 比赛等级 -->
+      <el-table-column
+        label="比赛等级"
+        :filters="[{text: '国家级', value: '0'},{ text: '省级', value: '1' },{ text: '校级', value: '2' }]"
+        :filter-method="filterLevel"
+        class-name="level-col"
+        align="center"
+        min-width="90px"
+      >
+        <template slot-scope="{row}">
+          <el-tag :type="row.level | levelFilter">
+            <span>{{ transLevel(row.level) }}</span>
+          </el-tag>
+        </template>
+
+      </el-table-column>
+      <!-- 比赛类型 -->
+      <el-table-column
+        label="比赛类型"
+        :filters="[{text: '个人', value: '0'},{ text: '团队', value: '1' }]"
+        :filter-method="filterType"
+        class-name="type-col"
+        align="center"
+        min-width="90px"
+      >
+        <template slot-scope="{row}">
+          <el-tag :type="row.type | typeFilter">
+            {{ row.type === 1 ? '团队' : '个人' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <!-- 申请书 -->
+      <el-table-column label="申请书" prop="applicationForm" :show-overflow-tooltip="true" type="primary" align="center" min-width="110px">
+        <template slot-scope="scope">
+          <a class="el-link el-link--primary" @click="upload(scope.row.applicationForm)">{{ scope.row.applicationForm }}</a>
+        </template>
+      </el-table-column>
+      <!-- 比赛时间 -->
+      <el-table-column label="比赛时间" prop="time" :show-overflow-tooltip="true" align="center" min-width="100px">
+        <template slot-scope="scope">
+          <span>{{ scope.row.time }}</span>
+        </template>
+      </el-table-column>
+      <!-- 花费 -->
+      <el-table-column label="花费" prop="cost" :show-overflow-tooltip="true" align="center" min-width="50px">
+        <template slot-scope="scope">
+          <span>{{ scope.row.cost }}</span>
+        </template>
+      </el-table-column>
+      <!-- 比赛名次 -->
+      <el-table-column
+        label="比赛名次"
+        :filters="[{text: '一等奖', value: '1'},{ text: '二等奖', value: '2' },{ text: '三等奖', value: '3' },{ text: '特等奖', value: '4' },{ text: '优胜奖', value: '5' },{ text: '无', value: '6' }]"
+        :filter-method="filterRankCode"
+        class-name="rankCode-col"
+        align="center"
+        min-width="90px"
+      >
+        <template slot-scope="{row}">
+          <el-tag :type="row.rankCode | rankCodeFilter">
+            <span>{{ transRankCode(row.rankCode) }}</span>
+          </el-tag>
+        </template>
+      </el-table-column>
+      <!-- 状态 -->
+      <el-table-column
+        label="状态"
+        :filters="[{text: '进行中', value: '1'},{ text: '已完成', value: '2' }]"
+        :filter-method="filterState"
+        class-name="state-col"
+        align="center"
+        min-width="80px"
+      >
+        <template slot-scope="{row}">
+          <el-tag :type="row.state | stateFilter">
+            {{ row.state === 2 ? '已完成' : '进行中' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <!-- 是否已报销 -->
+      <el-table-column
+        label="报销"
+        :filters="[{text: '未报销', value: '0'},{ text: '已报销', value: '1' }]"
+        :filter-method="filterReimbursement"
+        class-name="reimbursement-col"
+        align="center"
+      >
+        <template slot-scope="{row}">
+          <el-tag :type="row.reimbursement | reimbursementFilter">
+            {{ row.reimbursement === 1 ? '已报销' : '未报销' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <!-- 操作-->
+      <el-table-column :label="$t('table.operation')" align="center" min-width="150px" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <el-tooltip
+            v-hasPermission="['task:add']"
+            class="item"
+            effect="dark"
+            content="申请报销"
+            placement="top"
+            :enterable="false"
+          >
+            <i v-hasPermission="['task:add']" class="el-icon-coin table-operation" style="color: #87d068;" @click="changeReimbursement(row)" />
+          </el-tooltip>
+          <el-tooltip
+            v-hasPermission="['task:update']"
+            class="item"
+            effect="dark"
+            content="修改比赛"
+            placement="top"
+            :enterable="false"
+          >
+            <i v-hasPermission="['task:update']" class="el-icon-setting table-operation" style="color: #2db7f5;" @click="edit(row)" />
+          </el-tooltip>
+          <el-tooltip
+            v-hasPermission="['task:delete']"
+            class="item"
+            effect="dark"
+            content="删除比赛"
+            placement="top"
+            :enterable="false"
+          >
+            <i v-hasPermission="['task:delete']" class="el-icon-delete table-operation" style="color: #f50;" @click="singleDelete(row)" />
+          </el-tooltip>
+          <el-tooltip
+            v-hasPermission="['task:view']"
+            class="item"
+            effect="dark"
+            content="查看详情"
+            placement="top"
+            :enterable="false"
+          >
+            <i v-hasPermission="['task:view']" class="el-icon-info table-operation" style="color: #909399;" @row-click="toogleExpand(row)" />
+          </el-tooltip>
+          <el-link v-has-no-permission="['task:add','task:view','task:update','task:delete']" class="no-perm">
+            {{ $t('tips.noPermission') }}
+          </el-link>
+        </template>
+      </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="pagination.num" :limit.sync="pagination.size" @pagination="search" />
     <match-edit
@@ -280,7 +280,7 @@
     >
       <el-image :src="previewPath" alt class="previewImg" />
     </el-dialog>
- </div>
+  </div>
 </template>
 <script>
 import Pagination from '@/components/Pagination'
@@ -316,7 +316,7 @@ export default {
       return map[state]
     },
     // 比赛名次
-    rankCodeFilter(rankCode){
+    rankCodeFilter(rankCode) {
       const map = {
         1: '',
         2: '',
@@ -385,9 +385,6 @@ export default {
       url: ''
     }
   },
-  created() {
-    this.fetch()
-  },
   computed: {
     currentUser() {
       return this.$store.state.account.user
@@ -402,6 +399,9 @@ export default {
         this.newWin = null
       }
     }
+  },
+  created() {
+    this.fetch()
   },
   mounted() {
     this.fetch()
@@ -422,8 +422,8 @@ export default {
       return row.level === value
     },
     // 比赛名次
-    transRankCode(rankCode){
-      switch (rankCode){
+    transRankCode(rankCode) {
+      switch (rankCode) {
         case 1:
           return '一等奖'
         case 2:
@@ -724,7 +724,7 @@ export default {
         })
       })
     },
-     // 获取时间
+    // 获取时间
     getTime: function() {
       var _this = this
       const yy = new Date().getFullYear()

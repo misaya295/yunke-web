@@ -12,21 +12,21 @@
         class="filter-item search-item date-range-item"
         type="daterange"
       />
-     <el-select  v-model="queryParams.reimbursement"  value="" placeholder="是否已报销">
-          <el-option
-            v-for="item in whether"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          />
-        </el-select>
+      <el-select v-model="queryParams.reimbursement" value="" placeholder="是否已报销">
+        <el-option
+          v-for="item in whether"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"
+        />
+      </el-select>
       <el-button class="filter-item" type="primary" plain @click="search">
         {{ $t('table.search') }}
       </el-button>
       <el-button class="filter-item" type="warning" plain @click="reset">
         {{ $t('table.reset') }}
       </el-button>
-     <el-dropdown v-has-any-permission="['task:add','task:delete','task:reset','task:export']" trigger="click" class="filter-item">
+      <el-dropdown v-has-any-permission="['task:add','task:delete','task:reset','task:export']" trigger="click" class="filter-item">
         <el-button>
           {{ $t('table.more') }}<i class="el-icon-arrow-down el-icon--right" />
         </el-button>
@@ -38,7 +38,7 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-  <!-- 表格区域 -->
+    <!-- 表格区域 -->
     <el-table
       ref="table"
       :key="tableKey"
@@ -52,116 +52,116 @@
     >
       <!-- 展开区域 -->
       <el-table-column type="expand" width="30px">
-          <template slot-scope="props">
-            <el-form label-position="left" class="table-expand">
-              <el-row>
+        <template slot-scope="props">
+          <el-form label-position="left" class="table-expand">
+            <el-row>
               <el-col :span="8">
-              <el-form-item label="负责人:">
-                <span>{{ team.reliable}}</span>
-              </el-form-item>
+                <el-form-item label="负责人:">
+                  <span>{{ team.reliable }}</span>
+                </el-form-item>
               </el-col>
               <el-col :span="8">
-              <el-form-item label="指导老师:">
-                <span>{{ team.teacher }}</span>
-              </el-form-item>
-               </el-col>
-              <el-col :span="8">
-              <el-form-item label="成员:">
-                <span>{{ team.member }}</span>
-              </el-form-item>
-              </el-col>
-              </el-row>
-            </el-form>
-            <el-form label-position="left" class="table-expand">
-              <el-row>
-              <el-col :span="8">
-              <el-form-item label="花费:">
-                <span>{{ props.row.cost }}</span>
-              </el-form-item>
+                <el-form-item label="指导老师:">
+                  <span>{{ team.teacher }}</span>
+                </el-form-item>
               </el-col>
               <el-col :span="8">
-              <el-form-item label="结束时间:">
-                <span>{{ props.row.endTime }}</span>
-              </el-form-item>
+                <el-form-item label="成员:">
+                  <span>{{ team.member }}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+          <el-form label-position="left" class="table-expand">
+            <el-row>
+              <el-col :span="8">
+                <el-form-item label="花费:">
+                  <span>{{ props.row.cost }}</span>
+                </el-form-item>
               </el-col>
               <el-col :span="8">
-              <el-form-item label="软件协议:">
-                <span>{{ props.row.agreement }}</span>
-              </el-form-item>
-              </el-col>
-              </el-row>
-            </el-form>
-            <el-form label-position="left" class="table-expand">
-              <el-row>
-              <el-col :span="8">
-              <el-form-item label="申请书:">
-                <span>{{ props.row.applicationForm }}</span>
-              </el-form-item>
+                <el-form-item label="结束时间:">
+                  <span>{{ props.row.endTime }}</span>
+                </el-form-item>
               </el-col>
               <el-col :span="8">
-              <el-form-item label="源文件:">
-                <span>{{ props.row.originFile }}</span>
-              </el-form-item>
+                <el-form-item label="软件协议:">
+                  <span>{{ props.row.agreement }}</span>
+                </el-form-item>
               </el-col>
-              </el-row>
-            </el-form>
-            <el-form label-position="left" class="table-expand">
-             <el-row>
+            </el-row>
+          </el-form>
+          <el-form label-position="left" class="table-expand">
+            <el-row>
               <el-col :span="8">
-               <el-form-item label="发票:">
-                <div class="demo-image" v-if="props.row.invoice">
-                  <div class="block" v-for="(item, i) in props.row.invoice.split(',')" :key="i">
-                    <el-image
-                      :src="item"
-                      @click="showpreViewDialog(item)">
-                      </el-image>
+                <el-form-item label="申请书:">
+                  <span>{{ props.row.applicationForm }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="源文件:">
+                  <span>{{ props.row.originFile }}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+          <el-form label-position="left" class="table-expand">
+            <el-row>
+              <el-col :span="8">
+                <el-form-item label="发票:">
+                  <div v-if="props.row.invoice" class="demo-image">
+                    <div v-for="(item, i) in props.row.invoice.split(',')" :key="i" class="block">
+                      <el-image
+                        :src="item"
+                        @click="showpreViewDialog(item)"
+                      />
+                    </div>
                   </div>
-                </div>
-              </el-form-item>
+                </el-form-item>
               </el-col>
               <el-col :span="8">
-              <el-form-item label="证书:">
-                <div class="demo-image" v-if="props.row.certificate">
-                  <div class="block" v-for="(item, i) in props.row.certificate.split(',')" :key="i">
-                    <el-image
-                      :src="item"
-                      @click="showpreViewDialog(item)">
-                      </el-image>
+                <el-form-item label="证书:">
+                  <div v-if="props.row.certificate" class="demo-image">
+                    <div v-for="(item, i) in props.row.certificate.split(',')" :key="i" class="block">
+                      <el-image
+                        :src="item"
+                        @click="showpreViewDialog(item)"
+                      />
+                    </div>
                   </div>
-                </div>
-              </el-form-item>
+                </el-form-item>
               </el-col>
-              </el-row>
-            </el-form>
-          </template>
-        </el-table-column>
+            </el-row>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column type="selection" align="center" width="45px" />
       <!-- 项目名称 -->
-      <el-table-column  label="项目名称" prop="itemsId" :show-overflow-tooltip="true" align="center" min-width="120px">
+      <el-table-column label="项目名称" prop="itemsId" :show-overflow-tooltip="true" align="center" min-width="120px">
         <template slot-scope="scope">
           <span>{{ scope.row.itemTitle }}</span>
         </template>
       </el-table-column>
       <!-- 著作权名称 -->
-      <el-table-column  label="著作权名称" prop="title"  :show-overflow-tooltip="true" align="center" min-width="120px">
+      <el-table-column label="著作权名称" prop="title" :show-overflow-tooltip="true" align="center" min-width="120px">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-       <!-- 著作权摘要 -->
+      <!-- 著作权摘要 -->
       <el-table-column label="摘要" prop="introduction" :show-overflow-tooltip="true" align="center" min-width="150px">
         <template slot-scope="scope">
           <span>{{ scope.row.introduction }}</span>
         </template>
       </el-table-column>
-       <!-- 著作权开始时间 -->
+      <!-- 著作权开始时间 -->
       <el-table-column label="开始时间" prop="startTime" align="center" min-width="150px" sortable="custom">
         <template slot-scope="scope">
           <span>{{ scope.row.startTime }}</span>
         </template>
       </el-table-column>
       <!-- 著作权状态  -->
-       <el-table-column
+      <el-table-column
         label="状态"
         :filters="[{ text: '进行中', value: 1 }, { text: '已完成', value: 2 }]"
         :filter-method="filterStatus"
@@ -173,8 +173,8 @@
           </el-tag>
         </template>
       </el-table-column>
-         <!-- 项目是否已报销  -->
-       <el-table-column
+      <!-- 项目是否已报销  -->
+      <el-table-column
         min-width="110px"
         label="是否已报销"
         :filters="[{ text: '未报销', value: 0 }, { text: '已报销', value: 1 }]"
@@ -199,7 +199,7 @@
           </el-link>
         </template>
       </el-table-column>
-      </el-table>
+    </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="pagination.num" :limit.sync="pagination.size" @pagination="search" />
     <tasks-edit
       ref="edit"
@@ -208,20 +208,20 @@
       @success="editSuccess"
       @close="editClose"
     />
-     <!-- <tasks-view
+    <!-- <tasks-view
       ref="view"
       :dialog-visible="taskViewVisible"
       @close="viewClose"
     /> -->
     <!-- 图片预览 -->
     <el-dialog
-        title="图片预览"
-        :visible.sync="previewVisible"
-        width="30%"
-        @close="previewDialogClose"
-      >
-        <el-image :src="previewPath" alt class="previewImg" />
-      </el-dialog>
+      title="图片预览"
+      :visible.sync="previewVisible"
+      width="30%"
+      @close="previewDialogClose"
+    >
+      <el-image :src="previewPath" alt class="previewImg" />
+    </el-dialog>
   </div>
 </template>
 

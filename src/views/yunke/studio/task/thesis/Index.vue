@@ -1,38 +1,38 @@
 <template>
   <div class="app-container">
-   <div class="filter-container">
-        <!-- 标题 -->
-        <el-input v-model="queryParams.title" placeholder="题目"  class="filter-item search-item"/>
-        <!-- 真实姓名 -->
-        <el-input v-model="queryParams.fullName" placeholder="真实姓名" class="filter-item search-item"/>
-        <!-- 是否已报销 -->
-        <el-select  v-model="queryParams.reimbursement"  value="" placeholder="是否已报销" class="filter-item search-item">
-          <el-option
-            v-for="thesis in whether"
-            :key="thesis.id"
-            :label="thesis.name"
-            :value="thesis.id"
-          />
-        </el-select>
-        <!-- 比赛时间 -->
-        <el-date-picker
+    <div class="filter-container">
+      <!-- 标题 -->
+      <el-input v-model="queryParams.title" placeholder="题目" class="filter-item search-item" />
+      <!-- 真实姓名 -->
+      <el-input v-model="queryParams.fullName" placeholder="真实姓名" class="filter-item search-item" />
+      <!-- 是否已报销 -->
+      <el-select v-model="queryParams.reimbursement" value="" placeholder="是否已报销" class="filter-item search-item">
+        <el-option
+          v-for="thesis in whether"
+          :key="thesis.id"
+          :label="thesis.name"
+          :value="thesis.id"
+        />
+      </el-select>
+      <!-- 比赛时间 -->
+      <el-date-picker
         v-model="queryParams.time"
         :range-separator="null"
         :start-placeholder="$t('table.user.createTime')"
         value-format="yyyy-MM-dd"
         class="filter-item search-item date-range-item"
         type="daterange"
-      /><br/>
-        <!-- 搜索 -->
-        <el-button class="filter-item" type="primary" plain @click="search">
-            {{ $t('table.search') }}
-        </el-button>
-        <!-- 重置 -->
-        <el-button class="filter-item" type="warning" plain @click="reset">
-            {{ $t('table.reset') }}
-        </el-button>
-        <!-- 更多操作 -->
-        <el-dropdown v-has-any-permission="['task:add','task:delete','task:export']" trigger="click" class="filter-item">
+      /><br>
+      <!-- 搜索 -->
+      <el-button class="filter-item" type="primary" plain @click="search">
+        {{ $t('table.search') }}
+      </el-button>
+      <!-- 重置 -->
+      <el-button class="filter-item" type="warning" plain @click="reset">
+        {{ $t('table.reset') }}
+      </el-button>
+      <!-- 更多操作 -->
+      <el-dropdown v-has-any-permission="['task:add','task:delete','task:export']" trigger="click" class="filter-item">
         <el-button>
           {{ $t('table.more') }}<i class="el-icon-arrow-down el-icon--right" />
         </el-button>
@@ -43,8 +43,8 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-  <!-- 表格区域 -->
-  <el-table
+    <!-- 表格区域 -->
+    <el-table
       ref="table"
       :key="tableKey"
       :data="list"
@@ -56,167 +56,167 @@
       @expand-change="getTeam"
       @row-click="toogleExpand"
     >
-      <!-- 展开区域 --> 
-        <el-table-column label="详情" type="expand" width="40px">
-          <template slot-scope="props">
-            <el-form label-position="left" class="table-expand">
-              <el-row>
-                <el-col :span="4">
-                  <el-form-item label="负责人:">
-                    <span>{{ team.reliable }}</span>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="6">
-                  <el-form-item label="成员:">
-                    <span>{{ team.member }}</span>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="5">
-                  <el-form-item label="指导老师:">
-                    <span>{{ team.teacher }}</span>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col>
-                  <el-form-item label="发票:">
-                    <div class="demo-image" v-if="props.row.invoice">
-                      <div class="block" v-for="(item, i) in props.row.invoice.split(',')" :key="i">
-                        <el-image
-                          :src="item"
-                          @click="showpreViewDialog(item)">
-                        </el-image>
-                      </div>
+      <!-- 展开区域 -->
+      <el-table-column label="详情" type="expand" width="40px">
+        <template slot-scope="props">
+          <el-form label-position="left" class="table-expand">
+            <el-row>
+              <el-col :span="4">
+                <el-form-item label="负责人:">
+                  <span>{{ team.reliable }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="成员:">
+                  <span>{{ team.member }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="5">
+                <el-form-item label="指导老师:">
+                  <span>{{ team.teacher }}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col>
+                <el-form-item label="发票:">
+                  <div v-if="props.row.invoice" class="demo-image">
+                    <div v-for="(item, i) in props.row.invoice.split(',')" :key="i" class="block">
+                      <el-image
+                        :src="item"
+                        @click="showpreViewDialog(item)"
+                      />
                     </div>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </el-form>
-          </template>
-        </el-table-column>
+                  </div>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column type="selection" align="center" width="45px" />
       <!-- 论文标题 -->
-      <el-table-column label='标题' prop="title" :show-overflow-tooltip="true" align="center" min-width="100px">
+      <el-table-column label="标题" prop="title" :show-overflow-tooltip="true" align="center" min-width="100px">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-       <!-- 论文介绍 -->
-      <el-table-column label='论文介绍' prop="introduction" :show-overflow-tooltip="true" align="center" min-width="130px">
+      <!-- 论文介绍 -->
+      <el-table-column label="论文介绍" prop="introduction" :show-overflow-tooltip="true" align="center" min-width="130px">
         <template slot-scope="scope">
           <span>{{ scope.row.introduction }}</span>
         </template>
       </el-table-column>
-       <!-- 论文类型 -->
+      <!-- 论文类型 -->
       <el-table-column
-            label="论文类型"
-            :filters="[{text:'核心', value: '1'},{ text: '普通', value: '2' }]"
-            :filter-method="filterPaperType"
-            class-name="paperType-col"
-            align="center"
-            min-width="90px"
-        >
-            <template slot-scope="{row}">
-                <el-tag :type="row.paperType | paperTypeFilter">
-                    {{ row.paperType === 1 ? '核心' : '普通' }}
-                </el-tag>
-            </template>
-        </el-table-column>
-      <!--创建时间-->
-      <el-table-column label='创建时间' prop="time" :show-overflow-tooltip="true" align="center" min-width="120px">
-          <template slot-scope="scope">
-            <span>{{ scope.row.time }}</span>
+        label="论文类型"
+        :filters="[{text:'核心', value: '1'},{ text: '普通', value: '2' }]"
+        :filter-method="filterPaperType"
+        class-name="paperType-col"
+        align="center"
+        min-width="90px"
+      >
+        <template slot-scope="{row}">
+          <el-tag :type="row.paperType | paperTypeFilter">
+            {{ row.paperType === 1 ? '核心' : '普通' }}
+          </el-tag>
         </template>
       </el-table-column>
-       <!-- 论文下载  -->
+      <!--创建时间-->
+      <el-table-column label="创建时间" prop="time" :show-overflow-tooltip="true" align="center" min-width="120px">
+        <template slot-scope="scope">
+          <span>{{ scope.row.time }}</span>
+        </template>
+      </el-table-column>
+      <!-- 论文下载  -->
       <el-table-column label="论文下载" prop="url" :show-overflow-tooltip="true" align="center" min-width="120px">
-       <template slot-scope="scope">
+        <template slot-scope="scope">
           <!-- <span>{{ scope.row.url }}</span> -->
           <a class="el-link el-link--primary" type="primary" @click="upload(scope.row.url)">{{ scope.row.url }}</a>
         </template>
       </el-table-column>
-       <!-- 花费  -->
-       <el-table-column label="花费" prop="cost" :show-overflow-tooltip="true" align="center" min-width="80px">
-          <template slot-scope="scope">
-              <span>{{ scope.row.cost }}</span>
-          </template>
+      <!-- 花费  -->
+      <el-table-column label="花费" prop="cost" :show-overflow-tooltip="true" align="center" min-width="80px">
+        <template slot-scope="scope">
+          <span>{{ scope.row.cost }}</span>
+        </template>
       </el-table-column>
       <!-- 状态  -->
       <el-table-column
-            label="状态"
-            :filters="[{text: '进行中', value: 1},{ text: '已完成', value: 2 }]"
-            :filter-method="filterState"
-            class-name="state-col"
-            align="center"
-        >
-            <template slot-scope="{row}">
-                <el-tag :type="row.state | stateFilter">
-                    {{ row.state === 2 ? '已完成' : '进行中' }}
-                </el-tag>
-            </template>
+        label="状态"
+        :filters="[{text: '进行中', value: 1},{ text: '已完成', value: 2 }]"
+        :filter-method="filterState"
+        class-name="state-col"
+        align="center"
+      >
+        <template slot-scope="{row}">
+          <el-tag :type="row.state | stateFilter">
+            {{ row.state === 2 ? '已完成' : '进行中' }}
+          </el-tag>
+        </template>
       </el-table-column>
       <!-- 是否已报销  -->
       <el-table-column
-            label="是否已报销"
-            :filters="[{text: '否', value: 0},{ text: '是', value: 1 }]"
-            :filter-method="filterReimbursement"
-            class-name="reimbursement-col"
-            align="center"
-            min-width="110px"
+        label="是否已报销"
+        :filters="[{text: '否', value: 0},{ text: '是', value: 1 }]"
+        :filter-method="filterReimbursement"
+        class-name="reimbursement-col"
+        align="center"
+        min-width="110px"
       >
-            <template slot-scope="{row}">
-                <el-tag :type="row.reimbursement | reimbursementFilter">
-                    {{ row.reimbursement === 1 ? '是' : '否' }}
-                </el-tag>
-            </template>
+        <template slot-scope="{row}">
+          <el-tag :type="row.reimbursement | reimbursementFilter">
+            {{ row.reimbursement === 1 ? '是' : '否' }}
+          </el-tag>
+        </template>
       </el-table-column>
       <!-- 操作 -->
       <el-table-column :label="$t('table.operation')" align="center" min-width="150px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-            <el-tooltip
-              v-hasPermission="['task:add']"
-              class="item"
-              effect="dark"
-              content="申请报销"
-              placement="top"
-              :enterable="false"
-            >
-              <i v-hasPermission="['task:add']" class="el-icon-coin table-operation" style="color: #87d068;" @click="changeReimbursement(row)" />
-            </el-tooltip>
-            <el-tooltip
-              v-hasPermission="['task:update']"
-              class="item"
-              effect="dark"
-              content="修改论文"
-              placement="top"
-              :enterable="false"
-            >
-              <i v-hasPermission="['task:update']" class="el-icon-setting table-operation" style="color: #2db7f5;" @click="edit(row)" />
-            </el-tooltip>
-            <el-tooltip
-              v-hasPermission="['task:delete']"
-              class="item"
-              effect="dark"
-              content="删除论文"
-              placement="top"
-              :enterable="false"
-            >
-              <i v-hasPermission="['task:delete']" class="el-icon-delete table-operation" style="color: #f50;" @click="singleDelete(row)" />
-            </el-tooltip>
-            <el-tooltip
-              v-hasPermission="['task:view']"
-              class="item"
-              effect="dark"
-              content="查看详情"
-              placement="top"
-              :enterable="false"
-            >
-              <i v-hasPermission="['task:view']" class="el-icon-info table-operation" style="color: #909399;"  @row-click="toogleExpand(row)" />
-            </el-tooltip>
-            <el-link v-has-no-permission="['task:add','task:view','task:update','task:delete']" class="no-perm">
-              {{ $t('tips.noPermission') }}
-            </el-link>
-          </template>
+          <el-tooltip
+            v-hasPermission="['task:add']"
+            class="item"
+            effect="dark"
+            content="申请报销"
+            placement="top"
+            :enterable="false"
+          >
+            <i v-hasPermission="['task:add']" class="el-icon-coin table-operation" style="color: #87d068;" @click="changeReimbursement(row)" />
+          </el-tooltip>
+          <el-tooltip
+            v-hasPermission="['task:update']"
+            class="item"
+            effect="dark"
+            content="修改论文"
+            placement="top"
+            :enterable="false"
+          >
+            <i v-hasPermission="['task:update']" class="el-icon-setting table-operation" style="color: #2db7f5;" @click="edit(row)" />
+          </el-tooltip>
+          <el-tooltip
+            v-hasPermission="['task:delete']"
+            class="item"
+            effect="dark"
+            content="删除论文"
+            placement="top"
+            :enterable="false"
+          >
+            <i v-hasPermission="['task:delete']" class="el-icon-delete table-operation" style="color: #f50;" @click="singleDelete(row)" />
+          </el-tooltip>
+          <el-tooltip
+            v-hasPermission="['task:view']"
+            class="item"
+            effect="dark"
+            content="查看详情"
+            placement="top"
+            :enterable="false"
+          >
+            <i v-hasPermission="['task:view']" class="el-icon-info table-operation" style="color: #909399;"  @row-click="toogleExpand(row)" />
+          </el-tooltip>
+          <el-link v-has-no-permission="['task:add','task:view','task:update','task:delete']" class="no-perm">
+            {{ $t('tips.noPermission') }}
+          </el-link>
+        </template>
       </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="pagination.num" :limit.sync="pagination.size" @pagination="search" />
@@ -247,7 +247,7 @@
 <script>
 import Pagination from '@/components/Pagination'
 import ThesisEdit from './Edit'
-//import ThesisView from './View'
+// import ThesisView from './View'
 export default {
   name: 'ThesisManage',
   components: { Pagination, ThesisEdit },

@@ -1,138 +1,138 @@
 <template>
-<div>
+  <div>
     <el-dialog
-    :title="title"
-    :width="width"
-    top=""
-    close-on-click-modal
-    :close-on-press-escape="false"
-    :visible.sync="isVisible"
-  >
-    <el-form ref="form" :model="tasks" :rules="rules" label-position="right" label-width="100px">
-      <el-form-item label="标题" prop="title">
-        <el-input v-model="tasks.title"  />
-      </el-form-item>
-      <el-form-item label="摘要">
-        <el-input v-model="tasks.introduction"  />
-      </el-form-item>
-       <el-form-item label="开始时间">
-        <el-col :span="15">
-          <el-date-picker
-            v-model="tasks.startTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择日期">
-          </el-date-picker>
-        </el-col>
-      </el-form-item>
-      <el-form-item label="结束时间">
-        <el-col :span="15">
-          <el-date-picker
-            v-model="tasks.endTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择日期">
-          </el-date-picker>
-        </el-col>
-      </el-form-item>
-      <el-form-item label="花费">
-        <el-input v-model.number="tasks.cost" />
-      </el-form-item>
-      <el-form-item :label="$t('table.user.status')" prop="state">
-        <el-radio-group v-model="tasks.state">
-          <el-radio :label="1">进行中</el-radio>
-          <el-radio :label="2">已完成</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="报销" >
-        <el-radio-group v-model="tasks.reimbursement">
-          <el-radio :label="0">未报销</el-radio>
-          <el-radio :label="1">已报销</el-radio>
-        </el-radio-group>
-      </el-form-item>
-    <el-form-item label="负责人" >
-      <el-select  v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
-          <el-option
-            v-for="item in userRoles"
-            :key="item.userId"
-            :label="item.fullName"
-            :value="String(item.userId)"
-          />
-        </el-select>
-    </el-form-item>
-    <el-form-item label="成员" >
-      <el-select  v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
-        <el-option
-          v-for="item in userRoles"
-          :key="item.userId"
-          :label="item.fullName"
-          :value="String(item.userId)"
-        />
-      </el-select>
-    </el-form-item>
-    <el-form-item label="指导老师" >
-      <el-select  v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
-        <el-option
-          v-for="item in teacherRoles"
-          :key="item.userId"
-          :label="item.fullName"
-          :value="String(item.userId)"
-        />
-      </el-select>
-    </el-form-item>
-      <el-form-item label="发票" prop="invoice">
-        <!-- <el-button size="small" type="primary" @click="upload('发票')">点击上传</el-button> -->
-        <el-upload
-          :before-upload="handleBeforeUpload"
-          :before-remove="handleBeforeRemove"
-          :on-success="handleSuccessInvoice"
-          :file-list="fileList"
-          :action="uploadUrl"
-          class="upload-demo"
-          :headers="headers"
-          multiple
-          :limit="3"
-          drag
-        >
-          <i  class="el-icon-upload" />
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
-        </el-upload>
-      </el-form-item>
-      <el-form-item label="项目说明书" prop="specification">
-       <!-- <el-input v-model="tasks.ce" /> -->
-       <!-- <el-button size="small" type="primary" @click="upload('项目说明书')">点击上传</el-button> -->
-         <el-upload
-          :before-upload="handleBeforeUpload"
-          :before-remove="handleBeforeRemove"
-          :on-success="handleSuccessSpecification"
-          :file-list="fileList"
-          :action="uploadUrl"
-          class="upload-demo"
-          :headers="headers"
-          multiple
-          :limit="1"
-          drag
-        >
-          <i  class="el-icon-upload" />
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
-        </el-upload>
-    </el-form-item> 
-       <el-form-item label="源文件" prop="url">
-        <el-input v-model="tasks.url" />
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button type="warning" plain :loading="buttonLoading" @click="isVisible = false">
-        {{ $t('common.cancel') }}
-      </el-button>
-      <el-button type="primary" plain :loading="buttonLoading" @click.prevent="submitForm">
-        {{ $t('common.confirm') }}
-      </el-button>
-    </div>
-  </el-dialog>
-</div>
+      :title="title"
+      :width="width"
+      top=""
+      close-on-click-modal
+      :close-on-press-escape="false"
+      :visible.sync="isVisible"
+    >
+      <el-form ref="form" :model="tasks" :rules="rules" label-position="right" label-width="100px">
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="tasks.title" />
+        </el-form-item>
+        <el-form-item label="摘要">
+          <el-input v-model="tasks.introduction" />
+        </el-form-item>
+        <el-form-item label="开始时间">
+          <el-col :span="15">
+            <el-date-picker
+              v-model="tasks.startTime"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期"
+            />
+          </el-col>
+        </el-form-item>
+        <el-form-item label="结束时间">
+          <el-col :span="15">
+            <el-date-picker
+              v-model="tasks.endTime"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期"
+            />
+          </el-col>
+        </el-form-item>
+        <el-form-item label="花费">
+          <el-input v-model.number="tasks.cost" />
+        </el-form-item>
+        <el-form-item :label="$t('table.user.status')" prop="state">
+          <el-radio-group v-model="tasks.state">
+            <el-radio :label="1">进行中</el-radio>
+            <el-radio :label="2">已完成</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="报销">
+          <el-radio-group v-model="tasks.reimbursement">
+            <el-radio :label="0">未报销</el-radio>
+            <el-radio :label="1">已报销</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="负责人">
+          <el-select v-model="team.reliable" value="" placeholder="负责人" style="width:100%">
+            <el-option
+              v-for="item in userRoles"
+              :key="item.userId"
+              :label="item.fullName"
+              :value="String(item.userId)"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="成员">
+          <el-select v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
+            <el-option
+              v-for="item in userRoles"
+              :key="item.userId"
+              :label="item.fullName"
+              :value="String(item.userId)"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="指导老师">
+          <el-select v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
+            <el-option
+              v-for="item in teacherRoles"
+              :key="item.userId"
+              :label="item.fullName"
+              :value="String(item.userId)"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="发票" prop="invoice">
+          <!-- <el-button size="small" type="primary" @click="upload('发票')">点击上传</el-button> -->
+          <el-upload
+            :before-upload="handleBeforeUpload"
+            :before-remove="handleBeforeRemove"
+            :on-success="handleSuccessInvoice"
+            :file-list="fileList"
+            :action="uploadUrl"
+            class="upload-demo"
+            :headers="headers"
+            multiple
+            :limit="3"
+            drag
+          >
+            <i class="el-icon-upload" />
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="项目说明书" prop="specification">
+          <!-- <el-input v-model="tasks.ce" /> -->
+          <!-- <el-button size="small" type="primary" @click="upload('项目说明书')">点击上传</el-button> -->
+          <el-upload
+            :before-upload="handleBeforeUpload"
+            :before-remove="handleBeforeRemove"
+            :on-success="handleSuccessSpecification"
+            :file-list="fileList"
+            :action="uploadUrl"
+            class="upload-demo"
+            :headers="headers"
+            multiple
+            :limit="1"
+            drag
+          >
+            <i class="el-icon-upload" />
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="源文件" prop="url">
+          <el-input v-model="tasks.url" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="warning" plain :loading="buttonLoading" @click="isVisible = false">
+          {{ $t('common.cancel') }}
+        </el-button>
+        <el-button type="primary" plain :loading="buttonLoading" @click.prevent="submitForm">
+          {{ $t('common.confirm') }}
+        </el-button>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 <script>
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
