@@ -103,7 +103,7 @@
     </el-row>
   </el-dialog>
   <!-- 负责人 -->
-            <!-- <el-form-item label="负责人" >
+  <!-- <el-form-item label="负责人" >
               <el-select :disabled="tasks.thesisId === '' ? false : true" v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
                 <el-option
                   v-for="thesis in userRoles"
@@ -113,8 +113,8 @@
                 />
               </el-select>
             </el-form-item> -->
-            <!-- 成员 -->
-            <!-- <el-form-item label="成员" >
+  <!-- 成员 -->
+  <!-- <el-form-item label="成员" >
               <el-select :disabled="tasks.thesisId === '' ? false : true" v-model="team.member" multiple value="" placeholder="成员" style="width:100%">
                 <el-option
                   v-for="thesis in userRoles"
@@ -124,8 +124,8 @@
                 />
               </el-select>
             </el-form-item> -->
-            <!-- 指导老师 -->
-            <!-- <el-form-item label="指导老师" >
+  <!-- 指导老师 -->
+  <!-- <el-form-item label="指导老师" >
               <el-select :disabled="tasks.thesisId === '' ? false : true" v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
                 <el-option
                   v-for="thesis in teacherRoles"
@@ -151,18 +151,18 @@ export default {
       return map[paper_type]
     },
     // 状态
-    stateFilter(state){
-        const map = {
-            1: '进行中',
-            2: '已完成'
-        }
-         return map[state]
+    stateFilter(state) {
+      const map = {
+        1: '进行中',
+        2: '已完成'
+      }
+      return map[state]
     },
     // 是否已报销
-    reimbursementFilter(reimbursement){
-      const map={
-        0:'未报销',
-        1:'已报销'
+    reimbursementFilter(reimbursement) {
+      const map = {
+        0: '未报销',
+        1: '已报销'
       }
       return map[reimbursement]
     },
@@ -217,15 +217,15 @@ export default {
   },
   methods: {
     // 获取成员
-    getName(i){
-        let nameArr = new Array();
-        this.$get(`studio/members/${i}`).then((r) => {
-          let tmp=r.data.data.rows;
-          for(i=0; i<tmp.length; i++){
-            nameArr.push(tmp[i].full_name)  
-          }
-          this.users = nameArr.join("、");
-        })
+    getName(i) {
+      const nameArr = new Array()
+      this.$get(`studio/members/${i}`).then((r) => {
+        const tmp = r.data.data.rows
+        for (i = 0; i < tmp.length; i++) {
+          nameArr.push(tmp[i].full_name)
+        }
+        this.users = nameArr.join('、')
+      })
     },
     reInitTask(t) {
       this.$get(`studio/thesis/${t.thesisId}`).then((r) => {

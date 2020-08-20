@@ -10,37 +10,37 @@
     <el-form ref="form" :model="tasks" :rules="rules" label-position="right" label-width="100px">
       <!-- 比赛名称 -->
       <el-form-item label="比赛名称" prop="title">
-        <el-input v-model="tasks.title"  />
+        <el-input v-model="tasks.title" />
       </el-form-item>
       <!-- 比赛类型 -->
       <el-form-item label="比赛类型" prop="type">
         <el-radio-group v-model="tasks.type">
-          <el-radio :label='0'>个人</el-radio>
-          <el-radio :label='1'>团队</el-radio>
+          <el-radio :label="0">个人</el-radio>
+          <el-radio :label="1">团队</el-radio>
         </el-radio-group>
       </el-form-item>
       <!-- 比赛等级 -->
       <el-form-item label="比赛等级" prop="level">
         <el-radio-group v-model="tasks.level">
-          <el-radio :label='0'>国家级</el-radio>
-          <el-radio :label='1'>省级</el-radio>
-          <el-radio :label='2'>校级</el-radio>
+          <el-radio :label="0">国家级</el-radio>
+          <el-radio :label="1">省级</el-radio>
+          <el-radio :label="2">校级</el-radio>
         </el-radio-group>
       </el-form-item>
       <!-- 比赛名次 -->
       <el-form-item label="比赛名次" prop="rankCode">
         <el-radio-group v-model="tasks.rankCode">
-          <el-radio :label='1'>一等奖</el-radio>
-          <el-radio :label='2'>二等奖</el-radio>
-          <el-radio :label='3'>三等奖</el-radio><br/>
-          <el-radio :label='4'>特等奖</el-radio>
-          <el-radio :label='5'>优胜奖</el-radio>
-          <el-radio :label='6'>无</el-radio>
+          <el-radio :label="1">一等奖</el-radio>
+          <el-radio :label="2">二等奖</el-radio>
+          <el-radio :label="3">三等奖</el-radio><br>
+          <el-radio :label="4">特等奖</el-radio>
+          <el-radio :label="5">优胜奖</el-radio>
+          <el-radio :label="6">无</el-radio>
         </el-radio-group>
       </el-form-item>
       <!-- 负责人 -->
-      <el-form-item label="负责人" >
-        <el-select v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
+      <el-form-item label="负责人">
+        <el-select v-model="team.reliable" value="" placeholder="负责人" style="width:100%">
           <el-option
             v-for="match in userRoles"
             :key="match.userId"
@@ -50,7 +50,7 @@
         </el-select>
       </el-form-item>
       <!-- 成员 -->
-      <el-form-item label="成员" >
+      <el-form-item label="成员">
         <el-select v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
           <el-option
             v-for="match in userRoles"
@@ -61,7 +61,7 @@
         </el-select>
       </el-form-item>
       <!-- 指导老师 -->
-      <el-form-item label="指导老师" >
+      <el-form-item label="指导老师">
         <el-select v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
           <el-option
             v-for="match in teacherRoles"
@@ -108,8 +108,8 @@
       <!-- 状态 -->
       <el-form-item label="状态" prop="state">
         <el-radio-group v-model="tasks.state">
-          <el-radio :label='1'>进行中</el-radio>
-          <el-radio :label='2'>已完成</el-radio>
+          <el-radio :label="1">进行中</el-radio>
+          <el-radio :label="2">已完成</el-radio>
         </el-radio-group>
       </el-form-item>
       <!-- 花费 -->
@@ -138,8 +138,8 @@
       <!-- 是否已报销 -->
       <el-form-item label="报销" prop="reimbursement">
         <el-radio-group v-model="tasks.reimbursement">
-          <el-radio :label='0'>未报销</el-radio>
-          <el-radio :label='1'>已报销</el-radio>
+          <el-radio :label="0">未报销</el-radio>
+          <el-radio :label="1">已报销</el-radio>
         </el-radio-group>
       </el-form-item>
       <!-- 证书 -->

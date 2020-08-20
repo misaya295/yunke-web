@@ -11,8 +11,8 @@
       <el-form-item label="标题" prop="title">
         <el-input v-model="copyright.title" />
       </el-form-item>
-      <el-form-item label="摘要" >
-        <el-input v-model="copyright.introduction"  />
+      <el-form-item label="摘要">
+        <el-input v-model="copyright.introduction" />
       </el-form-item>
       <el-form-item label="开始时间">
         <el-col :span="15">
@@ -20,8 +20,8 @@
             v-model="copyright.startTime"
             type="date"
             value-format="yyyy-MM-dd"
-            placeholder="选择日期">
-          </el-date-picker>
+            placeholder="选择日期"
+          />
         </el-col>
       </el-form-item>
       <el-form-item label="结束时间">
@@ -30,21 +30,21 @@
             v-model="copyright.endTime"
             type="date"
             value-format="yyyy-MM-dd"
-            placeholder="选择日期">
-          </el-date-picker>
+            placeholder="选择日期"
+          />
         </el-col>
       </el-form-item>
-      <el-form-item label="花费" >
+      <el-form-item label="花费">
         <el-input v-model.number="copyright.cost" />
       </el-form-item>
-      <el-form-item label="申请书" >
-       <el-input type="textarea" v-model="copyright.applicationForm"></el-input>
+      <el-form-item label="申请书">
+        <el-input v-model="copyright.applicationForm" type="textarea" />
       </el-form-item>
-      <el-form-item label="源文件" >
+      <el-form-item label="源文件">
         <el-input v-model="copyright.originFile" />
       </el-form-item>
-      <el-form-item label="软件协议" >
-       <el-input  v-model="copyright.agreement"></el-input>
+      <el-form-item label="软件协议">
+        <el-input v-model="copyright.agreement" />
       </el-form-item>
       <el-form-item :label="$t('table.user.status')" prop="state">
         <el-radio-group v-model="copyright.state">
@@ -58,8 +58,8 @@
           <el-radio :label="1">已报销</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="负责人" >
-        <el-select  v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
+      <el-form-item label="负责人">
+        <el-select v-model="team.reliable" value="" placeholder="负责人" style="width:100%">
           <el-option
             v-for="item in userRoles"
             :key="item.userId"
@@ -68,18 +68,18 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="成员" >
-        <el-select  v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
+      <el-form-item label="成员">
+        <el-select v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
           <el-option
             v-for="item in userRoles"
             :key="item.userId"
-           :label="item.fullName"
+            :label="item.fullName"
             :value="String(item.userId)"
-         />
+          />
         </el-select>
       </el-form-item>
-      <el-form-item label="指导老师" >
-        <el-select  v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
+      <el-form-item label="指导老师">
+        <el-select v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
           <el-option
             v-for="item in teacherRoles"
             :key="item.userId"
@@ -88,8 +88,8 @@
           />
         </el-select>
       </el-form-item>
-       <el-form-item label="项目名称" prop="itemId">
-         <el-select  v-model="copyright.itemId"  value="" placeholder="选择项目名称" style="width:100%">
+      <el-form-item label="项目名称" prop="itemId">
+        <el-select v-model="copyright.itemId" value="" placeholder="选择项目名称" style="width:100%">
           <el-option
             v-for="item in itemsIds"
             :key="item.itemsId"
@@ -311,7 +311,7 @@ export default {
       this.team.member = val.member
       this.team.teacher = val.teacher
       console.log(this.team)
-      if ( this.copyright.invoice.length > 1) {
+      if (this.copyright.invoice.length > 1) {
         this.fileUrlList = this.copyright.invoice.split(',')
       } else {
         this.fileUrlList = this.copyright.invoice

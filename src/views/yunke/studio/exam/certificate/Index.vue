@@ -300,9 +300,10 @@
                   :on-preview="handlePreview"
                   :file-list="invoiceFileList"
                   :action="uploadUrl"
-                  :class="{hideupload:addinvoicehideupload}"
+                  :class="{hideupload:addinvoicehideupload, picturecard:true}"
                   :headers="headers"
                   multiple
+                  drag
                   :limit="uploadPicLimit"
                   list-type="picture-card"
                 >
@@ -311,7 +312,7 @@
                     slot="tip"
                     style="display: block;"
                     class="el-upload__tip"
-                  >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+                  >请勿上传违法文件，可拖拽上传，可同时上传3个附件，且文件不超过5M</div>
                 </el-upload>
               </el-form-item>
               <el-form-item label="证书：" prop="certificate">
@@ -323,9 +324,10 @@
                   :on-preview="handlePreview"
                   :file-list="certificateFileList"
                   :action="uploadUrl"
-                  :class="{hideupload:addcertificatehideupload}"
+                  :class="{hideupload:addcertificatehideupload, picturecard:true}"
                   :headers="headers"
                   multiple
+                  drag
                   :limit="uploadPicLimit"
                   list-type="picture-card"
                 >
@@ -334,7 +336,7 @@
                     slot="tip"
                     style="display: block;"
                     class="el-upload__tip"
-                  >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+                  >请勿上传违法文件，可拖拽上传，可同时上传3个附件，且文件不超过5M</div>
                 </el-upload>
               </el-form-item>
               <el-form-item class="formbutton">
@@ -399,9 +401,10 @@
               :on-preview="handlePreview"
               :file-list="editInvoiceFileList"
               :action="uploadUrl"
-              :class="{hideupload:editinvoicehideupload}"
+              :class="{hideupload:editinvoicehideupload, picturecard:true}"
               :headers="headers"
               multiple
+              drag
               :limit="uploadPicLimit"
               list-type="picture-card"
             >
@@ -410,7 +413,7 @@
                 slot="tip"
                 style="display: block;"
                 class="el-upload__tip"
-              >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+              >请勿上传违法文件，可拖拽上传，可同时上传3个附件，且文件不超过5M</div>
             </el-upload>
           </el-form-item>
           <el-form-item label="证书" prop="certificate">
@@ -422,9 +425,10 @@
               :on-preview="handlePreview"
               :file-list="editCertificateFileList"
               :action="uploadUrl"
-              :class="{hideupload:editcertificatehideupload}"
+              :class="{hideupload:editcertificatehideupload, picturecard:true}"
               :headers="headers"
               multiple
+              drag
               :limit="uploadPicLimit"
               list-type="picture-card"
             >
@@ -433,7 +437,7 @@
                 slot="tip"
                 style="display: block;"
                 class="el-upload__tip"
-              >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+              >请勿上传违法文件，可拖拽上传，可同时上传3个附件，且文件不超过5M</div>
             </el-upload>
           </el-form-item>
         </el-form>

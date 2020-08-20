@@ -182,18 +182,19 @@
               :on-preview="handlePreview"
               :file-list="editFileList"
               :action="uploadUrl"
-              :class="{hideupload:editrepairinvoicehideupload}"
+              :class="{hideupload:editrepairinvoicehideupload, picturecard:true}"
               :headers="headers"
-              multiple
               :limit="uploadPicLimit"
               list-type="picture-card"
+              multiple
+              drag
             >
               <i class="el-icon-plus" />
               <div
                 slot="tip"
                 style="display: block;"
                 class="el-upload__tip"
-              >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+              >请勿上传违法文件，可拖拽上传，可同时上传3个附件，且文件不超过5M</div>
             </el-upload>
           </el-form-item>
         </el-form>
