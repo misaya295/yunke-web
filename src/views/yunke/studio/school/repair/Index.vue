@@ -24,7 +24,12 @@
         plain
         @click="searchrepair"
       >搜索</el-button>
-      <el-button type="warning" class="filter-item" plain @click="resetrepair">重置</el-button>
+      <el-button
+        type="warning"
+        class="filter-item"
+        plain
+        @click="resetrepair"
+      >重置</el-button>
       <!-- table内容 -->
       <el-table
         ref="tableref"
@@ -34,7 +39,11 @@
         style="width: 100%;"
         @row-click="toogleExpand"
       >
-        <el-table-column type="selection" align="center" width="40px" />
+        <el-table-column
+          type="selection"
+          align="center"
+          width="40px"
+        />
         <el-table-column
           label="资产名称"
           prop="propertyName"
@@ -111,9 +120,18 @@
             >{{ $t('tips.noPermission') }}</el-link>
           </template>
         </el-table-column>
-        <el-table-column type="expand" width="1">
-          <template slot-scope="props" class="tableExpand">
-            <el-form label-position="left" class="table-expand">
+        <el-table-column
+          type="expand"
+          width="1"
+        >
+          <template
+            slot-scope="props"
+            class="tableExpand"
+          >
+            <el-form
+              label-position="left"
+              class="table-expand"
+            >
               <el-row>
                 <el-form-item label="发票:">
                   <template v-if="props.row.repairInvoice !== null">
@@ -145,24 +163,53 @@
       <el-dialog
         title="修改维修信息"
         :visible.sync="editDialogVisible"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
         width="50%"
         top="3vh"
         @close="closeEditDialog"
       >
-        <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="100px">
-          <el-form-item label="资产名称" prop="propertyName">
-            <el-input v-model="editForm.propertyName" disabled />
+        <el-form
+          ref="editFormRef"
+          :model="editForm"
+          :rules="editFormRules"
+          label-width="100px"
+        >
+          <el-form-item
+            label="资产名称"
+            prop="propertyName"
+          >
+            <el-input
+              v-model="editForm.propertyName"
+              disabled
+            />
           </el-form-item>
-          <el-form-item label="证明人名称" prop="repairProverUserInfoName">
-            <el-input v-model="editForm.repairProverUserInfoName" disabled />
+          <el-form-item
+            label="证明人名称"
+            prop="repairProverUserInfoName"
+          >
+            <el-input
+              v-model="editForm.repairProverUserInfoName"
+              disabled
+            />
           </el-form-item>
-          <el-form-item label="维修价格" prop="repairPrice" type="number">
+          <el-form-item
+            label="维修价格"
+            prop="repairPrice"
+            type="number"
+          >
             <el-input v-model.number="editForm.repairPrice" />
           </el-form-item>
-          <el-form-item label="维修信息" prop="repairMessage">
+          <el-form-item
+            label="维修信息"
+            prop="repairMessage"
+          >
             <el-input v-model="editForm.repairMessage" />
           </el-form-item>
-          <el-form-item label="维修日期" prop="repairDate">
+          <el-form-item
+            label="维修日期"
+            prop="repairDate"
+          >
             <el-date-picker
               v-model="editForm.repairDate"
               type="date"
@@ -173,7 +220,10 @@
               style="width: 100%"
             />
           </el-form-item>
-          <el-form-item label="发票" prop="repairInvoice">
+          <el-form-item
+            label="发票"
+            prop="repairInvoice"
+          >
             <el-upload
               :before-upload="handleBeforeUpload"
               :before-remove="handleBeforeRemove"
@@ -198,9 +248,20 @@
             </el-upload>
           </el-form-item>
         </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="editRepair">修 改</el-button>
+        <span
+          slot="footer"
+          class="dialog-footer"
+        >
+          <el-button
+            type="warning"
+            plain
+            @click="editDialogVisible = false"
+          >取 消</el-button>
+          <el-button
+            type="primary"
+            plain
+            @click="editRepair"
+          >修 改</el-button>
         </span>
       </el-dialog>
 
@@ -211,7 +272,11 @@
         width="40%"
         @close="previewDialogClose"
       >
-        <el-image :src="previewPath" alt class="previewImg" />
+        <el-image
+          :src="previewPath"
+          alt
+          class="previewImg"
+        />
       </el-dialog>
     </div>
   </div>
@@ -225,7 +290,7 @@ import Pagination from '@/components/Pagination'
 export default {
   name: 'Index',
   components: { Pagination },
-  data() {
+  data () {
     return {
       // 输入框的值
       input: '',
@@ -239,7 +304,7 @@ export default {
       selection: [],
       pagination: {
         size: 10,
-        num: 1
+        num: 1,
       },
       // 添加对话框的显示与隐藏
       drawerVisible: false,
@@ -254,13 +319,13 @@ export default {
         repairInvoice: '',
         repairProverUserInfoUuid: '',
         id: 0,
-        repairMessage: ''
+        repairMessage: '',
       },
       // 修改对话框的验证规则
       editFormRules: {
         repairPrice: [
           {
-            validator(rule, value, callback) {
+            validator (rule, value, callback) {
               if (value === '' || value === null) {
                 callback()
               }
@@ -270,9 +335,9 @@ export default {
                 callback(new Error('请输入有效数字'))
               }
             },
-            trigger: 'blur'
-          }
-        ]
+            trigger: 'blur',
+          },
+        ],
       },
       // 保存预览图片路径
       previewPath: '',
@@ -280,7 +345,7 @@ export default {
       previewVisible: false,
       // 图片上传组件的headers请求头对象
       headers: {
-        Authorization: `bearer ${getToken()}`
+        Authorization: `bearer ${getToken()}`,
       },
       // 上传图片的URL地址
       uploadUrl: qiNiuUrl,
@@ -293,20 +358,20 @@ export default {
       // 上传图片数量限制
       uploadPicLimit: 3,
       // 超过图片数量限制时隐藏上传组件
-      editrepairinvoicehideupload: false
+      editrepairinvoicehideupload: false,
     }
   },
   computed: {
-    currentUser() {
+    currentUser () {
       return this.$store.state.account.user
-    }
+    },
   },
-  mounted() {
+  mounted () {
     this.fetch()
   },
   methods: {
     // 根据条件获取所有考证信息
-    fetch(params = {}) {
+    fetch (params = {}) {
       params.pageSize = this.pagination.size
       params.pageNum = this.pagination.num
       if (this.queryParams.timeRange) {
@@ -315,7 +380,7 @@ export default {
       }
       this.loading = true
       this.$get('studio/school/assets/repair', {
-        ...params
+        ...params,
       }).then((r) => {
         const data = r.data.data
         this.total = data.total
@@ -324,14 +389,14 @@ export default {
         this.loading = false
       })
     },
-    search() {
+    search () {
       this.fetch({
         ...this.queryParams,
-        ...this.sort
+        ...this.sort,
       })
     },
     // 搜索证书
-    searchrepair() {
+    searchrepair () {
       console.log(this.queryParams)
       this.$get(`studio/school/assets/repair`, { ...this.queryParams }).then(
         (r) => {
@@ -343,12 +408,12 @@ export default {
       )
     },
     // 重置搜索框数据
-    resetrepair() {
+    resetrepair () {
       this.queryParams = {}
       this.fetch()
     },
     // 获取时间
-    getTime: function() {
+    getTime: function () {
       var _this = this
       const yy = new Date().getFullYear()
       const mm =
@@ -363,7 +428,7 @@ export default {
       return _this.nowDate
     },
     // 弹出完成维修对话框
-    async changeReimbursement(row) {
+    async changeReimbursement (row) {
       console.log(row)
       // 检查维修日期，价格是否填写
       if (row.repairDate === '' || row.repairDate === null) {
@@ -381,7 +446,7 @@ export default {
         {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
         }
       ).catch((err) => err)
 
@@ -390,7 +455,7 @@ export default {
       }
 
       this.$delete(`studio/school/assets/repair/${row.id}`, {
-        ...this.Funding
+        ...this.Funding,
       }).then((r) => {
         console.log(r)
         if (r.status === 200) {
@@ -402,7 +467,7 @@ export default {
       })
     },
     // 修改证书对话框
-    showEditDialog(row) {
+    showEditDialog (row) {
       // 获得数据
       // 浅克隆，同一源里的数值也会改变
       // this.editForm = row;
@@ -422,7 +487,7 @@ export default {
           if (fileurl !== null || fileurl !== '') {
             this.editFileList.push({
               name: fileurl.substring(28),
-              url: fileurl
+              url: fileurl,
             })
           }
         }
@@ -432,7 +497,7 @@ export default {
       this.editDialogVisible = true
     },
     // 提交修改对话框
-    editRepair() {
+    editRepair () {
       console.log(this.editForm)
       this.$refs.editFormRef.validate((valid) => {
         if (!valid) return
@@ -450,14 +515,14 @@ export default {
       })
     },
     // 监听关闭对话框事件
-    closeEditDialog() {
+    closeEditDialog () {
       this.$refs.editFormRef.resetFields()
       this.fileUrlList = []
       this.editFileList = []
       this.editListLength = 0
     },
     // 修改用户的发票上传成功后
-    editHandleSuccess(response, file, fileList) {
+    editHandleSuccess (response, file, fileList) {
       const uid = file.uid
       const id = response.data.contentId
       this.files.push({ uid, id })
@@ -473,18 +538,16 @@ export default {
       }
       this.editFileList.push({
         name: response.data.url.substring(28),
-        url: response.data.url
+        url: response.data.url,
       })
     },
     // 删除上传的图片，写死的（图片长度限定为3）
-    handleBeforeRemove(file, fileList) {
+    handleBeforeRemove (file, fileList) {
       for (let n = 0; n < this.editFileList.length; n++) {
         if (this.editFileList[n].uid === file.uid) {
           console.log(this.editFileList)
           const fileUrl = this.editFileList[n].url
-          const fileName = this.editFileList[n].url
-            .substring(28)
-            .split('.')[0]
+          const fileName = this.editFileList[n].url.substring(28).split('.')[0]
           this.$delete(`oss/content`, { fileName: fileName })
           // 根据图片数量分别执行删除的功能
           if (this.editFileList.length === 1) {
@@ -511,8 +574,12 @@ export default {
               )[1]
               this.editFileList.shift()
             } else if (n === 1) {
-              const firsturl = this.editForm.repairInvoice.split(',' + fileUrl)[0]
-              const lasturl = this.editForm.repairInvoice.split(',' + fileUrl)[1]
+              const firsturl = this.editForm.repairInvoice.split(
+                ',' + fileUrl
+              )[0]
+              const lasturl = this.editForm.repairInvoice.split(
+                ',' + fileUrl
+              )[1]
               this.editForm.repairInvoice = firsturl + lasturl
               this.editFileList.splice(n, 1)
             } else {
@@ -529,7 +596,7 @@ export default {
       }
     },
     // 处理图片预览效果
-    handlePreview(file) {
+    handlePreview (file) {
       console.log(file)
       if ('url' in file) {
         this.previewPath = file.url
@@ -539,11 +606,11 @@ export default {
       this.previewVisible = true
     },
     // 上传校验
-    handleBeforeUpload(file) {
+    handleBeforeUpload (file) {
       if (file.size / 1024 > 5000) {
         this.$message({
           message: '上传文件大小不能超过5MB!',
-          type: 'error'
+          type: 'error',
         })
         return false
       } else {
@@ -551,24 +618,24 @@ export default {
         if (!validatePicExt(ext)) {
           this.$message({
             type: 'error',
-            message: '禁止上传' + ext + '类型的附件'
+            message: '禁止上传' + ext + '类型的附件',
           })
           return false
         }
       }
     },
     // 查看发票图片
-    showpreViewDialog(item) {
+    showpreViewDialog (item) {
       this.previewPath = item
       this.previewVisible = true
     },
     // 图片预览关闭
-    previewDialogClose() {
+    previewDialogClose () {
       this.previewPath = ''
       this.previewVisible = false
     },
     // 手风琴效果
-    toogleExpand(row, event, column) {
+    toogleExpand (row, event, column) {
       const $table = this.$refs.tableref
       this.repairList.map((item) => {
         if (row.id !== item.id) {
@@ -578,11 +645,11 @@ export default {
       $table.toggleRowExpansion(row)
     },
     // 监听发票图片数量是否超过限制，从而隐藏上传框
-    editRepairInvoiceChange() {
+    editRepairInvoiceChange () {
       this.editrepairinvoicehideupload =
         this.editListLength >= this.uploadPicLimit
-    }
-  }
+    },
+  },
 }
 </script>
 
