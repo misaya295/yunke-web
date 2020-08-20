@@ -336,6 +336,10 @@ export default {
           label: '软件工程'
         },
         {
+          value: '084',
+          label: '数媒技术'
+        },
+        {
           value: '094',
           label: '大数据'
         }
