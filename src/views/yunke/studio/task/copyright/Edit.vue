@@ -3,48 +3,43 @@
     :title="title"
     :width="width"
     top="3vh"
-    close-on-click-modal
+    :close-on-click-modal="false" 
     :close-on-press-escape="false"
     :visible.sync="isVisible"
   >
     <el-form ref="form" :model="copyright" :rules="rules" label-position="right" label-width="100px">
       <el-form-item label="标题" prop="title">
-        <el-input v-model="copyright.title" />
+        <el-input v-model="copyright.title"  />
       </el-form-item>
-      <el-form-item label="摘要">
-        <el-input v-model="copyright.introduction" />
+      <el-form-item label="摘要" >
+        <el-input v-model="copyright.introduction"  />
       </el-form-item>
       <el-form-item label="开始时间">
-        <el-col :span="15">
+        <el-col>
           <el-date-picker
             v-model="copyright.startTime"
             type="date"
             value-format="yyyy-MM-dd"
             placeholder="选择日期"
-          />
+            style="width:100%"
+            >
+          </el-date-picker>
         </el-col>
       </el-form-item>
       <el-form-item label="结束时间">
-        <el-col :span="15">
+        <el-col>
           <el-date-picker
             v-model="copyright.endTime"
             type="date"
             value-format="yyyy-MM-dd"
             placeholder="选择日期"
-          />
+            style="width:100%"
+            >
+          </el-date-picker>
         </el-col>
       </el-form-item>
-      <el-form-item label="花费">
+      <el-form-item label="花费" >
         <el-input v-model.number="copyright.cost" />
-      </el-form-item>
-      <el-form-item label="申请书">
-        <el-input v-model="copyright.applicationForm" type="textarea" />
-      </el-form-item>
-      <el-form-item label="源文件">
-        <el-input v-model="copyright.originFile" />
-      </el-form-item>
-      <el-form-item label="软件协议">
-        <el-input v-model="copyright.agreement" />
       </el-form-item>
       <el-form-item :label="$t('table.user.status')" prop="state">
         <el-radio-group v-model="copyright.state">
@@ -58,8 +53,8 @@
           <el-radio :label="1">已报销</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="负责人">
-        <el-select v-model="team.reliable" value="" placeholder="负责人" style="width:100%">
+      <el-form-item label="负责人" >
+        <el-select  v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
           <el-option
             v-for="item in userRoles"
             :key="item.userId"
@@ -68,18 +63,18 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="成员">
-        <el-select v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
+      <el-form-item label="成员" >
+        <el-select  v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
           <el-option
             v-for="item in userRoles"
             :key="item.userId"
-            :label="item.fullName"
+           :label="item.fullName"
             :value="String(item.userId)"
-          />
+         />
         </el-select>
       </el-form-item>
-      <el-form-item label="指导老师">
-        <el-select v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
+      <el-form-item label="指导老师" >
+        <el-select  v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
           <el-option
             v-for="item in teacherRoles"
             :key="item.userId"
@@ -88,8 +83,8 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="项目名称" prop="itemId">
-        <el-select v-model="copyright.itemId" value="" placeholder="选择项目名称" style="width:100%">
+       <el-form-item label="项目名称" prop="itemId">
+         <el-select  v-model="copyright.itemId"  value="" placeholder="选择项目名称" style="width:100%">
           <el-option
             v-for="item in itemsIds"
             :key="item.itemsId"
@@ -102,45 +97,106 @@
       <el-form-item label="发票" prop="invoice">
         <!-- <el-button size="small" type="primary" @click="upload('发票')">点击上传</el-button> -->
         <el-upload
-          :before-upload="handleBeforeUpload"
+          :before-upload="handleBeforeUploadInvoice"
           :before-remove="handleBeforeRemove"
           :on-success="handleSuccessInvoice"
           :file-list="fileList"
           :action="uploadUrl"
-          class="upload-demo"
+          :class="{hideupload:editrepairinvoicehideupload, picturecard:true}"
+          accept=".jpg,.jpeg,.png,.gif,.bmp"
           :headers="headers"
           multiple
-          :limit="3"
+          :limit="uploadPicLimit"
+          list-type="picture-card"
           drag
         >
           <i class="el-icon-upload" />
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
           <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
         </el-upload>
       </el-form-item>
       <!-- 证书 -->
-      <el-form-item label="证书" prop="invoice">
+      <el-form-item label="证书" prop="certificate">
         <!-- <el-button size="small" type="primary" @click="upload('发票')">点击上传</el-button> -->
         <el-upload
-          :before-upload="handleBeforeUpload"
+          :before-upload="handleBeforeUploadInvoice"
           :before-remove="handleBeforeRemove"
           :on-success="handleSuccessCertificate"
           :file-list="fileList"
           :action="uploadUrl"
-          class="upload-demo"
+          :class="{hideupload:editrepairinvoicehideupload, picturecard:true}"
+          accept=".jpg,.jpeg,.png,.gif,.bmp"
           :headers="headers"
           multiple
-          :limit="3"
+          :limit="uploadPicLimit"
+          list-type="picture-card"
           drag
         >
           <i class="el-icon-upload" />
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
           <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
+        </el-upload>
+      </el-form-item>
+      <!-- 源文件 -->
+      <el-form-item label="源文件" prop="originFile">
+       <el-input v-model="copyright.originFile" />
+        <!-- <el-upload
+          :before-upload="handleBeforeUploadUrl"
+          :before-remove="handleBeforeRemove"
+          :on-success="handleSuccessOriginFile"
+          :file-list="fileList"
+          :action="uploadUrl"
+          accept=".doc,.pdf,.docx,.ppt,.rar,.zip,.arj,.gz,.tar,.tar.gz"
+          :class="{hideupload:editrepairinvoicehideupload, picturecard:true}"
+          :headers="headers"
+          :limit="uploadDocTarLimit"
+          list-type="picture-card"
+          drag
+        >
+          <i  class="el-icon-upload" />
+          <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传1个附件，且文件不超过10M</div>
+        </el-upload> -->
+      </el-form-item>
+      <!-- 申请书 -->
+      <el-form-item label="申请书" prop="applicationForm">
+        <!-- <el-input v-model="tasks.url" /> -->
+        <el-upload
+          :before-upload="handleBeforeUploadSpecif"
+          :before-remove="handleBeforeRemove"
+          :on-success="handleSuccessApplicationForm"
+          :file-list="fileList"
+          :action="uploadUrl"
+          accept=".doc,.docx,.pdf,.ppt"
+          :class="{hideupload:editrepairinvoicehideupload, picturecard:true}"
+          :headers="headers"
+          :limit="uploadDocTarLimit"
+          drag
+        >
+          <i  class="el-icon-upload" />
+          <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传1个附件，且文件不超过5M</div>
+        </el-upload>
+      </el-form-item>
+      <!-- 软件协议 -->
+      <el-form-item label="软件协议" prop="certificate">
+        <!-- <el-button size="small" type="primary" @click="upload('发票')">点击上传</el-button> -->
+        <el-upload
+          :before-upload="handleBeforeUploadSpecif"
+          :before-remove="handleBeforeRemove"
+          :on-success="handleSuccessAgreement"
+          :file-list="fileList"
+          :action="uploadUrl"
+          :class="{hideupload:editrepairinvoicehideupload, picturecard:true}"
+          :headers="headers"
+          accept=".doc,.docx,.pdf,.ppt"
+          multiple
+          :limit="uploadDocTarLimit"
+          drag
+        >
+          <i class="el-icon-upload" />
+          <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传1个附件，且文件不超过5M</div>
         </el-upload>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button type="warning" plain :loading="buttonLoading" @click="isVisible = false">
+      <el-button type="primary" plain :loading="buttonLoading" @click="isVisible = false">
         {{ $t('common.cancel') }}
       </el-button>
       <el-button type="primary" plain :loading="buttonLoading" @click="submitForm">
@@ -153,7 +209,7 @@
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import { qiNiuUrl } from '@/settings'
 import { getToken } from '@/utils/auth'
-import { validateFileExt } from '@/utils/my-validate'
+import { validatePicExt, validateFileExt, validateFileTarExt, validateFileDocmentExt } from '@/utils/my-validate'
 
 export default {
   name: 'ItemsEdit',
@@ -169,6 +225,12 @@ export default {
   },
   data() {
     return {
+      // 上传图片数量限制
+      uploadPicLimit: 3,
+      // 上传文档和压缩包数量限制
+      uploadDocTarLimit: 1,
+      // 超过图片数量限制时隐藏上传组件
+      editrepairinvoicehideupload: false,
       headers: {
         Authorization: `bearer ${getToken()}`
       },
@@ -291,7 +353,7 @@ export default {
             fullName: v.fullName
           }
           if (v.noteId === '1') teacherRoles.push(obj)
-          userRoles.push(obj)
+          else if (v.noteId === '2' || v.noteId === '3') userRoles.push(obj)
         })
         this.userRoles = userRoles
         this.teacherRoles = teacherRoles
@@ -310,7 +372,6 @@ export default {
       this.team.reliable = val.reliable
       this.team.member = val.member
       this.team.teacher = val.teacher
-      console.log(this.team)
       if (this.copyright.invoice.length > 1) {
         this.fileUrlList = this.copyright.invoice.split(',')
       } else {
@@ -327,6 +388,12 @@ export default {
       }
     },
     close() {
+      this.team = {
+        reliable: '',
+        member: [],
+        teacher: []
+      }
+      this.doSubmit()
       this.$emit('close')
     },
     submitForm() {
@@ -336,15 +403,16 @@ export default {
           if (!this.copyright.copyrightId) {
             // create
             // 调用getDge
+            const copyright = this.copyright
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
               this.buttonLoading = false
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
             this.doSubmit()
-            this.copyright.userId = a
-            this.copyright.m_state = b
-            this.$post('studio/copyright', { ...this.copyright }).then(() => {
+            copyright.userId = a
+            copyright.m_state = b
+            this.$post('studio/copyright', { ...copyright }).then(() => {
               this.buttonLoading = false
               this.isVisible = false
               this.$message({
@@ -360,17 +428,24 @@ export default {
             })
           } else {
             // update
-            this.copyright.reimbursement = parseInt(this.copyright.reimbursement)
-            this.copyright.state = parseInt(this.copyright.state)
+            const copyright = this.copyright
+            copyright.reimbursement = parseInt(copyright.reimbursement)
+            copyright.state = parseInt(copyright.state)
             // 调用getDge
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
               this.buttonLoading = false
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
-            this.copyright.userId = a
-            this.copyright.m_state = b
-            this.$put('studio/copyright', { ...this.copyright }).then((r) => {
+            copyright.userId = a
+            copyright.m_state = b
+            delete copyright.members
+            const updateState = {
+              state: copyright.state,
+              copyrightId: copyright.copyrightId
+            }
+            this.$put('studio/copyright/state', { ...updateState })
+            this.$put('studio/copyright', { ...copyright }).then((r) => {
               this.buttonLoading = false
               this.isVisible = false
               this.$message({
@@ -434,6 +509,28 @@ export default {
         this.copyright.invoice = this.copyright.invoice + ',' + response.data.url
       }
     },
+    // 源文件上传
+    // handleSuccessOriginFile(response, file, fileList) {
+    //   const uid = file.uid
+    //   const id = response.data.contentId
+    //   this.files.push({ uid, id })
+    //   if (this.copyright.originFile === '' || this.copyright.originFile === null) {
+    //     this.copyright.originFile = response.data.url
+    //   } else {
+    //     this.copyright.originFile = this.copyright.originFile + ',' + response.data.url
+    //   }
+    // },
+    // 申请书上传
+    handleSuccessApplicationForm(response, file, fileList) {
+      const uid = file.uid
+      const id = response.data.contentId
+      this.files.push({ uid, id })
+      if (this.copyright.applicationForm === '' || this.copyright.applicationForm === null) {
+        this.copyright.applicationForm = response.data.url
+      } else {
+        this.copyright.applicationForm = this.copyright.applicationForm + ',' + response.data.url
+      }
+    },
     // 证书上传
     handleSuccessCertificate(response, file, fileList) {
       const uid = file.uid
@@ -443,6 +540,17 @@ export default {
         this.copyright.certificate = response.data.url
       } else {
         this.copyright.certificate = this.copyright.certificate + ',' + response.data.url
+      }
+    },
+    // 软件协议上传
+    handleSuccessAgreement(response, file, fileList) {
+      const uid = file.uid
+      const id = response.data.contentId
+      this.files.push({ uid, id })
+      if (this.copyright.agreement === '' || this.copyright.agreement === null) {
+        this.copyright.agreement = response.data.url
+      } else {
+        this.copyright.agreement = this.copyright.agreement + ',' + response.data.url
       }
     },
     handleBeforeRemove(file, fileList) {
@@ -458,7 +566,43 @@ export default {
         }
       }
     },
-    handleBeforeUpload(file) {
+    handleBeforeUploadInvoice(file) {
+      if (file.size / 1024 > 5000) {
+        this.$message({
+          message: '上传文件大小不能超过5MB!',
+          type: 'error'
+        })
+        return false
+      } else {
+        const ext = file.name.replace(/.+\./, '')
+        if (!validatePicExt(ext)) {
+          this.$message({
+            type: 'error',
+            message: '禁止上传' + ext + '类型的附件'
+          })
+          return false
+        }
+      }
+    },
+    // handleBeforeUploadUrl(file) {
+    //   if (file.size / 1024 > 10000) {
+    //     this.$message({
+    //       message: '上传文件大小不能超过10MB!',
+    //       type: 'error'
+    //     })
+    //     return false
+    //   } else {
+    //     const ext = file.name.replace(/.+\./, '')
+    //     if (!validateFileExt(ext)) {
+    //       this.$message({
+    //         type: 'error',
+    //         message: '禁止上传' + ext + '类型的附件'
+    //       })
+    //       return false
+    //     }
+    //   }
+    // },
+    handleBeforeUploadSpecif(file) {
       if (file.size / 1024 > 5000) {
         this.$message({
           message: '上传文件大小不能超过5MB!',
