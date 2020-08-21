@@ -3,10 +3,8 @@
     <div class="filter-container">
         <!-- 比赛名称 -->
         <el-input v-model="queryParams.title" placeholder="比赛名称" class="filter-item search-item"/>
-        <!-- 真实姓名 -->
-        <el-input v-model="queryParams.fullName" placeholder="真实姓名" class="filter-item search-item"/>
-        <!-- 是否已报销 -->
-        <el-select  v-model="queryParams.reimbursement"  value="" placeholder="是否已报销" class="filter-item search-item">
+        <!-- 比赛等级 -->
+        <el-select  v-model="queryParams.level"  value="" placeholder="比赛等级" class="filter-item search-item">
           <el-option
             v-for="match in whether"
             :key="match.id"
@@ -14,15 +12,19 @@
             :value="match.id"
           />
         </el-select>
+        <!-- 负责人 -->
+        <el-input v-model="queryParams.chargeFullName" placeholder="负责人" class="filter-item search-item"/>
+        <!-- 指导老师 -->
+        <el-input v-model="queryParams.teacherFullName" placeholder="指导老师" class="filter-item search-item"/>
         <!-- 比赛时间 -->
         <el-date-picker
         v-model="queryParams.time"
         :range-separator="null"
-        :start-placeholder="$t('table.user.createTime')"
+        start-placeholder="比赛时间"
         value-format="yyyy-MM-dd"
         class="filter-item search-item date-range-item"
         type="daterange"
-      /><br/>
+      />
         <!-- 搜索 -->
         <el-button class="filter-item" type="primary" plain @click="search">
             {{ $t('table.search') }}
@@ -31,17 +33,20 @@
         <el-button class="filter-item" type="warning" plain @click="reset">
             {{ $t('table.reset') }}
         </el-button>
-        <!-- 更多操作 -->
-        <el-dropdown v-has-any-permission="['task:add','task:delete','task:export']" trigger="click" class="filter-item">
-        <el-button>
-          {{ $t('table.more') }}<i class="el-icon-arrow-down el-icon--right" />
+        <!-- 添加 -->
+        <el-button class="filter-item" type="success" plain icon="el-icon-plus" @click.native="add">
+            {{ $t('table.add') }}
         </el-button>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item v-has-permission="['task:add']" @click.native="add">{{ $t('table.add') }}</el-dropdown-item>
-          <el-dropdown-item v-has-permission="['task:delete']" @click.native="batchDelete">{{ $t('table.delete') }}</el-dropdown-item>
-          <el-dropdown-item v-has-permission="['task:export']" @click.native="exportExcel">{{ $t('table.export') }}</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+        <!-- 更多操作 -->
+        <!-- <el-dropdown v-has-any-permission="['task:add','task:delete','task:export']" trigger="click" class="filter-item">
+          <el-button>
+            {{ $t('table.more') }}<i class="el-icon-arrow-down el-icon--right" />
+          </el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item v-has-permission="['task:delete']" @click.native="batchDelete">{{ $t('table.delete') }}</el-dropdown-item>
+            <el-dropdown-item v-has-permission="['task:export']" @click.native="exportExcel">{{ $t('table.export') }}</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown> -->
     </div>
 
     <!-- 表 -->
@@ -54,115 +59,49 @@
       style="width: 100%;"
       @selection-change="onSelectChange"
       @sort-change="sortChange"
-      @expand-change="getTeam"
       @row-click="toogleExpand"
     >
-         <!-- 展开区域 -->
-        <el-table-column label="详情" type="expand" width="40px">
-          <template slot-scope="props">
-            <el-form label-position="left" class="table-expand">
-              <el-row>
-                <el-col :span="4">
-                  <el-form-item label="负责人:">
-                    <span>{{ team.reliable }}</span>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="5">
-                  <el-form-item label="成员:">
-                    <span>{{ team.member }}</span>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="5">
-                  <el-form-item label="指导老师:">
-                    <span>{{ team.teacher }}</span>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col>
-                  <el-form-item label="发票:">
-                    <div class="demo-image" v-if="props.row.invoice">
-                      <div class="block" v-for="(item, i) in props.row.invoice.split(',')" :key="i">
-                        <el-image
-                          :src="item"
-                          @click="showpreViewDialog(item)">
-                        </el-image>
-                      </div>
-                    </div>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col>
-                  <el-form-item label="证书:">
-                    <div class="demo-image" v-if="props.row.invoice">
-                      <div class="block" v-for="(item, i) in props.row.certificate.split(',')" :key="i">
-                        <el-image
-                          :src="item"
-                          @click="showpreViewDialog(item)">
-                        </el-image>
-                      </div>
-                    </div>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </el-form>
-          </template>
-        </el-table-column>
-        <el-table-column type="selection" align="center" width="45px" />
+        <el-table-column type="selection" align="center" width="40px" />
         <!-- 比赛名称 -->
         <el-table-column label="比赛名称" prop="title" :show-overflow-tooltip="true" align="center" min-width="120px">
             <template slot-scope="scope">
                 <span>{{ scope.row.title }}</span>
             </template>
         </el-table-column>
-        <!-- 比赛等级 -->
-        <el-table-column 
-            label="比赛等级" 
+        <!-- 等级 -->
+        <el-table-column
+            label="等级" 
             :filters="[{text: '国家级', value: '0'},{ text: '省级', value: '1' },{ text: '校级', value: '2' }]"
             :filter-method="filterLevel"
             class-name="level-col"
             align="center"
             min-width="90px"
         >
-             <template slot-scope="{row}">
-                <el-tag :type="row.level | levelFilter">
-                    <span>{{transLevel(row.level)}}</span> 
-                </el-tag>
-            </template>
-
+          <template slot-scope="{row}">
+            <el-tag :type="row.level | levelFilter">
+              <span>{{transLevel(row.level)}}</span> 
+            </el-tag>
+          </template>
         </el-table-column>
-        <!-- 比赛类型 -->
+        <!-- 类型 -->
         <el-table-column
-            label="比赛类型"
+            label="类型"
             :filters="[{text: '个人', value: '0'},{ text: '团队', value: '1' }]"
             :filter-method="filterType"
             class-name="type-col"
             align="center"
             min-width="90px"
         >
-            <template slot-scope="{row}">
-                <el-tag :type="row.type | typeFilter">
-                    {{ row.type === 1 ? '团队' : '个人' }}
-                </el-tag>
-            </template>
+          <template slot-scope="{row}">
+            <el-tag :type="row.type | typeFilter">
+              {{ row.type === 1 ? '团队' : '个人' }}
+            </el-tag>
+          </template>
         </el-table-column>
         <!-- 申请书 -->
         <el-table-column label="申请书" prop="applicationForm" :show-overflow-tooltip="true" type="primary" align="center" min-width="110px">
             <template slot-scope="scope">
-                <a @click="upload(scope.row.applicationForm)" class="el-link el-link--primary">{{scope.row.applicationForm}}</a>
-            </template>
-        </el-table-column>
-        <!-- 比赛时间 -->
-        <el-table-column label="比赛时间" prop="time" :show-overflow-tooltip="true" align="center" min-width="100px">
-            <template slot-scope="scope">
-                <span>{{ scope.row.time }}</span>
-            </template>
-        </el-table-column>
-        <!-- 花费 -->
-        <el-table-column label="花费" prop="cost" :show-overflow-tooltip="true" align="center" min-width="50px">
-            <template slot-scope="scope">
-                <span>{{ scope.row.cost }}</span>
+                <el-button v-if="scope.row.applicationForm !== ''" size="mini" type="primary" plain  @click.stop="upload(scope.row.applicationForm)">下载</el-button>
             </template>
         </el-table-column>
         <!-- 比赛名次 -->
@@ -180,6 +119,18 @@
               </el-tag>
             </template>
         </el-table-column>
+        <!-- 负责人 -->
+        <el-table-column label="负责人" :show-overflow-tooltip="true" align="center" min-width="86px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.chargeFullName }}</span>
+          </template>
+        </el-table-column>
+        <!-- 指导老师 -->
+        <el-table-column label='指导老师' :show-overflow-tooltip="true" align="center" min-width="90px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.teacherFullName }}</span>
+          </template>
+        </el-table-column>
         <!-- 状态 -->
         <el-table-column
             label="状态"
@@ -189,15 +140,15 @@
             align="center"
             min-width="80px"
         >
-            <template slot-scope="{row}">
-                <el-tag :type="row.state | stateFilter">
-                  {{ row.state === 2 ? '已完成' : '进行中' }}
-                </el-tag>
-            </template>
-      </el-table-column>
-        <!-- 是否已报销 -->
+          <template slot-scope="{row}">
+            <el-tag :type="row.state | stateFilter">
+              {{ row.state === 2 ? '已完成' : '进行中' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <!-- 报销情况 -->
         <el-table-column
-          label="报销"
+          label="报销情况"
           :filters="[{text: '未报销', value: '0'},{ text: '已报销', value: '1' }]"
           :filter-method="filterReimbursement"
           class-name="reimbursement-col"
@@ -220,7 +171,7 @@
               placement="top"
               :enterable="false"
             >
-              <i v-hasPermission="['task:add']" class="el-icon-coin table-operation" style="color: #87d068;" @click="changeReimbursement(row)" />
+              <i v-hasPermission="['task:add']" class="el-icon-coin table-operation" style="color: #87d068;" @click.stop="changeReimbursement(row)" />
             </el-tooltip>
             <el-tooltip
               v-hasPermission="['task:update']"
@@ -230,7 +181,7 @@
               placement="top"
               :enterable="false"
             >
-              <i v-hasPermission="['task:update']" class="el-icon-setting table-operation" style="color: #2db7f5;" @click="edit(row)" />
+              <i v-hasPermission="['task:update']" class="el-icon-setting table-operation" style="color: #2db7f5;" @click.stop="edit(row)" />
             </el-tooltip>
             <el-tooltip
               v-hasPermission="['task:delete']"
@@ -240,7 +191,7 @@
               placement="top"
               :enterable="false"
             >
-              <i v-hasPermission="['task:delete']" class="el-icon-delete table-operation" style="color: #f50;" @click="singleDelete(row)" />
+              <i v-hasPermission="['task:delete']" class="el-icon-delete table-operation" style="color: #f50;" @click.stop="singleDelete(row)" />
             </el-tooltip>
             <el-tooltip
               v-hasPermission="['task:view']"
@@ -255,6 +206,56 @@
             <el-link v-has-no-permission="['task:add','task:view','task:update','task:delete']" class="no-perm">
               {{ $t('tips.noPermission') }}
             </el-link>
+          </template>
+        </el-table-column>
+        <!-- 展开区域 -->
+        <el-table-column type="expand" width="1px">
+          <template slot-scope="props">
+            <el-form label-position="left" class="table-expand">
+              <el-row>
+                <el-col :span="11">
+                  <el-form-item label="成员:">
+                    <span>{{ team.member }}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="4">
+                  <el-form-item label="花费:">
+                    <span>{{props.row.cost}}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="5">
+                  <el-form-item label="比赛时间:">
+                    <span>{{props.row.time}}</span>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="11">
+                  <el-form-item label="发票:">
+                    <div class="demo-image" v-if="props.row.invoice">
+                      <div class="block" v-for="(item, i) in props.row.invoice.split(',')" :key="i">
+                        <el-image
+                          :src="item"
+                          @click="showpreViewDialog(item)">
+                        </el-image>
+                      </div>
+                    </div>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="11">
+                  <el-form-item label="证书:">
+                    <div class="demo-image" v-if="props.row.invoice">
+                      <div class="block" v-for="(item, i) in props.row.certificate.split(',')" :key="i">
+                        <el-image
+                          :src="item"
+                          @click="showpreViewDialog(item)">
+                        </el-image>
+                      </div>
+                    </div>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-form>
           </template>
         </el-table-column>
     </el-table>
@@ -275,7 +276,7 @@
     <el-dialog
       title="图片预览"
       :visible.sync="previewVisible"
-      width="30%"
+      width="40%"
       @close="previewDialogClose"
     >
       <el-image :src="previewPath" alt class="previewImg" />
@@ -293,8 +294,8 @@ export default {
     // 比赛等级
     levelFilter(level) {
       const map = {
-        0: '',
-        1: '',
+        0: 'success',
+        1: 'warning',
         2: ''
       }
       return map[level]
@@ -302,8 +303,8 @@ export default {
     // 比赛类型
     typeFilter(type) {
       const map = {
-        0: '',
-        1: ''
+        0: 'warning',
+        1: 'success'
       }
       return map[type]
     },
@@ -318,12 +319,12 @@ export default {
     // 比赛名次
     rankCodeFilter(rankCode){
       const map = {
-        1: '',
-        2: '',
+        1: 'success',
+        2: 'warning',
         3: '',
         4: '',
         5: '',
-        6: ''
+        6: 'info'
       }
       return map[rankCode]
     },
@@ -342,12 +343,12 @@ export default {
         isVisible: false,
         title: ''
       },
-      userViewVisible: false,
+      // userViewVisible: false,
       tableKey: 0,
       loading: false,
       list: [],
       total: 0,
-      queryParams: { reimbursement: '' },
+      queryParams: {},
       sort: {},
       selection: [],
       newWin: null,
@@ -375,11 +376,15 @@ export default {
       whether: [
         {
           id: 0,
-          name: '未报销'
+          name: '国家级'
         },
         {
           id: 1,
-          name: '已报销'
+          name: '省级'
+        },
+        {
+          id: 2,
+          name: '校级'
         }
       ],
       url: ''
@@ -453,9 +458,9 @@ export default {
     filterReimbursement(value, row) {
       return row.reimbursement === value
     },
-    viewClose() {
-      this.userViewVisible = false
-    },
+    // viewClose() {
+    //   this.userViewVisible = false
+    // },
     editClose() {
       this.dialog.isVisible = false
     },
@@ -470,21 +475,9 @@ export default {
       this.url = url
     },
     search() {
-      if (this.matchId !== '') {
-        this.getIdInfo(this.matchId)
-        return
-      }
       this.fetch({
         ...this.queryParams,
         ...this.sort
-      })
-    },
-    getIdInfo(id) {
-      this.$get(`studio/match/${id}`).then((r) => {
-        const data = r.data.data
-        const arr = []
-        arr.push(data)
-        this.list = arr
       })
     },
     reset() {
@@ -493,13 +486,6 @@ export default {
       this.$refs.table.clearSort()
       this.$refs.table.clearFilter()
       this.search()
-    },
-    exportExcel() {
-      this.$download('studio/task/match/excel', {
-        pageSize: this.pagination.size,
-        pageNum: this.pagination.num,
-        ...this.queryParams
-      }, `match_${new Date().getTime()}.xlsx`)
     },
     add() {
       this.dialog.title = this.$t('common.add')
@@ -560,168 +546,136 @@ export default {
         this.search()
       })
     },
-    getTeam(row) {
-      this.view(row)
-    },
-    view(row) {
-      this.$get(`studio/match/${row.matchId}`).then((r) => {
-        const uResult = []
-        const data = r.data.data
-        let userId = []
-        let userState = []
-        if (data.userId && typeof data.userId === 'string') {
-          userId = data.userId.split(',')
-        }
-        if (data.userState && typeof data.userState === 'string') {
-          userState = data.userState.split(',')
-        }
-        // 拿到uesrId及名称
-        this.$get('system/user').then((r) => {
-          const rows = r.data.data.rows
-          rows.forEach((v, i) => {
-            userId.forEach((v1, i1) => {
-              if (v1 === ('' + v.userId)) {
-                uResult.push(v.fullName)
-              }
-            })
-          })
-          let reliable = ''
-          let member = ''
-          let teacher = ''
-          userState.forEach((v1, i1) => {
-            if (v1 === '1') {
-              if (reliable === '') {
-                reliable = uResult[i1]
-              } else {
-                reliable += '，' + uResult[i1]
-              }
-            }
-            if (v1 === '2') {
-              if (member === '') {
-                member = uResult[i1]
-              } else {
-                member += '，' + uResult[i1]
-              }
-            }
-            if (v1 === '3') {
-              if (teacher === '') {
-                teacher = uResult[i1]
-              } else {
-                teacher += '，' + uResult[i1]
-              }
-            }
-          })
-          this.team = {
-            reliable,
-            member,
-            teacher
-          }
-          // this.$refs.view.setTasks(data)
-          // this.taskViewVisible = true
-        })
-      })
-    },
-    edit(row) {
-      // 已完成的任务无法修改
-      if (parseInt(row.state) === 2) {
-        return this.$message.warning('任务已完成无法修改！')
-      }
-      this.$get(`studio/match/${row.matchId}`).then((r) => {
-        const data = r.data.data
-        let userId = []
-        let userState = []
-        if (data.userId && typeof data.userId === 'string') {
-          userId = data.userId.split(',')
-        }
-        if (data.userState && typeof data.userState === 'string') {
-          userState = data.userState.split(',')
-        }
-        let reliable = ''
-        let member = ''
-        let teacher = ''
-        userState.forEach((v1, i1) => {
-          if (v1 === '1') {
-            if (reliable === '') {
-              reliable = userId[i1]
-            } else {
-              reliable += ',' + userId[i1]
-            }
-          }
-          if (v1 === '2') {
-            if (member === '') {
-              member = userId[i1]
-            } else {
-              member += ',' + userId[i1]
-            }
-          }
-          if (v1 === '3') {
-            if (teacher === '') {
-              teacher = userId[i1]
-            } else {
-              teacher += ',' + userId[i1]
-            }
-          }
-        })
-        row.reliable = reliable
-        row.member = member.split(',')
-        row.teacher = teacher.split(',')
-        this.$refs.edit.setTasks(row)
-        this.dialog.title = this.$t('common.edit')
-        this.dialog.isVisible = true
-      })
-    },
-    // checkInvoice(invoice) {
-    //   const arr = invoice.split(',') || []
-    //   arr.forEach((v1, i) => {
-    //     const id = parseInt(v1)
-    //     this.$get(`oss/content/download/${id}`).then((r) => {
-    //       this.srcList = [...this.srcList, r.data.data]
-    //       console.log(this.srcList)
+    // getTeam(row) {
+    //   this.view(row)
+    // },
+    // view(row) {
+    //   this.$get(`studio/match/${row.matchId}`).then((r) => {
+    //     const uResult = []
+    //     const data = r.data.data
+    //     let userId = []
+    //     let userState = []
+    //     if (data.userId && typeof data.userId === 'string') {
+    //       userId = data.userId.split(',')
+    //     }
+    //     if (data.userState && typeof data.userState === 'string') {
+    //       userState = data.userState.split(',')
+    //     }
+    //     // 拿到uesrId及名称
+    //     this.$get('system/user').then((r) => {
+    //       const rows = r.data.data.rows
+    //       rows.forEach((v, i) => {
+    //         userId.forEach((v1, i1) => {
+    //           if (v1 === ('' + v.userId)) {
+    //             uResult.push(v.fullName)
+    //           }
+    //         })
+    //       })
+    //       let reliable = ''
+    //       let member = ''
+    //       let teacher = ''
+    //       userState.forEach((v1, i1) => {
+    //         if (v1 === '1') {
+    //           if (reliable === '') {
+    //             reliable = uResult[i1]
+    //           } else {
+    //             reliable += '，' + uResult[i1]
+    //           }
+    //         }
+    //         if (v1 === '2') {
+    //           if (member === '') {
+    //             member = uResult[i1]
+    //           } else {
+    //             member += '，' + uResult[i1]
+    //           }
+    //         }
+    //         if (v1 === '3') {
+    //           if (teacher === '') {
+    //             teacher = uResult[i1]
+    //           } else {
+    //             teacher += '，' + uResult[i1]
+    //           }
+    //         }
+    //       })
+    //       this.team = {
+    //         reliable,
+    //         member,
+    //         teacher
+    //       }
+    //       // this.$refs.view.setTasks(data)
+    //       // this.taskViewVisible = true
     //     })
     //   })
     // },
+    edit(row) {
+      // 已完成的任务无法修改
+      // if (parseInt(row.state) === 2) {
+      //   return this.$message.warning('任务已完成无法修改！')
+      // }
+      let userId = row.members
+      let reliable = ''
+      let member = []
+      let teacher = []
+      userId.forEach((v1, i1) => {
+        if (v1.state === 1) {
+          reliable = '' + v1.userId
+        }
+        if (v1.state === 2) {
+          member.push('' + v1.userId)
+        }
+        if (v1.state === 3) {
+          teacher.push('' + v1.userId)
+        }
+      })
+      row.reliable = reliable
+      row.member = member
+      row.teacher = teacher
+      console.log(row)
+      this.$refs.edit.setTasks(row)
+      this.dialog.title = this.$t('common.edit')
+      this.dialog.isVisible = true
+    },
     // 弹出申请报销对话框
-    changeReimbursement(row) {
-      this.$get(`studio/match/${row.matchId}`).then(async(r) => {
-        const data = r.data.data
-        const userId = data.userId || ''
-        // 管理员权限  任务负责人权限
-        let flag = this.currentUser.roleId.indexOf('1') === -1
-        const fg = userId.indexOf(this.currentUser.userId) !== 0
-        if (!flag || !fg) {
-          flag = false
+    async changeReimbursement(row) {
+      const userId = row.userId || ''
+      // 管理员权限  任务负责人权限
+      let flag = this.currentUser.roleId.indexOf('1') === -1
+      const fg = row.chargeFullName !== this.currentUser.fullName
+      if (!flag || !fg) {
+        flag = false
+      }
+      if (flag) {
+        return this.$message.info('仅允许管理员或任务负责人操作！')
+      }
+      // 检查是否已报销
+      if (row.reimbursement === 1) {
+        return this.$message.info('该比赛任务已经报销！')
+      }
+      // 符合条件，弹出申请报销对话框
+      // this.reimbursementDialogVisible = true
+      const confirmResult = await this.$confirm(
+        '您的报销条件已符合, 是否确认报销?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         }
-        if (flag) {
-          return this.$message.info('仅允许管理员或任务负责人操作！')
+      ).catch((err) => err)
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('取消了报销')
+      }
+      this.Funding.applyTime = this.getTime()
+      this.Funding.proposerId = this.currentUser.userId
+      this.Funding.name = row.title + '比赛任务报销'
+      this.Funding.type = 'match'
+      this.Funding.id = row.matchId
+      console.log(this.Funding)
+      this.$router.push({
+        name: '经费管理',
+        params: {
+          Funding: this.Funding
         }
-        // 检查是否已报销
-        if (row.reimbursement === 1) {
-          return this.$message.info('该比赛任务已经报销！')
-        }
-        // 符合条件，弹出申请报销对话框
-        // this.reimbursementDialogVisible = true
-        const confirmResult = await this.$confirm(
-          '您的报销条件已符合, 是否确认报销?',
-          '提示',
-          {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }
-        ).catch((err) => err)
-        if (confirmResult !== 'confirm') {
-          return this.$message.info('取消了报销')
-        }
-        this.Funding.applyTime = this.getTime()
-        this.Funding.proposerId = this.currentUser.userId
-        this.Funding.name = row.title + '比赛任务报销'
-        console.log(this.Funding)
-        this.$router.push({
-          name: '经费管理',
-          params: {
-            Funding: this.Funding
-          }
-        })
       })
     },
      // 获取时间
@@ -754,17 +708,36 @@ export default {
         const data = r.data.data
         this.total = data.total
         this.list = data.rows
-        this.list.forEach((v, i) => {
-          if (v.invoice === null) {
-            v.invoice = ''
-          }
-        })
+        this.TakeTeams(data.rows)
         this.loading = false
       })
     },
+    TakeTeams(list){
+      list.forEach((v, i) => {
+        if (v.invoice === null) {
+          v.invoice = ''
+        }
+        v.members.forEach((v1, i1) => {
+          if (v1.state === 1) {
+            v.chargeFullName = v1.fullName
+          }
+          if (v1.state === 3) {
+            v.teacherFullName = v1.fullName
+          }
+          if (v1.state === 2) {
+            if (v.memberFullName === undefined) {
+              v.memberFullName = v1.fullName
+            } else {
+              v.memberFullName += '，' + v1.fullName
+            }
+          }
+        })
+      })
+      this.list = list
+    },
     // 手风琴效果
     async toogleExpand(row) {
-      await this.view(row)
+      this.team.member = row.memberFullName
       const $table = this.$refs.table
       this.list.map((item) => {
         if (row.matchId !== item.matchId) {
@@ -828,9 +801,12 @@ export default {
   display: flex;
 }
 .demo-image .el-image {
-  width: 50px;
-  height: 50px;
+  width: 100px;
+  height: 100px;
   margin: 0px 10px;
   border:  1px solid #000;
+}
+.previewImg {
+  width: 100%;
 }
 </style>
