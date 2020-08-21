@@ -1454,7 +1454,7 @@
           //赋值
           this.temp.name = routerParams.name;
           this.temp.applyTime = routerParams.applyTime;
-          this.temp.type = routerParams.taskType;
+          this.temp.type = routerParams.type;
           this.temp.taskId = routerParams.id
           //打开表单 什么都不传会报错： Cannot read property 'id' of undefined"
           this.handleCreate(this.temp);
