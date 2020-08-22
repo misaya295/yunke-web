@@ -8,9 +8,15 @@
         style="width:155px;"
         class="filter-item search-item"
       ></el-input>
+      <el-input
+        v-model="funding.type"
+        placeholder="请输入报销类型"
+        style="width:155px;"
+        class="filter-item search-item"
+      ></el-input>
 
-      <!-- 状态 -->
-      <el-select
+      <!-- 类型 -->
+      <!-- <el-select
         v-model="funding.state"
         placeholder="状态"
         class="filter-item search-item"
@@ -22,7 +28,7 @@
           :label="item.label"
           :value="item.value"
         ></el-option>
-      </el-select>
+      </el-select>-->
       <!-- 申请人 -->
       <el-autocomplete
         popper-class="my-autocomplete"
@@ -54,18 +60,8 @@
           style="width:255px"
         ></el-date-picker>
       </div>
-      <el-button
-        class="filter-item"
-        type="primary"
-        plain
-        @click="handleSearchFunding2"
-      >搜索</el-button>
-      <el-button
-        class="filter-item"
-        type="warning"
-        plain
-        @click="handleReset"
-      >重置</el-button>
+      <el-button class="filter-item" type="primary" plain @click="handleSearchFunding2">搜索</el-button>
+      <el-button class="filter-item" type="warning" plain @click="handleReset">重置</el-button>
       <el-button
         v-hasPermission="['funding:add']"
         class="filter-item"
@@ -117,7 +113,7 @@
         </el-table-column>
         <el-table-column label="类型" align="center" min-width="100px">
           <template slot-scope="scope">
-            <span>{{ judgeTypeIsTask(scope.row.type)?taskTypeMap[scope.row.type]:scope.row.type}}</span>
+            <span>{{ scope.row.type}}</span>
           </template>
         </el-table-column>
         <el-table-column label="费用" align="center" min-width="100px" :show-overflow-tooltip="true">
@@ -281,7 +277,7 @@
                     </span>
                     {{ getTaskName(row) }}
                     <el-tooltip
-                      v-if="row.taskId!==null&&row.taskId!==''&&judgeTypeIsTask(row.type)"
+                      v-if="row.taskId!==null&&row.taskId!==''&&judgeTypeIsTaskCh(row.type)"
                       class="item"
                       effect="dark"
                       content="跳转"
@@ -290,7 +286,7 @@
                     >
                       <i
                         class="el-icon-share table-operation"
-                        v-if="row.taskId!==null&&row.taskId!==''&&judgeTypeIsTask(row.type)"
+                        v-if="row.taskId!==null&&row.taskId!==''&&judgeTypeIsTaskCh(row.type)"
                         @click="jump(row)"
                       ></i>
                     </el-tooltip>
@@ -351,8 +347,13 @@
             <el-input v-model="temp.name" placeholder="请输入报销名称" style="width:100%"></el-input>
           </el-form-item>
           <!-- 如果申报是四种任务之一，就不给修改类型，原因：1、任务类型已确定，固定了 2、查询任务实际上四是个接口，需要根据类型调用不同的接口，避免用户修改导致接口不能使用 -->
-          <el-form-item label="类型" v-if="!judgeTypeIsTask(temp.type)">
-            <el-input v-model="temp.type" placeholder="请输入报销类型" style="width:100%" />
+          <el-form-item label="类型">
+            <el-input
+              v-model="temp.type"
+              :disabled="judgeTypeIsTaskCh(temp.type)"
+              placeholder="请输入报销类型"
+              style="width:100%"
+            />
           </el-form-item>
 
           <el-form-item label="日期" prop="applyTime">
@@ -562,7 +563,7 @@
         </el-row>
 
         <div slot="footer" class="dialog-footer" v-if="handleJudgePass(temp)">
-          <el-button type plain v-if="judgeCertificateIsNull()" @click="handleCertificate">证明</el-button>
+          <el-button plain v-if="judgeCertificateIsNull()" @click="handleCertificate">证明</el-button>
 
           <el-button type="warning" plain @click="handleChangeState('fail')">驳回</el-button>
           <el-button type="primary" plain @click="handleChangeState('pass')">通过</el-button>
@@ -899,6 +900,12 @@ export default {
         items: "项目",
         copyright: "著作权",
       },
+      taskType2Eng: {
+        论文: "thesis",
+        比赛: "match",
+        项目: "items",
+        著作权: "copyright",
+      },
       infoMap: {
         success: "完成",
         pass: "通过",
@@ -975,13 +982,9 @@ export default {
   },
   methods: {
     setSuccessTime() {
-      // console.log(this.temp)
-
       this.$put("/studio/funding/", {
         ...this.temp,
-      }).then((r) => {
-        // console.log(r)
-      });
+      }).then((r) => {});
     },
     // 修改时的图片预览效果
     handlePreview(file) {
@@ -1184,7 +1187,8 @@ export default {
     loadTable() {
       var param = Object.assign({}, this.page.param);
       let funding = Object.assign({}, this.funding);
-      funding = this.judgeFundingNull(JSON.stringify(funding)) ? null : funding; //后端是根据funding是不是null，判断是不是拿所有数据
+
+      funding = this.judgeFundingNull(JSON.stringify(funding)) ? null : funding; //后端根据funding是不是null，判断是不是拿所有数据
       if (
         funding &&
         funding.success_time !== "" &&
@@ -1309,25 +1313,10 @@ export default {
       this.resetTemp();
       this.temp = Object.assign({}, row);
       this.temp.applyTime = this.formatDate(new Date(this.temp.applyTime));
-      //this.invoiceFileList 设为空数组，不然会出现图片重复的情况
-      this.invoiceFileList = [];
 
-      if (this.temp.invoice === null || this.temp.invoice === "") {
-        this.fileUrlList = [];
-      } else {
-        this.fileUrlList = this.temp.invoice.split(",");
-      }
-      if (this.fileUrlList !== null) {
-        for (var i = 0; i < this.fileUrlList.length; i++) {
-          var fileurl = this.fileUrlList[i];
-          if (fileurl !== null || fileurl !== "") {
-            this.invoiceFileList.push({
-              name: fileurl.substring(28), //以后域名改了会有bug，因为这里获取名字是从固定的位置开始取
-              url: fileurl,
-            });
-          }
-        }
-      }
+      //设置图片数据
+      this.setInvoiceFileList();
+
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
@@ -1375,8 +1364,8 @@ export default {
             message: this.$t("tips.deleteSuccess"),
             type: "success",
           });
+          this.handleSearchFunding();
         });
-        this.handleSearchFunding();
       }
     },
     handleCheck(row) {
@@ -1494,12 +1483,14 @@ export default {
     },
     handleCreate(row) {
       this.resetTemp();
-
+      this.invoiceFileList = [];
       //根据row有任务id,需要给this.temp赋值
       if (row.taskId || row.id) {
         this.setTemp(row);
+        //设置图片数据
+        this.setInvoiceFileList();
       }
-      this.invoiceFileList = [];
+
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
@@ -1509,7 +1500,7 @@ export default {
     //重置
     handleReset() {
       this.funding.name = "";
-      this.funding.state = "";
+      this.funding.type = "";
       this.funding.applyTime = "";
       this.funding.successTime = "";
       this.funding.proposerId = "";
@@ -1650,6 +1641,16 @@ export default {
         return true;
       return false;
     },
+    judgeTypeIsTaskCh(type) {
+      if (
+        type === "论文" ||
+        type === "比赛" ||
+        type === "项目" ||
+        type === "著作权"
+      )
+        return true;
+      return false;
+    },
     getStaskInFo(id) {
       this.$get(`/studio/${this.taskType}/${id}`).then((r) => {
         this.setTemp(JSON.parse(JSON.stringify(r)));
@@ -1657,9 +1658,9 @@ export default {
     },
     //获取任务名
     getTaskName(row) {
-      if (!this.judgeTypeIsTask(row.type)) return;
+      if (!this.judgeTypeIsTaskCh(row.type)) return;
       //修改taskType以调用不同的接口
-      this.taskType = row.type;
+      this.taskType = this.taskType2Eng[row.type]; //啊啊
       //获取数据
       this.$get(`/studio/${this.taskType}/${row.taskId}`).then((r) => {
         this.taskName = r.data.data.title;
@@ -1668,9 +1669,7 @@ export default {
       return this.taskName;
     },
     //获取成功报销时间
-    getSuccessTime(row) {
-      // console.log(this.fundingTableData)
-    },
+    getSuccessTime(row) {},
     dealId(r) {
       //改变数据格式，方便调用
       return JSON.parse(
@@ -1685,22 +1684,43 @@ export default {
           .replace(/copyright_id/g, "id")
       );
     },
+    setInvoiceFileList() {
+      //this.invoiceFileList 设为空数组，不然会出现图片重复的情况
+      this.invoiceFileList = [];
+
+      if (this.temp.invoice === null || this.temp.invoice === "") {
+        this.fileUrlList = [];
+      } else {
+        this.fileUrlList = this.temp.invoice.split(",");
+      }
+      if (this.fileUrlList !== null) {
+        for (var i = 0; i < this.fileUrlList.length; i++) {
+          var fileurl = this.fileUrlList[i];
+          if (fileurl !== null || fileurl !== "") {
+            this.invoiceFileList.push({
+              name: fileurl.substring(28), //以后域名改了会有bug，因为这里获取名字是从固定的位置开始取
+              url: fileurl,
+            });
+          }
+        }
+      }
+    },
     setTemp(r) {
       //创建正则表达式,验证是不是英文
       var reg = /^[A-Za-z]+$/;
-
+      console.log(r);
       //r有值就用dealId转化一下
       if (r.data) r = this.dealId(r.data.data);
       //if(r.data)处理的是接口返回的r
       else if (r) r = this.dealId(r); //else if(r)处理的是其他条件的r
 
-      if (r.type && reg.test(r.type)) {
-        this.taskType = r.type;
+      if (r.type && this.judgeTypeIsTaskCh(r.type)) {
+        this.taskType = this.taskType2Eng[r.type];
       }
       // else this.taskType = "";
       this.temp.name = r.title ? r.title : r.name; //从导入报销传来的r只有r.title,从证书管理传来的r只有r.name;两者是同一个东西
       this.temp.cost = r.cost ? r.cost : "";
-      this.temp.type = this.taskType;
+      this.temp.type = r.type ? r.type : this.taskTypeMap[this.taskType];
       this.temp.invoice = r.invoice ? r.invoice : "";
       this.temp.taskId = r.taskId ? r.taskId : r.id ? r.id : ""; //导入报销传来的是id, 其他模块传来的是taskId;两者是同一个东西,只能存在一个
     },
@@ -1713,7 +1733,7 @@ export default {
       t.name = row.name;
       //跳转到任务模块
       this.$router.push({
-        name: this.taskTypeMap[row.type] + "任务",
+        name: row.type + "任务",
         params: {
           Tasks: t,
         },
@@ -1730,6 +1750,9 @@ export default {
         this.temp.applyTime = routerParams.applyTime;
         this.temp.type = routerParams.type;
         this.temp.taskId = routerParams.id;
+        this.temp.cost = routerParams.cost;
+        this.temp.invoice = routerParams.invoice;
+
         //打开表单 什么都不传会报错： Cannot read property 'id' of undefined"
         this.handleCreate(this.temp);
       }
