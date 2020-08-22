@@ -390,25 +390,6 @@
               >请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
             </el-upload>
           </el-form-item>
-          <!-- 证明人和审核人名单通用 -->
-          <el-form-item label="证明人">
-            <el-autocomplete
-              popper-class="my-autocomplete"
-              v-model="temp.certifierName"
-              :fetch-suggestions="querySearch2"
-              placeholder="请选择证明人"
-              @select="handleSelect3"
-              style="width: 100%"
-              class="filter-item"
-            >
-              <template slot-scope="{ item }">
-                <div class="name">
-                  {{ item.fullName }}
-                  <span class="id">{{ item.userId }}</span>
-                </div>
-              </template>
-            </el-autocomplete>
-          </el-form-item>
 
           <el-form-item label="银行卡号">
             <el-input v-model="temp.card" placeholder="请输入银行卡号" style="width:100%" />
@@ -1280,10 +1261,6 @@ export default {
     handleSelect2(item) {
       this.funding.verifierName = item.fullName;
       this.funding.verifierId = item.userId;
-    },
-    handleSelect3(item) {
-      this.temp.certifierName = item.fullName;
-      this.temp.certifierId = item.userId;
     },
     handleCertificate() {
       //添加证明人
