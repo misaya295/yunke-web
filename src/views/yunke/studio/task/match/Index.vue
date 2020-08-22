@@ -267,11 +267,6 @@
       @success="editSuccess"
       @close="editClose"
     />
-    <!-- <match-view
-      ref="view"
-      :dialog-visible="userViewVisible"
-      @close="viewClose"
-    /> -->
     <!-- 图片预览 -->
     <el-dialog
       title="图片预览"
@@ -317,7 +312,7 @@ export default {
       return map[state]
     },
     // 比赛名次
-    rankCodeFilter(rankCode){
+    rankCodeFilter(rankCode) {
       const map = {
         1: 'success',
         2: 'warning',
@@ -427,8 +422,8 @@ export default {
       return row.level === value
     },
     // 比赛名次
-    transRankCode(rankCode){
-      switch (rankCode){
+    transRankCode(rankCode) {
+      switch (rankCode) {
         case 1:
           return '一等奖'
         case 2:
@@ -546,67 +541,6 @@ export default {
         this.search()
       })
     },
-    // getTeam(row) {
-    //   this.view(row)
-    // },
-    // view(row) {
-    //   this.$get(`studio/match/${row.matchId}`).then((r) => {
-    //     const uResult = []
-    //     const data = r.data.data
-    //     let userId = []
-    //     let userState = []
-    //     if (data.userId && typeof data.userId === 'string') {
-    //       userId = data.userId.split(',')
-    //     }
-    //     if (data.userState && typeof data.userState === 'string') {
-    //       userState = data.userState.split(',')
-    //     }
-    //     // 拿到uesrId及名称
-    //     this.$get('system/user').then((r) => {
-    //       const rows = r.data.data.rows
-    //       rows.forEach((v, i) => {
-    //         userId.forEach((v1, i1) => {
-    //           if (v1 === ('' + v.userId)) {
-    //             uResult.push(v.fullName)
-    //           }
-    //         })
-    //       })
-    //       let reliable = ''
-    //       let member = ''
-    //       let teacher = ''
-    //       userState.forEach((v1, i1) => {
-    //         if (v1 === '1') {
-    //           if (reliable === '') {
-    //             reliable = uResult[i1]
-    //           } else {
-    //             reliable += '，' + uResult[i1]
-    //           }
-    //         }
-    //         if (v1 === '2') {
-    //           if (member === '') {
-    //             member = uResult[i1]
-    //           } else {
-    //             member += '，' + uResult[i1]
-    //           }
-    //         }
-    //         if (v1 === '3') {
-    //           if (teacher === '') {
-    //             teacher = uResult[i1]
-    //           } else {
-    //             teacher += '，' + uResult[i1]
-    //           }
-    //         }
-    //       })
-    //       this.team = {
-    //         reliable,
-    //         member,
-    //         teacher
-    //       }
-    //       // this.$refs.view.setTasks(data)
-    //       // this.taskViewVisible = true
-    //     })
-    //   })
-    // },
     edit(row) {
       // 已完成的任务无法修改
       // if (parseInt(row.state) === 2) {
@@ -637,7 +571,6 @@ export default {
     },
     // 弹出申请报销对话框
     async changeReimbursement(row) {
-      const userId = row.userId || ''
       // 管理员权限  任务负责人权限
       let flag = this.currentUser.roleId.indexOf('1') === -1
       const fg = row.chargeFullName !== this.currentUser.fullName
@@ -652,7 +585,6 @@ export default {
         return this.$message.info('该比赛任务已经报销！')
       }
       // 符合条件，弹出申请报销对话框
-      // this.reimbursementDialogVisible = true
       const confirmResult = await this.$confirm(
         '您的报销条件已符合, 是否确认报销?',
         '提示',
@@ -678,7 +610,7 @@ export default {
         }
       })
     },
-     // 获取时间
+    // 获取时间
     getTime: function() {
       var _this = this
       const yy = new Date().getFullYear()
@@ -712,7 +644,7 @@ export default {
         this.loading = false
       })
     },
-    TakeTeams(list){
+    TakeTeams(list) {
       list.forEach((v, i) => {
         if (v.invoice === null) {
           v.invoice = ''

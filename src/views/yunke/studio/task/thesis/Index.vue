@@ -578,50 +578,6 @@ export default {
       this.$refs.edit.setTasks(row)
       this.dialog.title = this.$t('common.edit')
       this.dialog.isVisible = true
-      // this.$get(`studio/items/${row.itemsId}`).then((r) => {
-      //   const data = r.data.data
-      //   let userId = []
-      //   let userState = []
-      //   if (data.userId && typeof data.userId === 'string') {
-      //     userId = data.userId.split(',')
-      //   }
-      //   if (data.userState && typeof data.userState === 'string') {
-      //     userState = data.userState.split(',')
-      //   }
-      //   let reliable = ''
-      //   let member = ''
-      //   let teacher = ''
-      //   userState.forEach((v1, i1) => {
-      //     if (v1 === '1') {
-      //       if (reliable === '') {
-      //         reliable = userId[i1]
-      //       } else {
-      //         reliable += ',' + userId[i1]
-      //       }
-      //     }
-      //     if (v1 === '2') {
-      //       if (member === '') {
-      //         member = userId[i1]
-      //       } else {
-      //         member += ',' + userId[i1]
-      //       }
-      //     }
-      //     if (v1 === '3') {
-      //       if (teacher === '') {
-      //         teacher = userId[i1]
-      //       } else {
-      //         teacher += ',' + userId[i1]
-      //       }
-      //     }
-      //   })
-      //   row.reliable = reliable
-      //   row.member = member === '' ? [] : member.split(',')
-      //   row.teacher = teacher === '' ? [] : teacher.split(',')
-      //   console.log(row)
-      //   this.$refs.edit.setTasks(row)
-      //   this.dialog.title = this.$t('common.edit')
-      //   this.dialog.isVisible = true
-      // })
     },
     fetch(params = {}) {
       params.pageSize = this.pagination.size

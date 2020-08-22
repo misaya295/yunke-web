@@ -81,7 +81,6 @@
                 :before-upload="handleBeforeUploadInvoice"
                 :before-remove="addInvoiceBeforeRemove"
                 :on-success="handleSuccessInvoice"
-                :on-change="editInvoiceChange"
   	            :on-preview="handlePreview"
                 :file-list="invoiceFileList"
                 :action="uploadUrl"
