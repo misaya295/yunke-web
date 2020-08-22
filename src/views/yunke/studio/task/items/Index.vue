@@ -12,7 +12,6 @@
         class="filter-item search-item date-range-item"
         type="daterange"
       />
-      <br>
      <!-- <el-select  v-model="queryParams.reimbursement"  value="" placeholder="是否已报销">
           <el-option
             v-for="item in whether"
@@ -420,9 +419,9 @@ export default {
     // },
     edit(row) {
       // 已完成的任务无法修改
-      if (parseInt(row.state) === 2) {
-        return this.$message.info('任务已完成无法修改！')
-      }
+      // if (parseInt(row.state) === 2) {
+      //   return this.$message.info('任务已完成无法修改！')
+      // }
       // 管理员权限  任务负责人权限
       let flag = this.currentUser.roleId.indexOf('1') === -1
       const fg = row.chargeFullName !== this.currentUser.fullName
@@ -588,8 +587,9 @@ export default {
       this.Funding.applyTime = this.getTime()
       this.Funding.proposerId = this.currentUser.userId
       this.Funding.name = row.title + '项目任务报销'
-      this.Funding.type = 'items'
+      this.Funding.type = '项目'
       this.Funding.id = row.itemsId
+      this.Funding.cost = row.cost
       console.log(this.Funding)
       this.$router.push({
         name: '经费管理',
