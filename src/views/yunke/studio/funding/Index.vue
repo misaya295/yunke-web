@@ -18,7 +18,7 @@
 
       <!-- 申请时间 -->
     <div class="filter-item">
-        <el-date-picker v-model="funding.applyTime" type="daterange" :range-separator="null" start-placeholder="申请时间" end-placeholder="" value-f ormat="yyyy-MM-dd" class="search-item" style="width:255px">
+        <el-date-picker v-model="funding.success_time" type="daterange" :range-separator="null" start-placeholder="申请时间" end-placeholder="" value-format="yyyy-MM-dd" class="search-item" style="width:255px">
         </el-date-picker>
       </div>
       <el-button class="filter-item" type="primary" plain icon="el-icon-search" @click="handleSearchFunding2">
@@ -148,7 +148,7 @@
               v-hasPermission="['funding:check']"
               class="el-icon-check table-operation"
               style="color: #909399;"
-              @click="handleChangeState(scope.row)"
+              @click="handleSuccess(scope.row)"
             />
             </el-tooltip>
               </template>
@@ -235,7 +235,7 @@
         :close-on-click-modal="false" :close-on-press-escape="false">
         <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="70px" top="3vh">
           <el-form-item label="名称" prop="name">
-            <el-input v-model="temp.name" placeholder="请输入报销名称" style="width:100%" @input="forceInput"></el-input>
+            <el-input v-model="temp.name" placeholder="请输入报销名称" style="width:100%"></el-input>
           </el-form-item>
           <!-- 如果申报是四种任务之一，就不给修改类型，原因：1、任务类型已确定，固定了 2、查询任务实际上四是个接口，需要根据类型调用不同的接口，避免用户修改导致接口不能使用 -->
           <el-form-item label="类型" v-if="!judgeTypeIsTask(temp.type)"> 
@@ -393,11 +393,17 @@
             </div>
           </el-col>
         </el-row>
-
+        
         <div slot="footer" class="dialog-footer" v-if="handleJudgePass(temp)">
+          <el-button type="" plain v-if="judgeCertificateIsNull()" @click="handleCertificate">证明</el-button>
+        
           <el-button type="warning" plain @click="handleChangeState('fail')">驳回</el-button>
           <el-button type="primary" plain @click="handleChangeState('pass')">通过</el-button>
         </div>
+        <div slot="footer" class="dialog-footer" v-else>
+          <el-button type="success" plain @click="handleChangeState('success')">完成</el-button>
+        </div>
+        
       </el-dialog>
 
       <el-dialog title="经费查询" :visible.sync="fundingBillVisible" :width="width" :close-on-click-modal="false" :close-on-press-escape="false">
@@ -504,6 +510,9 @@
       'task.title': {
         handler: 'handleTaskSearch',
       },
+      'temp.successTime': {
+        handler: 'setSuccessTime',
+      }
     },
     data() {
       return {
@@ -658,7 +667,8 @@
           taskId: '',
           proposerName: '',
           verifierName: '',
-          certifierName: ''
+          certifierName: '',
+          success_time: ''
         },
         textMap: {
           update: '编辑',
@@ -681,10 +691,10 @@
           'apply': '申报'
         },
         stateMap: {
-          'fail': '4',
-          'success': '3',
-          'pass': '2',
-          'apply': '1'
+          'fail': 4,
+          'success': 3,
+          'pass': 2,
+          'apply': 1
         },
         rules: {
           name: [{
@@ -744,9 +754,15 @@
     
     },
     methods: {
-      forceInput(){
-         this.$forceUpdate();//强制刷新视图，每一个无法输入的input框都需要使用该方法
-     }, 
+      setSuccessTime(){
+        // console.log(this.temp)
+
+        this.$put('/studio/funding/', {
+                ...this.temp
+              }).then((r) => {     
+                // console.log(r)  
+        })
+      },
       // 修改时的图片预览效果
       handlePreview(file) {
         if ('url' in file) {
@@ -780,14 +796,14 @@
       },
       // 手风琴效果
       toogleExpand(row, event, column) {
-      const $table = this.$refs.table
-      this.fundingTableData.map((item) => {
-        if (row.id !== item.id) {
-          $table.toggleRowExpansion(item, false)
-        }
-      })
-      $table.toggleRowExpansion(row)
-    },
+        const $table = this.$refs.table
+        this.fundingTableData.map((item) => {
+          if (row.id !== item.id) {
+            $table.toggleRowExpansion(item, false)
+          }
+        })
+        $table.toggleRowExpansion(row)
+      },
 
       getRowKey(row){
         return row.id;
@@ -971,11 +987,8 @@
         var param = Object.assign({}, this.page.param);
         let funding = Object.assign({}, this.funding);
         funding = this.judgeFundingNull(JSON.stringify(funding)) ? null : funding; //后端是根据funding是不是null，判断是不是拿所有数据
-        if (funding && (funding.applyTime !== "" && funding.applyTime !== null)) {
-          funding.applyTime = funding.applyTime[0] + "," + funding.applyTime[1];
-        }
-        if (funding && (funding.successTime !== "" && funding.successTime !== null)) {
-          funding.successTime = funding.successTime[0] + "," + funding.successTime[1];
+        if (funding && (funding.success_time !== "" && funding.success_time !== null)) {
+          funding.success_time = funding.success_time[0] + "," + funding.success_time[1];
         }
         this.$get('studio/funding', {
           ...param,
@@ -1018,9 +1031,9 @@
       },
       handleSearchBill() {
         //获取从建校到现在所有的经费开销、入账、剩余
-        var bd1 = "2001-5-1," + this.formatDate(new Date()) + ",-1";
-        var bd2 = "2001-5-1," + this.formatDate(new Date()) + ",0";
-        var bd3 = "2001-5-1," + this.formatDate(new Date()) + ",1"
+        var bd1 = "2001-05-01," + this.formatDate(new Date()) + ",-1";
+        var bd2 = "2001-05-01," + this.formatDate(new Date()) + ",0";
+        var bd3 = "2001-05-01," + this.formatDate(new Date()) + ",1"
         this.$get(`/studio/funding/bill/${bd1}`).then((r) => {
           this.spent = r.data.data;
         })
@@ -1058,6 +1071,22 @@
       handleSelect3(item) {
         this.temp.certifierName = item.fullName;
         this.temp.certifierId = item.userId;
+      },
+      handleCertificate(){
+        //添加证明人
+        this.temp.certifierId = this.currentUser.userId;
+        let funding = Object.assign({},this.temp);
+        this.$put('/studio/funding/', {
+              ...funding
+            }).then(() => {
+              this.$message({
+                message: '操作成功',
+                type: 'success'
+              })
+              this.handleSearchFunding();
+            this.fundingViewVisible = false;
+            })
+            
       },
       handleUpdate(row) {
         //判断是否可以更新
@@ -1138,8 +1167,8 @@
               message: this.$t('tips.deleteSuccess'),
               type: 'success'
             })
-            this.handleSearchFunding();
           })
+          this.handleSearchFunding();
         }
 
       },
@@ -1157,7 +1186,22 @@
           this.initImageSrcList(this.temp.invoice.split(','));
         }
 
-        this.temp.date = new Date(this.temp.applyTime);
+        // this.temp. = new Date(this.temp.applyTime);
+        this.fundingViewVisible = true;
+      },
+      handleSuccess(row){
+          if (row.state !== 2) { 
+            this.$message({
+              message: "状态为'报销中'才能完成报销",
+              type: 'error'
+            })
+          return;
+          }
+          this.temp = Object.assign({}, row);
+        //有发票信息就初始化图片地址
+        if (this.temp.invoice) {
+          this.initImageSrcList(this.temp.invoice.split(','));
+        }
         this.fundingViewVisible = true;
       },
       handleBill() {
@@ -1170,52 +1214,36 @@
         this.fundingImportVisible = true;
       },
       handleChangeState(s) {
-        var row = {};
-        //传来是对象就用对象赋值,传来是字符串就用this.temp赋值
-        if(typeof s === "object"){ 
-          row = s;
-          s = "success" //下面infoMap会用到
-          if (row.state !== 2) { //fundingIds等于"", 说明没有选择状态为失败的报销
-            this.$message({
-              message: "状态为'报销中'才能完成报销",
-              type: 'error'
-            })
-            return;
-          }
-          //如果状态不为报销中,就不给完成报销
-        }else{
-          row = this.temp;
-        }
+        let funding = Object.assign({},this.temp);
         this.$confirm(`此操作将${this.infoMap[s]}该项申报, 是否继续?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
           center: true
         }).then(() => {
-          row.state = this.stateMap[s];
-          row.verifierId = this.currentUser.roleId;
+          
+          funding.verifierId = this.currentUser.roleId;
           //若新状态为报销成功, 给成功报销时间赋值
+          if(s==="success") {
+            this.temp.successTime = this.formatDate(new Date());
+            //修改内容
+            this.$put('/studio/funding/', {
+                ...funding
+              }).then((r) => {       
+            })
+          }
+            funding.state = this.stateMap[s];
+            //修改状态
+            this.$put('/studio/funding/state', {
+              ...funding
+            }).then(() => {
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.handleSearchFunding();
+            })
           
-          if(row.state === "3"){row.successTime = this.formatDate(new Date());}
-          
-          //修改内容
-          this.$put('/studio/funding/', {
-            ...row
-          }).then(() => {
-            this.handleSearchFunding();
-          })
-          //修改状态
-          this.$put('/studio/funding/state', {
-            ...row
-          }).then(() => {
-            this.$message({
-              type: 'success',
-              message: '操作成功!'
-            });
-            this.handleSearchFunding();
-          })
-          
-
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -1292,7 +1320,6 @@
         //申请人为当前登录用户
         this.temp.proposerId = this.currentUser.userId;
         const funding = this.temp;
-        console.log(funding)
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.$post('/studio/funding/', {
@@ -1302,26 +1329,26 @@
                 message: '添加成功',
                 type: 'success'
               })
+              this.handleSearchFunding()
+              this.dialogFormVisible = false;
             })
-            this.handleSearchFunding()
-            this.dialogFormVisible = false;
+            
           } else {
             return false;
           }
         });
       },
       update(formName) {
-        let funding = this.temp;
+        let funding = Object.assign({},this.temp);
         
         //如果是申报失败，重新申报的，需要修改一下状态
         if (funding.state === 4) {
-          funding.state = "1";
+          funding.state = 1;
           this.$put('/studio/funding/state', {
             ...funding
           })
           
         }
-        console.log(funding)
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.$put('/studio/funding/', {
@@ -1331,9 +1358,10 @@
                 message: '操作成功',
                 type: 'success'
               })
-            })
-            this.handleSearchFunding();
+              this.handleSearchFunding();
             this.dialogFormVisible = false;
+            })
+            
           } else {
             return false;
           }
@@ -1375,7 +1403,10 @@
       formatDate(date) {
         //格式化日期
         var d = new Date(date);
-        return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+        let year = d.getFullYear();
+        let month = (d.getMonth() + 1)<10?"0"+(d.getMonth() + 1):(d.getMonth() + 1)
+        let day = d.getDate()<10?"0"+d.getDate() : d.getDate()
+        return (year+"-"+month+"-"+day);
       },
       judgeFundingNull(f) {
         //判断查询内容是否为空
@@ -1384,6 +1415,10 @@
           f.state === "" && f.successTime === "" && f.taskId === "" && f.type === "" &&
           f.verifierName === "" && f.verifierId === "") return true;
         else return false;
+      },
+      judgeCertificateIsNull(){
+        if(this.temp.certifierId === null || this.temp.certifierId === "") return true;
+        return false;
       },
       //判断类型是不是四种任务类型之一
       judgeTypeIsTask(type){
@@ -1406,6 +1441,10 @@
         })
         //返回名称
         return this.taskName;
+      },
+      //获取成功报销时间
+      getSuccessTime(row){
+        // console.log(this.fundingTableData)
       },
       dealId(r) {
         //改变数据格式，方便调用
