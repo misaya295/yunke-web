@@ -600,7 +600,7 @@ export default {
       this.Funding.applyTime = this.getTime()
       this.Funding.proposerId = this.currentUser.userId
       this.Funding.name = row.title + '比赛任务报销'
-      this.Funding.type = 'match'
+      this.Funding.type = '比赛'
       this.Funding.id = row.matchId
       this.Funding.cost = row.cost
       this.Funding.invoice =row.invoice
