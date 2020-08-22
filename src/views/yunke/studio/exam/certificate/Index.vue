@@ -122,7 +122,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          label="报销状态"
+          label="报销情况"
           prop="reimbursement"
           :show-overflow-tooltip="true"
           align="center"
@@ -707,7 +707,7 @@ export default {
           { required: true, message: '请填写通过状态！', trigger: 'blur' },
         ],
         reimbursement: [
-          { required: true, message: '请填写报销状态！', trigger: 'blur' },
+          { required: true, message: '请填写报销情况！', trigger: 'blur' },
         ],
         state: [{ required: true, message: '请填写状态！', trigger: 'blur' }],
       },
@@ -755,7 +755,7 @@ export default {
           { required: true, message: '请填写通过状态！', trigger: 'blur' },
         ],
         reimbursement: [
-          { required: true, message: '请填写报销状态！', trigger: 'blur' },
+          { required: true, message: '请填写报销情况！', trigger: 'blur' },
         ],
         state: [{ required: true, message: '请填写状态！', trigger: 'blur' }],
       },

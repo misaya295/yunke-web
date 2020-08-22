@@ -553,9 +553,18 @@ export default {
       searchByAssetsName.assetsName = row.id
       this.$get('studio/school/assets/repair', { ...searchByAssetsName }).then(
         (r) => {
-          console.log(r)
-          if (r.data.data.total !== 0) {
-            return this.$message.info('该资产已申请报修!')
+          const dataList = r.data.data.rows
+          const flag = dataList.every(function (item) {
+            return item.repairDate !== null && item.repairPrice !== null
+          })
+          if (!flag) {
+            this.$message.warning('该资产还有未完成的维修工作，请谨慎添加！')
+            setTimeout(() => {
+              this.fixForm.propertyName = row.assetsName
+              this.fixForm.assetsName = row.id
+              this.fixForm.repairProverUserInfoUuid = this.currentUser.userId
+              this.fixDialogVisible = true
+            }, 1000);
           } else {
             this.fixForm.propertyName = row.assetsName
             this.fixForm.assetsName = row.id
