@@ -644,8 +644,9 @@ export default {
       this.Funding.applyTime = this.getTime()
       this.Funding.proposerId = this.currentUser.userId
       this.Funding.name = row.title + '著作权任务报销'
-      this.Funding.type = 'copyright'
+      this.Funding.type = '著作权'
       this.Funding.id = row.copyrightId
+      this.Funding.cost = row.cost
       console.log(this.Funding)
       this.$router.push({
         name: '经费管理',
