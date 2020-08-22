@@ -109,9 +109,10 @@
           :before-remove="addInvoiceBeforeRemove"
           :on-success="handleSuccessInvoice"
           :on-preview="handlePreview"
+          :on-change="addInvoiceChange"
           :file-list="invoiceFileList"
           :action="uploadUrl"
-          :class="{hideupload:editrepairinvoicehideupload, picturecard:true}"
+          :class="{hideupload:addinvoicehideupload, picturecard:true}"
           :headers="headers"
           accept=".jpg,.jpeg,.png,.gif,.bmp"
           multiple
@@ -119,8 +120,7 @@
           list-type="picture-card"
           drag
         >
-          <i class="el-icon-plus" /> 
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <i class="el-icon-upload" /> 
           <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
         </el-upload>
       </el-form-item>
@@ -141,8 +141,7 @@
           list-type="picture-card"
           drag
         >
-          <i class="el-icon-plus" />
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <i class="el-icon-upload" />
           <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传3个附件，且文件不超过5M</div>
         </el-upload>
       </el-form-item>
@@ -163,7 +162,6 @@
           drag
         >
           <i class="el-icon-upload" />
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
           <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，<b>可同时上传1个附件</b>，且文件不超过5M</div>
         </el-upload>
       </el-form-item>
@@ -221,7 +219,8 @@ export default {
       uploadPicLimit: 3,
       // 上传文档数量限制
       uploadDocTarLimit: 1,
-  	  // 超过图片数量限制时隐藏上传组件
+      // 超过图片数量限制时隐藏上传组件
+      addinvoicehideupload: false,
       editrepairinvoicehideupload: false,
       // 发票上传的数据
       invoiceFiles: [],
@@ -891,6 +890,11 @@ export default {
       this.$refs.form.clearValidate()
       this.$refs.form.resetFields()
       this.tasks = this.initTasks()
+    },
+    // 监听发票图片数量是否超过限制，从而隐藏上传框
+    addInvoiceChange () {
+      this.addinvoicehideupload =
+        this.addInvoiceListLength >= this.uploadPicLimit;
     },
     // 刷新上传列表
     doSubmit() {

@@ -92,7 +92,7 @@
                 list-type="picture-card"
                 drag
               >
-                <i class="el-icon-plus" />
+                <i class="el-icon-upload" />
                 <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传<b>3张发票</b>，且文件不超过5M</div>
               </el-upload>
             </el-form-item>
@@ -113,7 +113,6 @@
                 drag
               >
                 <i class="el-icon-upload" />
-                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                 <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，<b>只能上传 1 个附件</b>，且文件不超过5M</div>
               </el-upload>
             </el-form-item>

@@ -34,7 +34,7 @@
             {{ $t('table.reset') }}
         </el-button>
         <!-- 添加 -->
-        <el-button class="filter-item" type="success" plain icon="el-icon-plus" @click.native="add">
+        <el-button class="filter-item" type="success" plain @click.native="add">
             {{ $t('table.add') }}
         </el-button>
         <!-- 更多操作 -->
@@ -602,6 +602,8 @@ export default {
       this.Funding.name = row.title + '比赛任务报销'
       this.Funding.type = 'match'
       this.Funding.id = row.matchId
+      this.Funding.cost = row.cost
+      this.Funding.invoice =row.invoice
       console.log(this.Funding)
       this.$router.push({
         name: '经费管理',

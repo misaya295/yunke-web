@@ -15,7 +15,7 @@
           value-format="yyyy-MM-dd"
           class="filter-item search-item date-range-item"
           type="daterange"
-        /><br/>
+        />
         <!-- 搜索 -->
         <el-button class="filter-item" type="primary" plain @click="search">
             {{ $t('table.search') }}
@@ -25,7 +25,7 @@
             {{ $t('table.reset') }}
         </el-button>
         <!-- 添加 -->
-        <el-button class="filter-item" type="success" plain icon="el-icon-plus" @click.native="add">
+        <el-button class="filter-item" type="success" plain @click.native="add">
             {{ $t('table.add') }}
         </el-button>
         <!-- 更多操作 -->
@@ -114,7 +114,7 @@
       </el-table-column>
       <!-- 报销情况  -->
       <el-table-column
-            label="是否已报销"
+            label="报销情况"
             :filters="[{text: '未报销', value: 0},{ text: '已报销', value: 1 }]"
             :filter-method="filterReimbursement"
             class-name="reimbursement-col"
@@ -509,6 +509,8 @@ export default {
       this.Funding.name = row.title + '论文任务报销'
       this.Funding.type = 'thesis'
       this.Funding.id = row.thesisId
+      this.Funding.invoice = row.invoice
+      this.Funding.cost = row.cost
       console.log(this.Funding)
       this.$router.push({
         name: '经费管理',
