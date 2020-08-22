@@ -507,7 +507,7 @@ export default {
       this.Funding.applyTime = this.getTime()
       this.Funding.proposerId = this.currentUser.userId
       this.Funding.name = row.title + '论文任务报销'
-      this.Funding.type = 'thesis'
+      this.Funding.type = '论文'
       this.Funding.id = row.thesisId
       this.Funding.invoice = row.invoice
       this.Funding.cost = row.cost
