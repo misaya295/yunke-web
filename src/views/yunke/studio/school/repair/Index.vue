@@ -797,6 +797,9 @@ export default {
       if (row.state === 0 || row.state === 1) {
         return this.$message.error('请接受维修后再点击该按钮！')
       }
+      if (row.state === 4) {
+        return this.$message.error('该资产已维修失败！')
+      }
       const confirmResult = await this.$confirm(
         '是否确认维修失败?',
         '提示',
