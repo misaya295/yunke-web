@@ -761,9 +761,11 @@ export default {
       },
       // 申请报销所需的资金对象
       Funding: {
+        id: 0,
+        type: '',
         name: '',
         applyTime: '',
-        proposerId: 0,
+        cost: 0
       },
       activeIndex: 0,
       // 保存预览图片路径
@@ -968,11 +970,13 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('取消了报销');
       }
-
+      this.Funding.id = row.userId;
+      this.Funding.type = '考证';
       this.Funding.applyTime = this.getTime();
-      this.Funding.proposerId = row.userId;
-      this.Funding.name = '考' + row.title + '证书报销';
+      this.Funding.name = row.title + '证书' + ' ' + row.time + ' ' + '报销';
+      this.Funding.cost = row.cost;
       console.log(this.Funding);
+      console.log(row);
       // 把funding作为参数，跳转到经费管理
       this.$router.push({
         name: '经费管理',
