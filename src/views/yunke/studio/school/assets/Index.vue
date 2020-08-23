@@ -441,6 +441,7 @@ export default {
         assetsName: '',
         repairProverUserInfoUuid: 0,
         repairMessage: '',
+        state: 1
       },
       // 申请维修对话框的验证规则
       fixFormRules: {
@@ -580,7 +581,6 @@ export default {
     },
     // 提交申请维修表单
     fixAssets (row) {
-      console.log('123123123')
       console.log(this.fixForm)
       this.$post('studio/school/assets/repair', {
         ...this.fixForm,
