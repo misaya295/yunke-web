@@ -136,7 +136,7 @@
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import { qiNiuUrl } from '@/settings'
 import { getToken } from '@/utils/auth'
-import { validateFileDocmentExt,validateFileExt, validatePicExt, validateFileTarExt } from '@/utils/my-validate'
+import { validateFileDocmentExt, validateFileExt, validatePicExt, validateFileTarExt } from '@/utils/my-validate'
 export default {
   name: 'ThesisEdit',
   props: {

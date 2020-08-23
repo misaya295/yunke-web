@@ -71,7 +71,7 @@
         <!-- 等级 -->
         <el-table-column
             label="等级" 
-            :filters="[{text: '国家级', value: '0'},{ text: '省级', value: '1' },{ text: '校级', value: '2' }]"
+            :filters="[{text: '国家级', value: 0},{ text: '省级', value: 1 },{ text: '校级', value: 2 }]"
             :filter-method="filterLevel"
             class-name="level-col"
             align="center"
@@ -86,7 +86,7 @@
         <!-- 类型 -->
         <el-table-column
             label="类型"
-            :filters="[{text: '个人', value: '0'},{ text: '团队', value: '1' }]"
+            :filters="[{text: '个人', value: 0},{ text: '团队', value: 1 }]"
             :filter-method="filterType"
             class-name="type-col"
             align="center"
@@ -99,7 +99,7 @@
           </template>
         </el-table-column>
         <!-- 申请书 -->
-        <el-table-column label="申请书" prop="applicationForm" :show-overflow-tooltip="true" type="primary" align="center" min-width="110px">
+        <el-table-column label="申请书" prop="applicationForm" :show-overflow-tooltip="true" type="primary" align="center" min-width="100px">
             <template slot-scope="scope">
                 <el-button v-if="scope.row.applicationForm !== ''" size="mini" type="primary" plain  @click.stop="upload(scope.row.applicationForm)">下载</el-button>
             </template>
@@ -107,7 +107,7 @@
         <!-- 比赛名次 -->
         <el-table-column 
             label="比赛名次" 
-            :filters="[{text: '一等奖', value: '1'},{ text: '二等奖', value: '2' },{ text: '三等奖', value: '3' },{ text: '特等奖', value: '4' },{ text: '优胜奖', value: '5' },{ text: '无', value: '6' }]"
+            :filters="[{text: '一等奖', value: 1 },{ text: '二等奖', value: 2 },{ text: '三等奖', value: 3 },{ text: '特等奖', value: 4 },{ text: '优胜奖', value: 5 },{ text: '无', value: 6 }]"
             :filter-method="filterRankCode"
             class-name="rankCode-col"
             align="center"
@@ -134,7 +134,7 @@
         <!-- 状态 -->
         <el-table-column
             label="状态"
-            :filters="[{text: '进行中', value: '1'},{ text: '已完成', value: '2' }]"
+            :filters="[{text: '进行中', value: 1},{ text: '已完成', value: 2 }]"
             :filter-method="filterState"
             class-name="state-col"
             align="center"
@@ -149,10 +149,11 @@
         <!-- 报销情况 -->
         <el-table-column
           label="报销情况"
-          :filters="[{text: '未报销', value: '0'},{ text: '已报销', value: '1' }]"
+          :filters="[{text: '未报销', value: 0},{ text: '已报销', value: 1 }]"
           :filter-method="filterReimbursement"
           class-name="reimbursement-col"
           align="center"
+           min-width="90px"
         >
           <template slot-scope="{row}">
             <el-tag :type="row.reimbursement | reimbursementFilter">
@@ -543,13 +544,22 @@ export default {
     },
     edit(row) {
       // 已完成的任务无法修改
-      // if (parseInt(row.state) === 2) {
-      //   return this.$message.warning('任务已完成无法修改！')
-      // }
+      if (parseInt(row.state) === 2) {
+        return this.$message.info('任务已完成无法修改！')
+      }
+      // 管理员权限  任务负责人权限
+      let flag = this.currentUser.roleId.indexOf('1') === -1
+      const fg = row.chargeFullName !== this.currentUser.fullName
+      if (!flag || !fg) {
+        flag = false
+      }
+      if (flag) {
+        return this.$message.info('仅允许管理员或任务负责人操作！')
+      }
       let userId = row.members
       let reliable = ''
-      let member = []
-      let teacher = []
+      const member = []
+      const teacher = []
       userId.forEach((v1, i1) => {
         if (v1.state === 1) {
           reliable = '' + v1.userId
@@ -564,7 +574,6 @@ export default {
       row.reliable = reliable
       row.member = member
       row.teacher = teacher
-      console.log(row)
       this.$refs.edit.setTasks(row)
       this.dialog.title = this.$t('common.edit')
       this.dialog.isVisible = true

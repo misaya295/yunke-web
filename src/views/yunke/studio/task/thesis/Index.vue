@@ -68,11 +68,11 @@
        <!-- 类型 -->
       <el-table-column
             label="类型"
-            :filters="[{text:'核心', value: '1'},{ text: '普通', value: '2' }]"
+            :filters="[{text:'核心', value: 1},{ text: '普通', value: 2 }]"
             :filter-method="filterPaperType"
             class-name="paperType-col"
             align="center"
-            min-width="90px"
+            min-width="85px"
       >
         <template slot-scope="{row}">
           <el-tag :type="row.paperType | paperTypeFilter">
@@ -81,7 +81,7 @@
         </template>
       </el-table-column>
        <!-- 论文下载  -->
-      <el-table-column  label="论文下载"  :show-overflow-tooltip="true" align="center" min-width="120px">
+      <el-table-column  label="论文下载"  :show-overflow-tooltip="true" align="center" min-width="100px">
        <template slot-scope="scope">
         <el-button v-if="scope.row.url !== ''" size="mini" type="primary" plain  @click.stop="upload(scope.row.url)">下载</el-button>
         </template>
