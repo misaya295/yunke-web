@@ -108,7 +108,7 @@
         min-width="90px"
         label="报销情况"
         :filters="[{ text: '未报销', value: 0 }, { text: '已报销', value: 1 }]"
-        :filter-method="filterStatus"
+        :filter-method="filterReimbursement"
         class-name="status-col"
       >
         <template slot-scope="{row}">
@@ -431,7 +431,7 @@ export default {
       if (flag) {
         return this.$message.info('仅允许管理员或任务负责人操作！')
       }
-      let userId = row.members
+      const userId = row.members
       let reliable = ''
       const member = []
       const teacher = []
@@ -553,7 +553,10 @@ export default {
       this.search()
     },
     filterStatus(value, row) {
-      return row.status === value
+      return row.state === value
+    },
+    filterReimbursement(value, row) {
+      return row.reimbursement === value
     },
     // 弹出申请报销对话框
     async changeReimbursement(row) {
