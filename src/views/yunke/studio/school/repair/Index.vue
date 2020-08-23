@@ -73,6 +73,36 @@
           min-width="70px"
         />
         <el-table-column
+          label="状态"
+          prop="state"
+          :show-overflow-tooltip="true"
+          align="center"
+          min-width="50px"
+        >
+          <template slot-scope="scope">
+            <el-tag
+              v-if="scope.row.state === 0"
+              type="warning"
+            >拒绝维修</el-tag>
+            <el-tag
+              v-if="scope.row.state === 1"
+              type="warning"
+            >申请维修中</el-tag>
+            <el-tag
+              v-else-if="scope.row.state === 2"
+              type="primary"
+            >正在维修</el-tag>
+            <el-tag
+              v-else-if="scope.row.state === 3"
+              type="success"
+            >维修完成</el-tag>
+            <el-tag
+              v-else
+              type="danger"
+            >维修失败</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
           label="维修证明人"
           prop="repairProverUserInfoName"
           :show-overflow-tooltip="true"
@@ -82,12 +112,26 @@
         <el-table-column
           label="操作"
           align="center"
-          min-width="50px"
+          min-width="70px"
           class-name="small-padding fixed-width"
         >
           <template slot-scope="slope">
             <el-tooltip
-              v-hasPermission="['repair:delete']"
+              v-hasPermission="['repair:apply']"
+              class="item"
+              effect="dark"
+              content="接受/拒绝 维修"
+              placement="top"
+              :enterable="false"
+            >
+              <i
+                class="el-icon-sort table-operation"
+                style="color: #E6A23C;"
+                @click.stop="showRepairApplyDialog(slope.row)"
+              />
+            </el-tooltip>
+            <el-tooltip
+              v-hasPermission="['repair:finish']"
               class="item"
               effect="dark"
               content="完成维修"
@@ -97,7 +141,21 @@
               <i
                 class="el-icon-check table-operation"
                 style="color: #87d068;"
-                @click.stop="changeReimbursement(slope.row)"
+                @click.stop="repairFinish(slope.row)"
+              />
+            </el-tooltip>
+            <el-tooltip
+              v-hasPermission="['repair:fail']"
+              class="item"
+              effect="dark"
+              content="维修失败"
+              placement="top"
+              :enterable="false"
+            >
+              <i
+                class="el-icon-close table-operation"
+                style="color: #F56C6C;"
+                @click.stop="repairFail(slope.row)"
               />
             </el-tooltip>
             <el-tooltip
@@ -114,8 +172,22 @@
                 @click.stop="showEditDialog(slope.row)"
               />
             </el-tooltip>
+            <el-tooltip
+              v-hasPermission="['repair:delete']"
+              class="item"
+              effect="dark"
+              content="删除维修数据"
+              placement="top"
+              :enterable="false"
+            >
+              <i
+                class="el-icon-delete"
+                style="color: #000000;"
+                @click.stop="deleteRepair(slope.row)"
+              />
+            </el-tooltip>
             <el-link
-              v-has-no-permission="['repair:put','repair:delete','repair:get']"
+              v-has-no-permission="['repair:put','repair:delete','repair:get','repair:finish','repair:fail','repair:apply']"
               class="no-perm"
             >{{ $t('tips.noPermission') }}</el-link>
           </template>
@@ -278,6 +350,33 @@
           class="previewImg"
         />
       </el-dialog>
+
+      <!-- 接受/拒绝维修对话框 -->
+      <el-dialog
+        title="接受/拒绝 维修"
+        :visible.sync="repairApplyVisible"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        width="50%"
+        @close="closeRepairApplyDialog"
+      >
+        <span>是否接受该维修？</span>
+        <span
+          slot="footer"
+          class="dialog-footer"
+        >
+          <el-button
+            type="warning"
+            plain
+            @click="repairApply(0)"
+          >拒 绝</el-button>
+          <el-button
+            type="primary"
+            plain
+            @click="repairApply(2)"
+          >接 受</el-button>
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -359,6 +458,10 @@ export default {
       uploadPicLimit: 3,
       // 超过图片数量限制时隐藏上传组件
       editrepairinvoicehideupload: false,
+      // 接受/拒绝维修对话框的显示与隐藏
+      repairApplyVisible: false,
+      // 存储一行数据
+      row: {}
     }
   },
   computed: {
@@ -428,20 +531,26 @@ export default {
       return _this.nowDate
     },
     // 弹出完成维修对话框
-    async changeReimbursement (row) {
-      console.log(row)
+    async repairFinish (row) {
+      // 检查维修状态
+      if (row.state === 0 || row.state === 1) {
+        return this.$message.error('请接受维修后再点击该按钮！')
+      }
+      if (row.state === 3) {
+        return this.$message.error('该资产已维修完成！')
+      }
       // 检查维修日期，价格是否填写
       if (row.repairDate === '' || row.repairDate === null) {
-        return this.$message.info('请填写维修日期后再点击该按钮！')
+        return this.$message.error('请填写维修日期后再点击该按钮！')
       }
       if (row.repairPrice === '' || row.repairPrice === null) {
-        return this.$message.info('请填写维修价格后再点击该按钮！')
+        return this.$message.error('请填写维修价格后再点击该按钮！')
       }
 
       // 符合条件，弹出完成维修对话框
       // this.reimbursementDialogVisible = true
       const confirmResult = await this.$confirm(
-        '是否确认完成维修?该维修信息将被删除',
+        '是否确认完成维修?',
         '提示',
         {
           confirmButtonText: '确定',
@@ -453,9 +562,12 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('取消了该操作')
       }
-
-      this.$delete(`studio/school/assets/repair/${row.id}`, {
-        ...this.Funding,
+      const schoolAssetsRepair = {
+        id: row.id,
+        state: 3
+      }
+      this.$put(`studio/school/assets/repair/state`, {
+        ...schoolAssetsRepair,
       }).then((r) => {
         console.log(r)
         if (r.status === 200) {
@@ -466,8 +578,11 @@ export default {
         this.fetch()
       })
     },
-    // 修改证书对话框
+    // 修改维修数据对话框
     showEditDialog (row) {
+      if (row.state === 0 || row.state === 1) {
+        return this.$message.error('仅在接受维修后才能修改维修数据！')
+      }
       // 获得数据
       // 浅克隆，同一源里的数值也会改变
       // this.editForm = row;
@@ -649,6 +764,106 @@ export default {
       this.editrepairinvoicehideupload =
         this.editListLength >= this.uploadPicLimit
     },
+    // 删除维修信息
+    async deleteRepair (row) {
+      const confirmResult = await this.$confirm(
+        '是否确认删除维修?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      ).catch((err) => err)
+
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('取消了该操作')
+      }
+      this.$delete(`studio/school/assets/repair/${row.id}`, {
+        ...this.Funding,
+      }).then((r) => {
+        console.log(r)
+        if (r.status === 200) {
+          this.$message.success('删除成功!')
+        } else {
+          this.$message.error('删除失败！')
+        }
+        this.fetch()
+      })
+    },
+    // 点击维修失败改变状态
+    async repairFail (row) {
+      // 检查维修状态
+      if (row.state === 0 || row.state === 1) {
+        return this.$message.error('请接受维修后再点击该按钮！')
+      }
+      const confirmResult = await this.$confirm(
+        '是否确认维修失败?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      ).catch((err) => err)
+
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('取消了该操作')
+      }
+      const schoolAssetsRepair = {
+        id: row.id,
+        state: 0
+      }
+      this.$put(`studio/school/assets/repair/state`, {
+        ...schoolAssetsRepair,
+      }).then((r) => {
+        console.log(r)
+        if (r.status === 200) {
+          this.$message.success('已拒绝维修!')
+        } else {
+          this.$message.error('提交失败！')
+        }
+        this.fetch()
+      })
+    },
+    // 显示接受/拒绝 维修对话框
+    showRepairApplyDialog (row) {
+      // 检查维修状态
+      if (row.state === 3 || row.state === 4) {
+        return this.$message.error('此资产已接受维修！')
+      }
+      this.row = row
+      this.repairApplyVisible = true
+    },
+    // 接受/拒绝 维修
+    repairApply (state) {
+      const schoolAssetsRepair = {
+        id: this.row.id,
+        state: state
+      }
+      console.log(schoolAssetsRepair)
+      this.$put(`studio/school/assets/repair/state`, {
+        ...schoolAssetsRepair,
+      }).then((r) => {
+        console.log(r)
+        if (r.status === 200) {
+          if (state === 1) {
+            this.$message.success('已接受维修!')
+          } else {
+            this.$message.success('已拒绝维修!')
+          }
+        } else {
+          this.$message.error('提交失败！')
+        }
+        this.fetch()
+      })
+      this.closeRepairApplyDialog()
+    },
+    // 监听接受/拒绝 维修对话框的关闭
+    closeRepairApplyDialog () {
+      this.row = {}
+      this.repairApplyVisible = false
+    }
   },
 }
 </script>
