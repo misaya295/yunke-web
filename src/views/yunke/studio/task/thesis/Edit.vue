@@ -4,7 +4,7 @@
       :title="title"
       :width="width"
       top="3vh"
-      close-on-click-modal="false"
+      :close-on-click-modal="false"
       :close-on-press-escape="false"
       :visible.sync="isVisible"
     >
