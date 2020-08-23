@@ -128,7 +128,7 @@
         min-width="110px"
         label="报销情况"
         :filters="[{ text: '未报销', value: 0 }, { text: '已报销', value: 1 }]"
-        :filter-method="filterStatus"
+        :filter-method="filterReimbursement"
         class-name="status-col"
       >
         <template slot-scope="{row}">
@@ -610,7 +610,10 @@ export default {
       this.search()
     },
     filterStatus(value, row) {
-      return row.status === value
+      return row.state === value
+    },
+    filterReimbursement(value, row) {
+      return row.reimbursement === value
     },
     // 弹出申请报销对话框
     async changeReimbursement(row) {
