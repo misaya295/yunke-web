@@ -1646,7 +1646,8 @@ export default {
         type === "论文" ||
         type === "比赛" ||
         type === "项目" ||
-        type === "著作权"
+        type === "著作权" ||
+        type === "考证"
       )
         return true;
       return false;
@@ -1659,12 +1660,18 @@ export default {
     //获取任务名
     getTaskName(row) {
       if (!this.judgeTypeIsTaskCh(row.type)) return;
-      //修改taskType以调用不同的接口
-      this.taskType = this.taskType2Eng[row.type]; //啊啊
-      //获取数据
-      this.$get(`/studio/${this.taskType}/${row.taskId}`).then((r) => {
-        this.taskName = r.data.data.title;
-      });
+      if(row.type==="考证"){
+          this.$get(`/studio/certificate/${row.taskId}`).then((r) => {
+            this.taskName = r.data.data.title;
+          });
+        }else{
+          //修改taskType以调用不同的接口
+          this.taskType = this.taskType2Eng[row.type]; 
+          //获取数据
+          this.$get(`/studio/${this.taskType}/${row.taskId}`).then((r) => {
+            this.taskName = r.data.data.title;
+          });
+        }
       //返回名称
       return this.taskName;
     },
@@ -1715,7 +1722,8 @@ export default {
       else if (r) r = this.dealId(r); //else if(r)处理的是其他条件的r
 
       if (r.type && this.judgeTypeIsTaskCh(r.type)) {
-        this.taskType = this.taskType2Eng[r.type];
+        if(this.taskType2Eng[r.type]) this.taskType = this.taskType2Eng[r.type];
+        else this.taskType = "match"
       }
       // else this.taskType = "";
       this.temp.name = r.title ? r.title : r.name; //从导入报销传来的r只有r.title,从证书管理传来的r只有r.name;两者是同一个东西
@@ -1729,11 +1737,18 @@ export default {
     },
     jump(row) {
       const t = {};
+      let goal = "";
       t.id = row.taskId;
       t.name = row.name;
+
+      if(row.type == "考证"){
+        goal = "考证管理"
+      }else{
+        goal = row.type + "任务";
+      }
       //跳转到任务模块
       this.$router.push({
-        name: row.type + "任务",
+        name: goal,
         params: {
           Tasks: t,
         },
