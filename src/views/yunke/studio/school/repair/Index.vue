@@ -847,7 +847,6 @@ export default {
         id: this.row.id,
         state: state
       }
-      console.log(schoolAssetsRepair)
       this.$put(`studio/school/assets/repair/state`, {
         ...schoolAssetsRepair,
       }).then((r) => {
