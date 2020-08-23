@@ -832,8 +832,11 @@ export default {
     // 显示接受/拒绝 维修对话框
     showRepairApplyDialog (row) {
       // 检查维修状态
-      if (row.state === 3 || row.state === 4) {
-        return this.$message.error('此资产已接受维修！')
+      if (row.state === 3) {
+        return this.$message.error('此资产已维修完成！')
+      }
+      if (row.state === 4) {
+        return this.$message.error('此资产已维修失败！')
       }
       this.row = row
       this.repairApplyVisible = true
