@@ -53,7 +53,7 @@
         </el-radio-group>
       </el-form-item>
     <el-form-item label="负责人" >
-      <el-select  v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
+      <el-select filterable allow-create default-first-option v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
           <el-option
             v-for="item in userRoles"
             :key="item.userId"
@@ -63,7 +63,16 @@
         </el-select>
     </el-form-item>
     <el-form-item label="成员" >
-      <el-select  v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
+      <el-select
+      filterable
+      allow-create
+      default-first-option
+      v-model="team.member"
+      multiple
+      value=""
+      placeholder="成员(不包含负责人)"
+      style="width:100%"
+      >
         <el-option
           v-for="item in userRoles"
           :key="item.userId"
@@ -73,7 +82,7 @@
       </el-select>
     </el-form-item>
     <el-form-item label="指导老师" >
-      <el-select  v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
+      <el-select filterable allow-create default-first-option v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
         <el-option
           v-for="item in teacherRoles"
           :key="item.userId"
@@ -367,7 +376,6 @@ export default {
             tasks.userId = a
             tasks.m_state = b
             delete tasks.members
-            console.log(22, tasks)
             const updateState = {
               state: tasks.state,
               itemsId: tasks.itemsId
@@ -381,7 +389,7 @@ export default {
                 type: 'success'
               })
               this.$emit('success')
-            })
+              })
           }
         } else {
           return false
@@ -430,7 +438,7 @@ export default {
       const uid = file.uid
       const id = response.data.contentId
       this.invoiceFiles.push({ uid, id })
-      this.addInvoiceListLength++;
+      this.addInvoiceListLength++
       if (this.tasks.invoice === '' || this.tasks.invoice === null) {
         this.tasks.invoice = response.data.url
       } else {
@@ -484,10 +492,8 @@ export default {
           this.$delete(`oss/content/${this.invoiceFiles[j].id}`)
           // 根据图片数量分别执行删除的功能
           if (this.invoiceFiles.length === 1) {
-            console.log('111')
             this.tasks.invoice = ''
           } else if (this.invoiceFiles.length === 2) {
-            console.log('222');
             if (j === 0) {
               this.tasks.invoice = this.tasks.invoice.split(
                 fileUrl + ','
@@ -501,7 +507,7 @@ export default {
             if (j === 0) {
               this.tasks.invoice = this.tasks.invoice.split(
                 fileUrl + ','
-              )[1];
+              )[1]
             } else if (j === 1) {
               const firsturl = this.tasks.invoice.split(',' + fileUrl)[0]
               const lasturl = this.tasks.invoice.split(',' + fileUrl)[1]
@@ -512,7 +518,7 @@ export default {
               )[0]
             }
           }
-          this.addInvoiceListLength--;
+          this.addInvoiceListLength--
           console.log(this.addInvoiceListLength)
           // this.addInvoiceChange();
           return true
@@ -525,47 +531,45 @@ export default {
           const fileUrl = this.invoiceFileList[n].url;
           const fileName = this.invoiceFileList[n].url
             .substring(28)
-            .split('.')[0];
+            .split('.')[0]
           this.$delete(`oss/content`, { fileName: fileName });
           // 根据图片数量分别执行删除的功能
           if (this.invoiceFileList.length === 1) {
-            console.log('111');
-            this.tasks.invoice = '';
-            this.invoiceFileList = [];
+            this.tasks.invoice = ''
+            this.invoiceFileList = []
           } else if (this.invoiceFileList.length === 2) {
-            console.log('222');
             if (n === 0) {
               this.tasks.invoice = this.tasks.invoice.split(
                 fileUrl + ','
-              )[1];
-              this.invoiceFileList.shift();
+              )[1]
+              this.invoiceFileList.shift()
             } else {
               this.tasks.invoice = this.tasks.invoice.split(
                 ',' + fileUrl
-              )[0];
-              this.invoiceFileList.pop();
+              )[0]
+              this.invoiceFileList.pop()
             }
           } else {
             if (n === 0) {
               this.tasks.invoice = this.tasks.invoice.split(
                 fileUrl + ','
-              )[1];
-              this.invoiceFileList.shift();
+              )[1]
+              this.invoiceFileList.shift()
             } else if (n === 1) {
-              const firsturl = this.tasks.invoice.split(',' + fileUrl)[0];
-              const lasturl = this.tasks.invoice.split(',' + fileUrl)[1];
-              this.tasks.invoice = firsturl + lasturl;
-              this.invoiceFileList.splice(n, 1);
+              const firsturl = this.tasks.invoice.split(',' + fileUrl)[0]
+              const lasturl = this.tasks.invoice.split(',' + fileUrl)[1]
+              this.tasks.invoice = firsturl + lasturl
+              this.invoiceFileList.splice(n, 1)
             } else {
               this.tasks.invoice = this.tasks.invoice.split(
                 ',' + fileUrl
-              )[0];
-              this.invoiceFileList.pop();
+              )[0]
+              this.invoiceFileList.pop()
             }
           }
-          this.addInvoiceListLength--;
-          // this.editInvoiceChange();
-          return true;
+          this.addInvoiceListLength--
+          // this.editInvoiceChange()
+          return true
         }
       }
     },
@@ -640,8 +644,8 @@ export default {
     doSubmit() {
       this.fileList = []
       this.fileUrlList = []
-      this.invoiceFileList = [];
-      this.invoiceFiles = [];
+      this.invoiceFileList = []
+      this.invoiceFiles = []
       this.dialogImageUrl = ''
       this.dialog = false
     },
