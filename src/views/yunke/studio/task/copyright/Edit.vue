@@ -54,7 +54,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="负责人" >
-        <el-select  v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
+        <el-select filterable allow-create default-first-option v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
           <el-option
             v-for="item in userRoles"
             :key="item.userId"
@@ -64,7 +64,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="成员" >
-        <el-select  v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
+        <el-select filterable allow-create default-first-option v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
           <el-option
             v-for="item in userRoles"
             :key="item.userId"
@@ -74,7 +74,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="指导老师" >
-        <el-select  v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
+        <el-select filterable allow-create default-first-option v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
           <el-option
             v-for="item in teacherRoles"
             :key="item.userId"
