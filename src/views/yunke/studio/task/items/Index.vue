@@ -104,7 +104,7 @@
         </template>
       </el-table-column>
       <!-- 项目报销情况  -->
-       <el-table-column
+       <!-- <el-table-column
         min-width="90px"
         label="报销情况"
         :filters="[{ text: '未报销', value: 0 }, { text: '已报销', value: 1 }]"
@@ -116,7 +116,7 @@
             {{ row.reimbursement === 1 ? '已报销' : '未报销' }}
           </el-tag>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <!-- 操作 -->
       <el-table-column :label="$t('table.operation')" align="center" min-width="130px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
