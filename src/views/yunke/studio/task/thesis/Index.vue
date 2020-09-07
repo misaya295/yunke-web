@@ -2,9 +2,9 @@
   <div class="app-container">
    <div class="filter-container">
         <!-- 标题 -->
-        <el-input v-model="queryParams.title" placeholder="标题"  class="filter-item search-item"/>
-        <!-- 负责人 -->
-        <el-input v-model="queryParams.chargeFullName" placeholder="负责人" class="filter-item search-item"/>
+        <el-input v-model="queryParams.title" placeholder="论文标题"  class="filter-item search-item"/>
+        <!-- 作者 -->
+        <el-input v-model="queryParams.chargeFullName" placeholder="作者" class="filter-item search-item"/>
         <!-- 指导老师 -->
         <el-input v-model="queryParams.teacherFullName" placeholder="指导老师" class="filter-item search-item"/>
         <!-- 时间查找 -->
@@ -53,26 +53,38 @@
       @row-click="toogleExpand"
     >
       <el-table-column type="selection" align="center" width="40px" />
+      <!-- 发表时间 -->
+      <el-table-column label="发表时间" prop="publishTime" :show-overflow-tooltip="true" align="center" min-width="95px">
+        <template slot-scope="scope">
+          <span>{{ scope.row.publishTime }}</span>
+        </template>
+      </el-table-column>
       <!-- 论文标题 -->
-      <el-table-column label='论文标题' prop="title" :show-overflow-tooltip="true" align="center" min-width="100px">
+      <el-table-column label='论文标题' prop="title" :show-overflow-tooltip="true" align="center" min-width="110px">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-       <!-- 摘要 -->
-      <el-table-column label='摘要' prop="introduction" :show-overflow-tooltip="true" align="center" min-width="130px">
+       <!-- 期刊名称 -->
+      <el-table-column label='期刊名称' prop="introduction" :show-overflow-tooltip="true" align="center" min-width="100px">
         <template slot-scope="scope">
           <span>{{ scope.row.introduction }}</span>
         </template>
       </el-table-column>
-       <!-- 类型 -->
+      <!-- 刊号 -->
+      <el-table-column label='刊号' prop="issue" :show-overflow-tooltip="true" align="center" min-width="80px">
+        <template slot-scope="scope">
+          <span>{{ scope.row.issue }}</span>
+        </template>
+      </el-table-column>
+      <!-- 类型 -->
       <el-table-column
             label="类型"
             :filters="[{text:'核心', value: 1},{ text: '普通', value: 2 }]"
             :filter-method="filterPaperType"
             class-name="paperType-col"
             align="center"
-            min-width="85px"
+            min-width="80px"
       >
         <template slot-scope="{row}">
           <el-tag :type="row.paperType | paperTypeFilter">
@@ -81,19 +93,19 @@
         </template>
       </el-table-column>
        <!-- 论文下载  -->
-      <el-table-column  label="论文下载"  :show-overflow-tooltip="true" align="center" min-width="100px">
+      <el-table-column  label="论文下载"  :show-overflow-tooltip="true" align="center" min-width="90px">
        <template slot-scope="scope">
         <el-button v-if="scope.row.url !== ''" size="mini" type="primary" plain  @click.stop="upload(scope.row.url)">下载</el-button>
         </template>
       </el-table-column>
-      <!-- 负责人 -->
-      <el-table-column label='负责人' prop="chargeFullName" :show-overflow-tooltip="true" align="center" min-width="90px">
+      <!-- 作者 -->
+      <el-table-column label='作者' prop="chargeFullName" :show-overflow-tooltip="true" align="center" min-width="85px">
         <template slot-scope="scope">
           <span>{{ scope.row.chargeFullName }}</span>
         </template>
       </el-table-column>
       <!-- 指导老师 -->
-      <el-table-column label='指导老师' prop="teacherFullName" :show-overflow-tooltip="true" align="center" min-width="90px">
+      <el-table-column label='指导老师' prop="teacherFullName" :show-overflow-tooltip="true" align="center" min-width="100px">
         <template slot-scope="scope">
           <span>{{ scope.row.teacherFullName }}</span>
         </template>
@@ -113,7 +125,7 @@
             </template>
       </el-table-column>
       <!-- 报销情况  -->
-      <el-table-column
+      <!-- <el-table-column
             label="报销情况"
             :filters="[{text: '未报销', value: 0},{ text: '已报销', value: 1 }]"
             :filter-method="filterReimbursement"
@@ -126,9 +138,9 @@
             {{ row.reimbursement === 1 ? '已报销' : '未报销' }}
           </el-tag>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <!-- 操作 -->
-      <el-table-column :label="$t('table.operation')" align="center" min-width="150px" class-name="small-padding fixed-width">
+      <el-table-column :label="$t('table.operation')" align="center" min-width="145px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
             <el-tooltip
               v-hasPermission="['task:add']"
@@ -550,14 +562,14 @@ export default {
       if (parseInt(row.state) === 2) {
         return this.$message.info('任务已完成无法修改！')
       }
-      // 管理员权限  任务负责人权限
+      // 管理员权限  论文作者权限
       let flag = this.currentUser.roleId.indexOf('1') === -1
       const fg = row.chargeFullName !== this.currentUser.fullName
       if (!flag || !fg) {
         flag = false
       }
       if (flag) {
-        return this.$message.info('仅允许管理员或任务负责人操作！')
+        return this.$message.info('仅允许管理员或论文作者操作！')
       }
       let userId = row.members
       let reliable = ''

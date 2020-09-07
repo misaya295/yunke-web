@@ -62,10 +62,22 @@
       @row-click="toogleExpand"
     >
         <el-table-column type="selection" align="center" width="40px" />
-        <!-- 比赛名称 -->
-        <el-table-column label="比赛名称" prop="title" :show-overflow-tooltip="true" align="center" min-width="120px">
+        <!-- 参赛时间 -->
+        <el-table-column label="参赛时间" prop="time" :show-overflow-tooltip="true" align="center" min-width="95px">
             <template slot-scope="scope">
-                <span>{{ scope.row.title }}</span>
+              <span>{{ scope.row.time }}</span>
+            </template>
+        </el-table-column>
+        <!-- 比赛名称 -->
+        <el-table-column label="比赛名称" prop="title" :show-overflow-tooltip="true" align="center" min-width="115px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.title }}</span>
+          </template>
+        </el-table-column>
+        <!-- 主办单位 -->
+        <el-table-column label="主办单位" prop="sponsor" :show-overflow-tooltip="true" align="center" min-width="95px">
+            <template slot-scope="scope">
+              <span>{{ scope.row.sponsor }}</span>
             </template>
         </el-table-column>
         <!-- 等级 -->
@@ -75,7 +87,7 @@
             :filter-method="filterLevel"
             class-name="level-col"
             align="center"
-            min-width="90px"
+            min-width="80px"
         >
           <template slot-scope="{row}">
             <el-tag :type="row.level | levelFilter">
@@ -90,7 +102,7 @@
             :filter-method="filterType"
             class-name="type-col"
             align="center"
-            min-width="90px"
+            min-width="75px"
         >
           <template slot-scope="{row}">
             <el-tag :type="row.type | typeFilter">
@@ -99,11 +111,11 @@
           </template>
         </el-table-column>
         <!-- 申请书 -->
-        <el-table-column label="申请书" prop="applicationForm" :show-overflow-tooltip="true" type="primary" align="center" min-width="100px">
+        <!-- <el-table-column label="申请书" prop="applicationForm" :show-overflow-tooltip="true" type="primary" align="center" min-width="100px">
             <template slot-scope="scope">
                 <el-button v-if="scope.row.applicationForm !== ''" size="mini" type="primary" plain  @click.stop="upload(scope.row.applicationForm)">下载</el-button>
             </template>
-        </el-table-column>
+        </el-table-column> -->
         <!-- 比赛名次 -->
         <el-table-column 
             label="比赛名次" 
@@ -120,7 +132,7 @@
             </template>
         </el-table-column>
         <!-- 负责人 -->
-        <el-table-column label="负责人" :show-overflow-tooltip="true" align="center" min-width="86px">
+        <el-table-column label="负责人" :show-overflow-tooltip="true" align="center" min-width="70px">
           <template slot-scope="scope">
             <span>{{ scope.row.chargeFullName }}</span>
           </template>
@@ -147,7 +159,7 @@
           </template>
         </el-table-column>
         <!-- 报销情况 -->
-        <el-table-column
+        <!-- <el-table-column
           label="报销情况"
           :filters="[{text: '未报销', value: 0},{ text: '已报销', value: 1 }]"
           :filter-method="filterReimbursement"
@@ -160,9 +172,9 @@
               {{ row.reimbursement === 1 ? '已报销' : '未报销' }}
             </el-tag>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <!-- 操作-->
-        <el-table-column :label="$t('table.operation')" align="center" min-width="150px" class-name="small-padding fixed-width">
+        <el-table-column :label="$t('table.operation')" align="center" min-width="145px" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
             <el-tooltip
               v-hasPermission="['task:add']"
@@ -225,8 +237,8 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="5">
-                  <el-form-item label="比赛时间:">
-                    <span>{{props.row.time}}</span>
+                  <el-form-item label="申请书:">
+                    <el-button v-if="props.row.applicationForm !== ''" type="primary" plain size="mini" @click.stop="upload(props.row.applicationForm)">下载</el-button>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -554,7 +566,7 @@ export default {
         flag = false
       }
       if (flag) {
-        return this.$message.info('仅允许管理员或任务负责人操作！')
+        return this.$message.info('仅允许管理员或负责人操作！')
       }
       let userId = row.members
       let reliable = ''
@@ -612,7 +624,7 @@ export default {
       this.Funding.type = '比赛'
       this.Funding.id = row.matchId
       this.Funding.cost = row.cost
-      this.Funding.invoice =row.invoice
+      this.Funding.invoice = row.invoice
       console.log(this.Funding)
       this.$router.push({
         name: '经费管理',

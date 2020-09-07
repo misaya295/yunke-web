@@ -9,13 +9,29 @@
       :visible.sync="isVisible"
     >
         <el-form ref="form" :model="tasks" :rules="rules" label-position="right" label-width="100px">
-            <!-- 标题 -->
-            <el-form-item label="标题" prop="title">
+            <!-- 发表时间 -->
+            <el-form-item label="发表时间:" prop="publishTime">
+              <el-date-picker
+                v-model="tasks.publishTime"
+                type="date"
+                placeholder="选择日期"
+                align="right"
+                format="yyyy-MM-dd"
+                value-format="yyyy-MM-dd"
+                style="width: 100%"
+              />
+            </el-form-item>
+            <!-- 论文标题 -->
+            <el-form-item label="论文标题:" prop="title">
                 <el-input v-model="tasks.title"  />
             </el-form-item>
-            <!-- 摘要 -->
-            <el-form-item label="摘要" prop="introduction">
+            <!-- 期刊名称 -->
+            <el-form-item label="期刊名称:" prop="introduction">
                 <el-input v-model="tasks.introduction"  />
+            </el-form-item>
+            <!-- 刊号 -->
+            <el-form-item label="刊号:" prop="issue">
+              <el-input v-model="tasks.issue"  />
             </el-form-item>
             <!-- 类型 -->
             <el-form-item label="类型" prop="paperType">
@@ -24,9 +40,9 @@
                     <el-radio :label='2'>普通</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <!-- 负责人 -->
-            <el-form-item label="负责人" >
-              <el-select v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
+            <!-- 作者 -->
+            <el-form-item label="作者:" >
+              <el-select v-model="team.reliable"  value="" placeholder="作者" style="width:100%">
                 <el-option
                   v-for="thesis in userRoles"
                   :key="thesis.userId"
@@ -37,7 +53,7 @@
             </el-form-item>
             <!-- 成员 -->
             <el-form-item label="成员" >
-              <el-select v-model="team.member" multiple value="" placeholder="成员(不包括负责人)" style="width:100%">
+              <el-select v-model="team.member" filterable allow-create multiple value="" placeholder="成员(不包括负责人)" style="width:100%">
                 <el-option
                   v-for="thesis in userRoles"
                   :key="thesis.userId"
@@ -47,8 +63,8 @@
               </el-select>
             </el-form-item>
             <!-- 指导老师 -->
-            <el-form-item label="指导老师" >
-              <el-select v-model="team.teacher" multiple value="" placeholder="指导老师" style="width:100%">
+            <el-form-item label="指导老师:" >
+              <el-select v-model="team.teacher" filterable allow-create multiple value="" placeholder="指导老师" style="width:100%">
                 <el-option
                   v-for="thesis in teacherRoles"
                   :key="thesis.userId"
@@ -58,11 +74,11 @@
               </el-select>
             </el-form-item>
             <!-- 花费 -->
-            <el-form-item label="花费" prop="cost">
+            <el-form-item label="花费:" prop="cost">
                 <el-input v-model.number="tasks.cost"  />
             </el-form-item>
             <!-- 状态 -->
-            <el-form-item label="状态" prop="state">
+            <el-form-item label="状态:" prop="state">
                 <el-radio-group v-model="tasks.state">
                     <el-radio :label='1'>进行中</el-radio>
                     <el-radio :label='2'>已完成</el-radio>
@@ -226,7 +242,9 @@ export default {
     initTasks() {
       return {
         thesisId: '',
+        publishTime: '',
         title: '',
+        issue: '',
         introduction: '',
         paperType: 2,
         url: '',
