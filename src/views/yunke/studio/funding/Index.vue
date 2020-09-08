@@ -146,7 +146,17 @@
           min-width="100px"
         >
           <template slot-scope="scope">
-            <el-tag :type="scope.row.state | BXStatusFilter">{{ scope.row.state | StateTextFilter }}</el-tag>
+            <el-tooltip
+              v-if="judgeFail(scope.row.state)"
+              class="item"
+              effect="dark"
+              :content="scope.row.reject"
+              placement="top"
+              :enterable="false"
+            >
+              <el-tag :type="scope.row.state | BXStatusFilter">{{ scope.row.state | StateTextFilter }}</el-tag>
+            </el-tooltip>
+              <el-tag v-else :type="scope.row.state | BXStatusFilter">{{ scope.row.state | StateTextFilter }}</el-tag>
           </template>
         </el-table-column>
 
@@ -865,6 +875,7 @@ export default {
         proposerName: "",
         verifierName: "",
         certifierName: "",
+        reject:""
       },
 
       funding: {
@@ -885,6 +896,7 @@ export default {
         verifierName: "",
         certifierName: "",
         success_time: "",
+        reject:""
       },
       textMap: {
         update: "编辑",
@@ -1412,7 +1424,37 @@ export default {
     },
     handleChangeState(s) {
       let funding = Object.assign({}, this.temp);
-      this.$confirm(`此操作将${this.infoMap[s]}该项申报, 是否继续?`, "提示", {
+      if(s==="fail"){
+        this.$prompt('请输入驳回原因', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPattern: /^.+$/,
+          inputErrorMessage: '驳回原因不能为空'
+        }).then(({ value }) => {
+          funding.reject = value;
+          //修改内容
+            this.$put("/studio/funding/", {
+              ...funding,
+            }).then((r) => {});
+          funding.state = this.stateMap[s];
+          //修改状态
+          this.$put("/studio/funding/state", {
+            ...funding,
+          }).then(() => {
+            this.$message({
+              type: "success",
+              message: "操作成功!",
+            });
+            this.handleSearchFunding();
+          });
+        }).catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消",
+          });
+        });
+      }else{
+        this.$confirm(`此操作将${this.infoMap[s]}该项申报, 是否继续?`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -1446,6 +1488,7 @@ export default {
             message: "已取消",
           });
         });
+      }
 
       this.fundingViewVisible = false;
     },
@@ -1545,6 +1588,7 @@ export default {
       }
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          console.log(funding)
           this.$put("/studio/funding/", {
             ...funding,
           }).then(() => {
@@ -1624,6 +1668,10 @@ export default {
       )
         return true;
       else return false;
+    },
+    judgeFail(state){
+      if(state===4) return true;
+      return false;
     },
     judgeCertificateIsNull() {
       if (this.temp.certifierId === null || this.temp.certifierId === "")
@@ -1715,7 +1763,6 @@ export default {
     setTemp(r) {
       //创建正则表达式,验证是不是英文
       var reg = /^[A-Za-z]+$/;
-      console.log(r);
       //r有值就用dealId转化一下
       if (r.data) r = this.dealId(r.data.data);
       //if(r.data)处理的是接口返回的r
@@ -1744,7 +1791,7 @@ export default {
       if(row.type == "考证"){
         goal = "考证管理"
       }else{
-        goal = row.type + "任务";
+        goal = row.type + "成果";
       }
       //跳转到任务模块
       this.$router.push({
