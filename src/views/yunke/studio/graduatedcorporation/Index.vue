@@ -17,6 +17,16 @@
         placeholder="职位"
         class="filter-item search-item"
       />
+      <el-date-picker
+        v-model="value2"
+        type="daterange"
+        align="right"
+        unlink-panels
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        :picker-options="pickerOptions"
+      />
       <el-button
         v-hasPermission="['graduatedcorporation:get']"
         type="primary"
@@ -67,6 +77,13 @@
         <el-table-column
           label="职位"
           prop="position"
+          :show-overflow-tooltip="true"
+          align="center"
+          min-width="200px"
+        />
+        <el-table-column
+          label="入职时间"
+          prop="entryTime"
           :show-overflow-tooltip="true"
           align="center"
           min-width="200px"

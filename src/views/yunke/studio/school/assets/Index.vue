@@ -95,7 +95,14 @@
           prop="scrapDetail"
           :show-overflow-tooltip="true"
           align="center"
-          min-width="150px"
+          min-width="130px"
+        />
+        <el-table-column
+          label="报废申请人"
+          prop="scrapApplicantName"
+          :show-overflow-tooltip="true"
+          align="center"
+          min-width="70px"
         />
         <el-table-column
           label="操作"
@@ -402,6 +409,7 @@ export default {
         inclusionDate: '',
         scrapDate: '',
         scrapDetail: '',
+        scrapApplicantName: ''
       },
       // 修改对话框的验证规则
       editFormRules: {
