@@ -64,7 +64,7 @@
             </el-form-item>
             <!-- 指导老师 -->
             <el-form-item label="指导老师:" >
-              <el-select v-model="team.teacher" filterable allow-create multiple value="" placeholder="指导老师" style="width:100%">
+              <el-select v-model="team.teacher" filterable allow-create default-first-option multiple value="" placeholder="指导老师" style="width:100%">
                 <el-option
                   v-for="thesis in teacherRoles"
                   :key="thesis.userId"
