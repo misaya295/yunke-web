@@ -797,6 +797,9 @@ export default {
       if (row.state === 0 || row.state === 1) {
         return this.$message.error('请接受维修后再点击该按钮！')
       }
+      if (row.state === 4) {
+        return this.$message.error('该资产已维修失败！')
+      }
       const confirmResult = await this.$confirm(
         '是否确认维修失败?',
         '提示',
@@ -829,8 +832,11 @@ export default {
     // 显示接受/拒绝 维修对话框
     showRepairApplyDialog (row) {
       // 检查维修状态
-      if (row.state === 3 || row.state === 4) {
-        return this.$message.error('此资产已接受维修！')
+      if (row.state === 3) {
+        return this.$message.error('此资产已维修完成！')
+      }
+      if (row.state === 4) {
+        return this.$message.error('此资产已维修失败！')
       }
       this.row = row
       this.repairApplyVisible = true
@@ -841,7 +847,6 @@ export default {
         id: this.row.id,
         state: state
       }
-      console.log(schoolAssetsRepair)
       this.$put(`studio/school/assets/repair/state`, {
         ...schoolAssetsRepair,
       }).then((r) => {
