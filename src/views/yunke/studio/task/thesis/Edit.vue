@@ -42,7 +42,7 @@
             </el-form-item>
             <!-- 作者 -->
             <el-form-item label="作者:" >
-              <el-select v-model="team.reliable"  value="" placeholder="作者" style="width:100%">
+              <el-select v-model="team.reliable" filterable allow-create default-first-option  value="" placeholder="作者" style="width:100%">
                 <el-option
                   v-for="thesis in userRoles"
                   :key="thesis.userId"
@@ -53,7 +53,7 @@
             </el-form-item>
             <!-- 成员 -->
             <el-form-item label="成员" >
-              <el-select v-model="team.member" filterable allow-create multiple value="" placeholder="成员(不包括负责人)" style="width:100%">
+              <el-select v-model="team.member" filterable allow-create default-first-option multiple value="" placeholder="成员(不包括负责人)" style="width:100%">
                 <el-option
                   v-for="thesis in userRoles"
                   :key="thesis.userId"

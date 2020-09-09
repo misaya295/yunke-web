@@ -57,7 +57,7 @@
       </el-form-item>
       <!-- 负责人 -->
       <el-form-item label="负责人:" >
-        <el-select v-model="team.reliable"  value="" placeholder="负责人" style="width:100%">
+        <el-select v-model="team.reliable" filterable allow-create default-first-option value="" placeholder="负责人" style="width:100%">
           <el-option
             v-for="match in userRoles"
             :key="match.userId"
@@ -68,7 +68,7 @@
       </el-form-item>
       <!-- 成员 -->
       <el-form-item label="成员:" >
-        <el-select v-model="team.member" multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
+        <el-select v-model="team.member" filterable allow-create default-first-option multiple value="" placeholder="成员(不包含负责人)" style="width:100%">
           <el-option
             v-for="match in userRoles"
             :key="match.userId"
