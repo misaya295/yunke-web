@@ -399,7 +399,7 @@
             </el-upload>
           </el-form-item>
           <!-- 证明人和审核人名单通用 -->
-          <el-form-item label="证明人">
+          <el-form-item label="证明人" v-if="dialogStatus==='update'">
             <el-autocomplete
               popper-class="my-autocomplete"
               v-model="temp.certifierName"
@@ -551,7 +551,7 @@
             <div class="view-item">
               <i class="el-icon-coin" />
               <span>申请人id:</span>
-              {{ temp.proposerId }}
+              {{ temp.proposerId }} 
             </div>
           </el-col>
         </el-row>
