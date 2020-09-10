@@ -117,7 +117,7 @@ export default {
       width: this.initWidth(),
       depts: [],
       roles: [],
-      deptTree: [],
+      deptTree: [1, 2, 3, 4, 10, 47, 48, 49],
       rules: {
         username: [
           { required: true, message: this.$t('rules.require'), trigger: 'blur' },
@@ -183,13 +183,13 @@ export default {
         password: '123456',
         email: '',
         mobile: '',
-        sex: '',
+        sex: '2',
         status: '1',
-        deptId: null,
+        deptId: 4,
         roleId: [],
         deptIds: '',
-        deptIdsArr: [],
-        noteId: '',
+        deptIdsArr: [1, 2, 3, 4, 10, 47, 48, 49],
+        noteId: '1',
         fullName: ''
       }
     },
