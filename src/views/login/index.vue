@@ -59,7 +59,7 @@
             name="code"
             type="text"
             autocomplete="off"
-            style="width: 70%"
+            style="width: 100%"
             @keyup.enter.native="handleLogin"
           />
         </el-form-item>
@@ -165,8 +165,8 @@ export default {
         { img: 'microsoft.png', name: 'microsoft', radius: false }
       ],
       loginForm: {
-        username: '20170404430208',
-        password: '123456',
+        username: '',
+        password: '',
         bindUsername: '',
         bindPassword: '',
         signUsername: '',
