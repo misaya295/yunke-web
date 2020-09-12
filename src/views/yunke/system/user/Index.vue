@@ -35,8 +35,12 @@
           :value="item.value"
         />
       </el-select>
-      <el-button class="filter-item" type="primary" plain @click="search">{{ $t('table.search') }}</el-button>
-      <el-button class="filter-item" type="warning" plain @click="reset">{{ $t('table.reset') }}</el-button>
+      <el-button class="filter-item" type="primary" plain @click="search">{{
+        $t('table.search')
+      }}</el-button>
+      <el-button class="filter-item" type="warning" plain @click="reset">{{
+        $t('table.reset')
+      }}</el-button>
       <el-button
         v-has-permission="['user:add']"
         class="filter-item"
@@ -45,7 +49,12 @@
         @click="add"
       >{{ $t('table.add') }}</el-button>
       <el-dropdown
-        v-has-any-permission="['user:add','user:delete','user:reset','user:export']"
+        v-has-any-permission="[
+          'user:add',
+          'user:delete',
+          'user:reset',
+          'user:export'
+        ]"
         trigger="click"
         class="filter-item"
       >
@@ -81,6 +90,7 @@
       @selection-change="onSelectChange"
       @sort-change="sortChange"
       @row-click="toogleExpand"
+      @filter-change="filterChange"
     >
       <el-table-column type="selection" align="center" width="40px" />
       <el-table-column
@@ -125,7 +135,11 @@
           <span>{{ scope.row.mobile }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.user.dept')" align="center" min-width="100px">
+      <el-table-column
+        :label="$t('table.user.dept')"
+        align="center"
+        min-width="100px"
+      >
         <template slot-scope="scope">
           <span>{{ scope.row.deptName }}</span>
         </template>
@@ -142,24 +156,35 @@
       </el-table-column>
       <el-table-column
         :label="$t('table.user.sex')"
-        :filters="[{ text: $t('common.sex.male'), value: '0' }, { text: $t('common.sex.female'), value: '1' }, { text: $t('common.sex.secret'), value: '2' }]"
-        :filter-method="filterSex"
+        :filters="[
+          { text: $t('common.sex.male'), value: '0' },
+          { text: $t('common.sex.female'), value: '1' },
+          { text: $t('common.sex.secret'), value: '2' }
+        ]"
+        :filter-multiple="false"
+        column-key="sex"
         class-name="status-col"
       >
-        <template slot-scope="{row}">
+        <template slot-scope="{ row }">
           <el-tag :type="row.sex | sexFilter">{{ transSex(row.sex) }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column
         :label="$t('table.user.status')"
-        :filters="[{ text: $t('common.status.valid'), value: '1' }, { text: $t('common.status.invalid'), value: '0' }]"
-        :filter-method="filterStatus"
+        :filters="[
+          { text: $t('common.status.valid'), value: '1' },
+          { text: $t('common.status.invalid'), value: '0' }
+        ]"
+        :filter-multiple="false"
+        column-key="status"
         class-name="status-col"
       >
-        <template slot-scope="{row}">
-          <el-tag
-            :type="row.status | statusFilter"
-          >{{ row.status === '1' ? $t('common.status.valid') : $t('common.status.invalid') }}</el-tag>
+        <template slot-scope="{ row }">
+          <el-tag :type="row.status | statusFilter">{{
+            row.status === '1'
+              ? $t('common.status.valid')
+              : $t('common.status.invalid')
+          }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -168,7 +193,7 @@
         min-width="100px"
         class-name="small-padding fixed-width"
       >
-        <template slot-scope="{row}">
+        <template slot-scope="{ row }">
           <i
             v-hasPermission="['user:view']"
             class="el-icon-info table-operation"
@@ -188,13 +213,14 @@
             @click.stop="singleDelete(row)"
           />
           <el-link
-            v-has-no-permission="['user:view','user:update','user:delete']"
+            v-has-no-permission="['user:view', 'user:update', 'user:delete']"
             class="no-perm"
-          >{{ $t('tips.noPermission') }}</el-link>
+          >{{ $t('tips.noPermission') }}
+          </el-link>
         </template>
       </el-table-column>
       <el-table-column type="expand" width="1px">
-        <template slot-scope="{row}">
+        <template slot-scope="{ row }">
           <el-form
             :title="$t('common.view')"
             :width="width"
@@ -205,21 +231,25 @@
               <el-col :span="8">
                 <el-form-item class="view-item">
                   <i class="el-icon-trophy" />
-                  <span>{{ $t('table.user.role') +'：' }}</span>
+                  <span>{{ $t('table.user.role') + '：' }}</span>
                   {{ row.roleName }}
                 </el-form-item>
               </el-col>
               <el-col :span="8">
                 <el-form-item class="view-item">
                   <i class="el-icon-bangzhu" />
-                  <span>{{ $t('table.user.status') +'：' }}</span>
-                  {{ row.status === '1' ? $t('common.status.valid') : $t('common.status.invalid') }}
+                  <span>{{ $t('table.user.status') + '：' }}</span>
+                  {{
+                    row.status === '1'
+                      ? $t('common.status.valid')
+                      : $t('common.status.invalid')
+                  }}
                 </el-form-item>
               </el-col>
               <el-col :span="8">
                 <el-form-item class="view-item">
                   <i class="el-icon-bell" />
-                  <span>{{ $t('table.user.createTime') +'：' }}</span>
+                  <span>{{ $t('table.user.createTime') + '：' }}</span>
                   {{ row.createTime }}
                 </el-form-item>
               </el-col>
@@ -228,22 +258,22 @@
               <el-col :span="8">
                 <el-form-item class="view-item">
                   <i class="el-icon-bell" />
-                  <span>{{ $t('table.user.updateTime') +'：' }}</span>
+                  <span>{{ $t('table.user.updateTime') + '：' }}</span>
                   {{ row.updateTime }}
                 </el-form-item>
               </el-col>
               <el-col :span="8">
                 <el-form-item class="view-item">
                   <i class="el-icon-circle-check" />
-                  <span>{{ $t('table.user.lastLoginTime') +'：' }}</span>
+                  <span>{{ $t('table.user.lastLoginTime') + '：' }}</span>
                   {{ row.lastLoginTime }}
                 </el-form-item>
               </el-col>
               <el-col :span="8">
                 <el-form-item class="view-item">
                   <i class="el-icon-document" />
-                  <span>{{ $t('table.user.desc') +'：' }}</span>
-                  {{ row.description ? user.description: $t('tips.nothing') }}
+                  <span>{{ $t('table.user.desc') + '：' }}</span>
+                  {{ row.description ? user.description : $t('tips.nothing') }}
                 </el-form-item>
               </el-col>
             </el-row>
@@ -252,7 +282,7 @@
       </el-table-column>
     </el-table>
     <pagination
-      v-show="total>0"
+      v-show="total > 0"
       :total="total"
       :page.sync="pagination.num"
       :limit.sync="pagination.size"
@@ -371,12 +401,6 @@ export default {
     }
   },
   methods: {
-    filterStatus(value, row) {
-      return row.status === value
-    },
-    filterSex(value, row) {
-      return row.sex === value
-    },
     viewClose() {
       this.userViewVisible = false
     },
@@ -439,7 +463,7 @@ export default {
       )
         .then(() => {
           const userNames = []
-          this.selection.forEach((u) => {
+          this.selection.forEach(u => {
             userNames.push(u.username)
           })
           this.$put('system/user/password/reset', {
@@ -476,7 +500,7 @@ export default {
       })
         .then(() => {
           const userIds = []
-          this.selection.forEach((u) => {
+          this.selection.forEach(u => {
             if (u.userId === this.currentUser.userId) {
               contain = true
               return
@@ -520,7 +544,7 @@ export default {
         roleId = row.roleId.split(',')
         row.roleId = roleId
       }
-      this.$get(`system/user/${row.userId}`).then((r) => {
+      this.$get(`system/user/${row.userId}`).then(r => {
         row.deptIds = r.data.data
         this.$refs.edit.setUser(row)
         this.dialog.title = this.$t('common.edit')
@@ -559,7 +583,7 @@ export default {
       this.loading = true
       this.$get('system/user', {
         ...params
-      }).then((r) => {
+      }).then(r => {
         const data = r.data.data
         this.total = data.total
         this.list = data.rows
@@ -573,11 +597,11 @@ export default {
     },
     initDept() {
       this.$get('system/dept')
-        .then((r) => {
+        .then(r => {
           this.depts = r.data.data.rows
           this.deptTree = this.depts
         })
-        .catch((error) => {
+        .catch(error => {
           console.error(error)
           this.$message({
             message: this.$t('tips.getDataFail'),
@@ -588,7 +612,7 @@ export default {
     // 手风琴效果
     toogleExpand(row, event, column) {
       const $table = this.$refs.table
-      this.list.map((item) => {
+      this.list.map(item => {
         if (row.userId !== item.userId) {
           $table.toggleRowExpansion(item, false)
         }
@@ -625,6 +649,26 @@ export default {
     },
     close() {
       this.$emit('close')
+    },
+    filterChange(filters) {
+      for (const filter in filters) {
+        if (filter === 'sex') {
+          if (filters.sex.length !== 0) {
+            this.queryParams.sex = filters.sex[0]
+          } else {
+            this.queryParams.sex = null
+          }
+        } else if (filter === 'status') {
+          if (filters.status.length !== 0) {
+            this.queryParams.status = filters.status[0]
+          } else {
+            this.queryParams.status = null
+          }
+        }
+      }
+      this.fetch({
+        ...this.queryParams
+      })
     }
   }
 }
