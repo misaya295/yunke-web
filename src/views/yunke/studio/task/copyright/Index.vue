@@ -143,7 +143,7 @@
           <i v-hasPermission="['task:add']" class="el-icon-coin table-operation" style="color: #87d068;" @click.stop="changeReimbursement(row)" />
           <i v-hasPermission="['task:update']" class="el-icon-setting table-operation" style="color: #2db7f5;" @click.stop="edit(row)" />
           <i v-hasPermission="['task:delete']" class="el-icon-delete table-operation" style="color: #f50;" @click.stop="singleDelete(row)" />
-          <i v-hasPermission="['task:view']" class="el-icon-info table-operation" style="color: #909399;" @click.stop="toogleExpand(row)" />
+          <i v-hasPermission="['task:view']" class="el-icon-info table-operation" style="color: #909399;" @row-click="toogleExpand(row)" />
           <el-link v-has-no-permission="['task:view','task:update','task:delete']" class="no-perm">
             {{ $t('tips.noPermission') }}
           </el-link>
