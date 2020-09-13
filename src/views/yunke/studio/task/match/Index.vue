@@ -257,7 +257,7 @@
                 </el-col>
                 <el-col :span="11">
                   <el-form-item label="证书:">
-                    <div class="demo-image" v-if="props.row.invoice">
+                    <div class="demo-image" v-if="props.row.certificate">
                       <div class="block" v-for="(item, i) in props.row.certificate.split(',')" :key="i">
                         <el-image
                           :src="item"

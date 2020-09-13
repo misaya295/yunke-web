@@ -267,27 +267,39 @@ export default {
       }
     },
     initUserRoles() {
-      this.$get('system/user').then((r) => {
-        console.log(11, r)
-        const userRoles = []
+      // 获取老师角色
+      this.$get(`system/user/queryUserByNoteIds`,{
+        noteIds: '1'
+      }).then((r) => {
+        console.log(1, r)
         const teacherRoles = []
-        const rows = r.data.data.rows
+        const rows = r.data.data
         rows.forEach((v, i) => {
           const obj = {
             userId: v.userId,
             fullName: v.fullName
           }
-          if (v.noteId === '1') teacherRoles.push(obj)
-          else if (v.noteId === '2' || v.noteId === '3') userRoles.push(obj)
+        teacherRoles.push(obj)
+        })
+        this.teacherRoles = teacherRoles
+        console.log(12, r);
+      })
+      // 获取成员和负责人
+      this.$get(`system/user/queryUserByNoteIds`, {
+        noteIds: '2,3,4'
+      }).then((r) => {
+        console.log(1, r)
+        const userRoles = []
+        const rows = r.data.data
+        rows.forEach((v, i) => {
+          const obj = {
+            userId: v.userId,
+            fullName: v.fullName
+          }
+          userRoles.push(obj)
         })
         this.userRoles = userRoles
-        this.teacherRoles = teacherRoles
-      }).catch((error) => {
-        console.error(error)
-        this.$message({
-          message: this.$t('tips.getDataFail'),
-          type: 'error'
-        })
+        console.log(12, r);
       })
     },
     setTasks(val) {
@@ -317,7 +329,7 @@ export default {
       } else {
         this.urlFileUrlList = this.tasks.url
       }
-      for (var i = 0; i < this.urlFileUrlList.length; i++) {
+      for (var i= 0; i < this.urlFileUrlList.length; i++) {
         var fileurl = this.urlFileUrlList[i]
         if (fileurl !== null || fileurl !== '') {
           this.urlFileList.push({
@@ -351,19 +363,19 @@ export default {
     handleBeforeUploadInvoice(file) {
       if (file.size / 1024 > 5000) {
         this.$message({
-            message: '上传文件大小不能超过5MB!',
-            type: 'error'
+          message: '上传文件大小不能超过5MB!',
+          type: 'error'
         })
         return false
       } else {
         const ext = file.name.replace(/.+\./, '')
-          if (!validatePicExt(ext)) {
-            this.$message({
-              type: 'error',
-              message: '禁止上传' + ext + '类型的附件'
-            })
-            return false
-          }
+        if (!validatePicExt(ext)) {
+          this.$message({
+            type: 'error',
+            message: '禁止上传' + ext + '类型的附件'
+          })
+          return false
+        }
       }
     },
     // 删除添加表单上传的发票图片，写死的（图片长度限定为3）
@@ -372,16 +384,15 @@ export default {
       let flag = false
       // 添加
       if (this.title === '新增') {
-         fileUrl = file.response.data.url
-         flag = true
-       } else {
-         // 修改
-         fileUrl = file.url
-       }
-      console.log(file,this.invoiceFileList)
-      if(flag) this.addInvoice(fileUrl, file)
+        fileUrl = file.response.data.url
+        flag = true
+      } else {
+        // 修改
+        fileUrl = file.url
+      }
+      console.log(file, this.invoiceFileList)
+      if (flag) this.addInvoice(fileUrl, file)
       else this.updateInvoice(file)
-       
     },
     addInvoice(fileUrl, file) {
       for (let j = 0; j < this.invoiceFiles.length; j++) {
@@ -509,14 +520,14 @@ export default {
       let flag = false
       // 添加
       if (this.title === '新增') {
-         fileUrl = file.response.data.url
-         flag = true
-       } else {
-         // 修改
-         fileUrl = file.url
-       }
-      console.log(file,this.urlFileList)
-      if(flag) this.addUrl(fileUrl, file)
+        fileUrl = file.response.data.url
+        flag = true
+      } else {
+        // 修改
+        fileUrl = file.url
+      }
+      console.log(file, this.urlFileList)
+      if (flag) this.addUrl(fileUrl, file)
       else this.updateUrl(file)
     },
     addUrl(fileUrl, file) {
@@ -676,9 +687,10 @@ export default {
       const memberArr = []
       const teacherArr = []
       // 负责人
-      if (reliable.length > 0) {
+      reliable = reliable.split()
+      reliable.forEach((v, i) => {
         reliableArr.push('1')
-      }
+      })
       // 成员
       member.forEach((v, i) => {
         memberArr.push('2')
@@ -696,7 +708,7 @@ export default {
         if (obj[a[i]]) flag = true
         obj[a[i]] = true
       }
-      a= a.join(',')
+      a = a.join(',')
       return {
         a,
         b,

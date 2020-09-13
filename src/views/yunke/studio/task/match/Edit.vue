@@ -134,7 +134,7 @@
           :before-upload="handleBeforeUploadCertificate"
           :before-remove="addCertificateBeforeRemove"
           :on-success="handleSuccessCertificate"
-  	      :on-preview="handlePreview"
+  	      :on-preview="handlePreview1"
           :file-list="certificateFileList"
           :action="uploadUrl"
           :class="{hideupload:editrepairinvoicehideupload, picturecard:true}"
@@ -310,27 +310,39 @@ export default {
       }
     },
     initUserRoles() {
-      this.$get('system/user').then((r) => {
-        console.log(11, r)
-        const userRoles = []
+      // 获取老师角色
+      this.$get(`system/user/queryUserByNoteIds`,{
+        noteIds: '1'
+      }).then((r) => {
+        console.log(1, r)
         const teacherRoles = []
-        const rows = r.data.data.rows
+        const rows = r.data.data
         rows.forEach((v, i) => {
           const obj = {
             userId: v.userId,
             fullName: v.fullName
           }
-          if (v.noteId === '1') teacherRoles.push(obj)
-          else if (v.noteId === '2' || v.noteId === '3') userRoles.push(obj)
+         teacherRoles.push(obj)
+        })
+        this.teacherRoles = teacherRoles
+        console.log(12, r);
+      })
+      // 获取成员和负责人
+      this.$get(`system/user/queryUserByNoteIds`,{
+        noteIds: '2,3,4'
+      }).then((r) => {
+        console.log(1, r)
+        const userRoles = []
+        const rows = r.data.data
+        rows.forEach((v, i) => {
+          const obj = {
+            userId: v.userId,
+            fullName: v.fullName
+          }
+         userRoles.push(obj)
         })
         this.userRoles = userRoles
-        this.teacherRoles = teacherRoles
-      }).catch((error) => {
-        console.error(error)
-        this.$message({
-          message: this.$t('tips.getDataFail'),
-          type: 'error'
-        })
+        console.log(12, r);
       })
     },
     setTasks(val) {
@@ -863,9 +875,10 @@ export default {
       const memberArr = []
       const teacherArr = []
       // 负责人
-      if (reliable.length > 0) {
+      reliable = reliable.split()
+      reliable.forEach((v, i) => {
         reliableArr.push('1')
-      }
+      })
       // 成员
       member.forEach((v, i) => {
         memberArr.push('2')
@@ -916,6 +929,15 @@ export default {
     },
     // 修改时的图片预览效果
     handlePreview(file) {
+      console.log(file)
+      if ('url' in file) {
+        this.previewPath = file.url
+      } else {
+        this.previewPath = file.response.data.url
+      }
+      this.previewVisible = true
+    },
+    handlePreview1(file) {
       console.log(file)
       if ('url' in file) {
         this.previewPath = file.url
