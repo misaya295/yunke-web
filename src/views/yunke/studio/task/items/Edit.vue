@@ -279,27 +279,35 @@ export default {
       }
     },
     initUserRoles() {
-      this.$get('system/user').then((r) => {
-        console.log(11, r)
-        const userRoles = []
+      // 获取老师角色
+      this.$get('system/user/queryUserByNoteIds',{
+        noteIds: "1"
+      }).then((r) => {
         const teacherRoles = []
-        const rows = r.data.data.rows
+        const rows = r.data.data
         rows.forEach((v, i) => {
           const obj = {
             userId: v.userId,
             fullName: v.fullName
           }
-          if (v.noteId === '1') teacherRoles.push(obj)
-          else if (v.noteId === '2' || v.noteId === '3') userRoles.push(obj)
+         teacherRoles.push(obj)
+        })
+        this.teacherRoles = teacherRoles
+      })
+      // 获取学生角色
+       this.$get('system/user/queryUserByNoteIds',{
+        noteIds: "2,3,4"
+      }).then((r) => {
+        const userRoles = []
+        const rows = r.data.data
+        rows.forEach((v, i) => {
+          const obj = {
+            userId: v.userId,
+            fullName: v.fullName
+          }
+         userRoles.push(obj)
         })
         this.userRoles = userRoles
-        this.teacherRoles = teacherRoles
-      }).catch((error) => {
-        console.error(error)
-        this.$message({
-          message: this.$t('tips.getDataFail'),
-          type: 'error'
-        })
       })
     },
     setTasks(val) {
@@ -342,6 +350,7 @@ export default {
             // create
             // 调用getDge
             const tasks = this.tasks
+            console.log(this.team.reliable, this.team.member, this.team.teacher)
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
               this.buttonLoading = false
@@ -350,6 +359,7 @@ export default {
             this.doSubmit()
             tasks.userId = a
             tasks.m_state = b
+            console.log(123,this.tasks)
             this.$post('studio/items', { ...tasks }).then(() => {
               this.buttonLoading = false
               this.isVisible = false
@@ -401,9 +411,10 @@ export default {
       const memberArr = []
       const teacherArr = []
       // 负责人
-      if (reliable.length > 0) {
+      reliable = reliable.split()
+      reliable.forEach((v, i) => {
         reliableArr.push('1')
-      }
+      })
       // 成员
       member.forEach((v, i) => {
         memberArr.push('2')
