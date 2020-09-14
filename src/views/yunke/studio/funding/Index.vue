@@ -287,7 +287,7 @@
                     </span>
                     {{ getTaskName(row) }}
                     <el-tooltip
-                      v-if="row.taskId!==null&&row.taskId!==''&&judgeTypeIsTaskCh(row.type)"
+                      v-if="taskName!='任务已被删除'&&row.taskId!==null&&row.taskId!==''&&judgeTypeIsTaskCh(row.type)"
                       class="item"
                       effect="dark"
                       content="跳转"
@@ -551,7 +551,7 @@
             <div class="view-item">
               <i class="el-icon-coin" />
               <span>申请人id:</span>
-              {{ temp.proposerId }} 
+              {{ temp.proposerId }}
             </div>
           </el-col>
         </el-row>
@@ -1588,7 +1588,6 @@ export default {
       }
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          console.log(funding)
           this.$put("/studio/funding/", {
             ...funding,
           }).then(() => {
@@ -1717,11 +1716,25 @@ export default {
           this.taskType = this.taskType2Eng[row.type]; 
           //获取数据
           this.$get(`/studio/${this.taskType}/${row.taskId}`).then((r) => {
-            this.taskName = r.data.data.title;
-          });
+            if(r.data.data===undefined){
+              //任务已被删除,修改taskId内容为:"任务已被删除"
+              const funding =  Object.assign({}, row);
+              //修改对应任务为提示信息：“任务已被删除”
+              funding.taskId = "任务已被删除";
+              this.taskName = "任务已被删除";
+              this.$put("studio/funding/", {
+                ...funding,
+              })
+            }else{
+              this.taskName = r.data.data.title;
+            }        
+          })
         }
       //返回名称
       return this.taskName;
+    },
+    updateTaskDeleted(row){
+        
     },
     //获取成功报销时间
     getSuccessTime(row) {},
@@ -1904,4 +1917,227 @@ export default {
   margin: 0px 10px;
   border: 1px solid #000;
 }
-</style>
+</style>"copyright",
+          label: "著作权",
+        },
+      ],
+      fundingTableData: [],
+      taskTableData: [],
+      dialogFormVisible: false,
+      dialogStatus: "",
+      page: {
+        param: {
+          serialVersionUID: "",
+          pageNum: 1,
+          pageSize: 10,
+          field: "",
+          order: "",
+        },
+        total: 0,
+      },
+      task: {
+        pageNum: 1,
+        pageSize: 5,
+        field: "",
+        order: "",
+        title: "",
+        time: "",
+        fullName: "",
+        reimbursement: 0,
+      },
+      temp: {
+        id: "",
+        verifierId: "",
+        certifierId: "",
+        name: "",
+        type: "",
+        applyTime: "",
+        successTime: "",
+        invoice: "",
+        cost: "",
+        card: "",
+        proposerId: "",
+        state: "1",
+        taskId: "",
+        proposerName: "",
+        verifierName: "",
+        certifierName: "",
+        reject:""
+      },
+
+      funding: {
+        id: "",
+        verifierId: "",
+        certifierId: "",
+        name: "",
+        type: "",
+        applyTime: "",
+        successTime: "",
+        invoice: "",
+        cost: "",
+        card: "",
+        proposerId: "",
+        state: "",
+        taskId: "",
+        proposerName: "",
+        verifierName: "",
+        certifierName: "",
+        success_time: "",
+        reject:""
+      },
+      textMap: {
+        update: "编辑",
+        create: "添加",
+      },
+      paperTypeMap: {
+        "1": "核心",
+        "2": "普通",
+      },
+      taskTypeMap: {
+        thesis: "论文",
+        match: "比赛",
+        items: "项目",
+        copyright: "著作权",
+      },
+      taskType2Eng: {
+        论文: "thesis",
+        比赛: "match",
+        项目: "items",
+        著作权: "copyright",
+      },
+      infoMap: {
+        success: "完成",
+        pass: "通过",
+        fail: "驳回",
+        apply: "申报",
+      },
+      stateMap: {
+        fail: 4,
+        success: 3,
+        pass: 2,
+        apply: 1,
+      },
+      rules: {
+        name: [
+          {
+            required: true,
+            message: "报销名称不能为空",
+            trigger: "blur",
+          },
+        ],
+        applyTime: [
+          {
+            required: true,
+            message: "报销时间未选择",
+            trigger: "blur",
+          },
+        ],
+        cost: [
+          {
+            validator(rule, value, callback) {
+              if (value === "") {
+                callback();
+              }
+              if (Number.isInteger(Number(value))) {
+                callback();
+              } else {
+                callback(new Error("请输入有效数字"));
+              }
+            },
+            trigger: "blur",
+          },
+        ],
+      },
+    };
+  },
+  filters: {
+    BXStatusFilter(state) {
+      const map = {
+        1: "",
+        2: "warning",
+        3: "success",
+        4: "danger",
+      };
+      return map[state];
+    },
+    StateTextFilter(state) {
+      const map = {
+        1: "申请中",
+        2: "报销中",
+        3: "报销成功",
+        4: "申请失败",
+      };
+      return map[state];
+    },
+    ViewTextFilter(state) {
+      const map = {
+        1: "审核",
+        2: "查看",
+        3: "查看",
+        4: "查看",
+      };
+      return map[state];
+    },
+  },
+  methods: {
+    setSuccessTime() {
+      this.$put("/studio/funding/", {
+        ...this.temp,
+      }).then((r) => {});
+    },
+    // 修改时的图片预览效果
+    handlePreview(file) {
+      if ("url" in file) {
+        this.previewPath = file.url;
+      } else {
+        this.previewPath = file.response.data.url;
+      }
+      this.previewVisible = true;
+    },
+    // 图片预览关闭
+    previewDialogClose() {
+      this.previewPath = "";
+      this.previewVisible = false;
+    },
+    //查看时的图片预览
+    onPreview() {
+      if (!this.temp.invoice) {
+        this.$message({
+          message: "暂无数据",
+          type: "warning",
+        });
+      } else {
+        this.showViewer = true;
+        this.fundingViewVisible = false;
+      }
+    },
+    // 查看发票图片
+    showpreViewDialog(item) {
+      this.previewPath = item;
+      this.previewVisible = true;
+    },
+    // 手风琴效果
+    toogleExpand(row, event, column) {
+      const $table = this.$refs.table;
+      this.fundingTableData.map((item) => {
+        if (row.id !== item.id) {
+          $table.toggleRowExpansion(item, false);
+        }
+      });
+      $table.toggleRowExpansion(row);
+    },
+
+    getRowKey(row) {
+      return row.id;
+    },
+    closeViewer() {
+      this.showViewer = false;
+      this.fundingViewVisible = true;
+    },
+    onSelectChange(selection) {
+      this.selection = selection;
+    },
+    handleBeforeUpload(file) {
+      if (file.size / 1024 > 5000) {
+        this.$message({
+          message: "上传
