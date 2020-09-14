@@ -251,7 +251,10 @@ export default {
         title: [
           { required: true, message: this.$t('rules.require'), trigger: 'blur' },
           { min: 2, max: 20, message: '长度为2-20', trigger: 'blur' }],
-        state: { required: true, message: this.$t('rules.require'), trigger: 'blur' }
+        state: { required: true, message: this.$t('rules.require'), trigger: 'blur' },
+        cost: [
+            {required: true, message: this.$t('rules.require'), trigger: 'blur'},
+            {type: 'number', message: '金额必须为数字值'}]
       },
       team: {
         reliable: '',
