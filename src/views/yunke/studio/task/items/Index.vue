@@ -529,8 +529,12 @@ export default {
           if (v1.state === 1) {
             v.chargeFullName = v1.fullName
           }
-          if (v1.state === 3) {
-            v.teacherFullName = v1.fullName
+         if (v1.state === 3) {
+            if (v.teacherFullName === '' || v.teacherFullName === null) {
+              v.teacherFullName = v1.fullName
+            }else {
+              v.teacherFullName += ','+v1.fullName
+            }
           }
           if (v1.state === 2) {
             if (v.memberFullName === undefined) {
