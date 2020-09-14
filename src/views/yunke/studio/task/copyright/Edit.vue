@@ -418,7 +418,7 @@ export default {
             const copyright = this.copyright
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
-              this.buttonLoading = false
+              this.buttonLoading = true
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
             this.doSubmit()
@@ -446,8 +446,7 @@ export default {
             // 调用getDge
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
-              this.buttonLoading = false
-              this.isVisible = false
+              this.buttonLoading = true
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
             copyright.userId = a
@@ -460,13 +459,13 @@ export default {
             this.$put('studio/copyright/state', { ...updateState })
             this.$put('studio/copyright', { ...copyright }).then((r) => {
               this.buttonLoading = false
+              this.isVisible = false
               this.$message({
                 message: this.$t('tips.updateSuccess'),
                 type: 'success'
               })
               this.$emit('success')
             })
-            this.isVisible = false
           }
         } else {
           return false
