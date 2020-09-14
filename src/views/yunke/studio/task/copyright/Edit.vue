@@ -270,7 +270,7 @@ export default {
         itemId: { required: true, message: this.$t('rules.require'), trigger: 'blur' },
         cost: [
           { required: true, message: this.$t('rules.require'), trigger: 'blur' },
-          { type: 'number', message: '年龄必须为数字值'}]
+          { type: 'number', message: '花费必须为数字值'}]
       }
     }
   },
