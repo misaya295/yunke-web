@@ -37,7 +37,7 @@
           </el-date-picker>
         </el-col>
       </el-form-item>
-      <el-form-item label="花费">
+      <el-form-item label="花费" prop="cost">
         <el-input v-model.number="tasks.cost" />
       </el-form-item>
       <el-form-item :label="$t('table.user.status')" prop="state">
@@ -217,8 +217,11 @@ export default {
         title: [
           { required: true, message: this.$t('rules.require'), trigger: 'blur' },
           { min: 2, max: 20, message: '长度为2-20', trigger: 'blur' }],
-        state: { required: true, message: this.$t('rules.require'), trigger: 'blur' }
-      },
+        state: { required: true, message: this.$t('rules.require'), trigger: 'blur' },
+        cost: [
+          { required: true, message: this.$t('rules.require'), trigger: 'blur' },
+          { type: 'number', message: '年龄必须为数字值'}]
+      }, 
       // 负责人，成员，指导老师
       team: {
         reliable: '',
@@ -314,6 +317,7 @@ export default {
       // 获得数据
       // 浅克隆，同一源里的数值也会改变
       // this.tasks = row;
+      console.log(123,val)
       this.tasks = Object.assign({}, val)
       this.team.reliable = val.reliable
       this.team.member = val.member
@@ -350,30 +354,29 @@ export default {
             // create
             // 调用getDge
             const tasks = this.tasks
-            console.log(this.team.reliable, this.team.member, this.team.teacher)
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
               this.buttonLoading = false
+              this.isVisible = false
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
             this.doSubmit()
             tasks.userId = a
             tasks.m_state = b
-            console.log(123,this.tasks)
             this.$post('studio/items', { ...tasks }).then(() => {
               this.buttonLoading = false
-              this.isVisible = false
               this.$message({
                 message: this.$t('tips.createSuccess'),
                 type: 'success'
               })
-              this.$emit('success')
               this.team = {
                 reliable: '',
                 member: [],
                 teacher: []
               }
+              this.$emit('success')
             })
+            this.isVisible = false
           } else {
             // update
             // 调用getDge
