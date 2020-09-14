@@ -1529,6 +1529,7 @@ export default {
       this.invoiceFileList = [];
       //根据row有任务id,需要给this.temp赋值
       if (row.taskId || row.id) {
+        console.log(row)
         this.setTemp(row);
         //设置图片数据
         this.setInvoiceFileList();
@@ -1786,9 +1787,11 @@ export default {
         else this.taskType = "match"
       }
       // else this.taskType = "";
+      console.log(r.type)
       this.temp.name = r.title ? r.title : r.name; //从导入报销传来的r只有r.title,从证书管理传来的r只有r.name;两者是同一个东西
       this.temp.cost = r.cost ? r.cost : "";
-      this.temp.type = r.type ? r.type : this.taskTypeMap[this.taskType];
+      if(r.type==="考证") this.temp.type = r.type
+      else this.temp.type = this.taskTypeMap[this.taskType];
       this.temp.invoice = r.invoice ? r.invoice : "";
       this.temp.taskId = r.taskId ? r.taskId : r.id ? r.id : ""; //导入报销传来的是id, 其他模块传来的是taskId;两者是同一个东西,只能存在一个
     },
