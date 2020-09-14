@@ -38,7 +38,7 @@
           </el-date-picker>
         </el-col>
       </el-form-item>
-      <el-form-item label="花费" >
+      <el-form-item label="花费" prop="cost">
         <el-input v-model.number="copyright.cost" />
       </el-form-item>
       <el-form-item :label="$t('table.user.status')" prop="state">
@@ -267,7 +267,10 @@ export default {
           { required: true, message: this.$t('rules.require'), trigger: 'blur' },
           { min: 2, max: 20, message: '长度为2-20', trigger: 'blur' }],
         state: { required: true, message: this.$t('rules.require'), trigger: 'blur' },
-        itemId: { required: true, message: this.$t('rules.require'), trigger: 'blur' }
+        itemId: { required: true, message: this.$t('rules.require'), trigger: 'blur' },
+        cost: [
+          { required: true, message: this.$t('rules.require'), trigger: 'blur' },
+          { type: 'number', message: '年龄必须为数字值'}]
       }
     }
   },
@@ -345,7 +348,7 @@ export default {
     initUserRoles() {
        // 获取老师角色
       this.$get('system/user/queryUserByNoteIds',{
-        noteIds: "1"
+        noteIds: "1,0"
       }).then((r) => {
         const teacherRoles = []
         const rows = r.data.data
@@ -360,7 +363,7 @@ export default {
       })
       // 获取学生角色
        this.$get('system/user/queryUserByNoteIds',{
-        noteIds: "2,3,4"
+        noteIds: "2,3,4,0"
       }).then((r) => {
         const userRoles = []
         const rows = r.data.data
@@ -444,6 +447,7 @@ export default {
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
               this.buttonLoading = false
+              this.isVisible = false
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
             copyright.userId = a
@@ -456,13 +460,13 @@ export default {
             this.$put('studio/copyright/state', { ...updateState })
             this.$put('studio/copyright', { ...copyright }).then((r) => {
               this.buttonLoading = false
-              this.isVisible = false
               this.$message({
                 message: this.$t('tips.updateSuccess'),
                 type: 'success'
               })
               this.$emit('success')
             })
+            this.isVisible = false
           }
         } else {
           return false
@@ -491,6 +495,7 @@ export default {
       // 进行判断是否多次选择同一个人
       let flag = false
       var obj = {}
+      console.log(22,a)
       for (var i = 0; i < a.length; i++) {
         if (obj[a[i]]) flag = true
         obj[a[i]] = true
