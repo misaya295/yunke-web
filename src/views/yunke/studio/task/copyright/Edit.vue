@@ -224,6 +224,13 @@ export default {
     }
   },
   data() {
+     var validateCost = (rule, value, callback) => {
+      if (value < 0) {
+        return callback(new Error('花费不能小于0'))
+      } else {
+        callback()
+      }
+    }
     return {
       // 上传图片数量限制
       uploadPicLimit: 3,
@@ -270,7 +277,8 @@ export default {
         itemId: { required: true, message: this.$t('rules.require'), trigger: 'blur' },
         cost: [
           { required: true, message: this.$t('rules.require'), trigger: 'blur' },
-          { type: 'number', message: '花费必须为数字值'}]
+          { type: 'number', message: '花费必须为数字值' },
+          { validator: validateCost }]
       }
     }
   },
@@ -348,7 +356,7 @@ export default {
     initUserRoles() {
        // 获取老师角色
       this.$get('system/user/queryUserByNoteIds',{
-        noteIds: "1,0"
+        noteIds: '1,0'
       }).then((r) => {
         const teacherRoles = []
         const rows = r.data.data
@@ -363,7 +371,7 @@ export default {
       })
       // 获取学生角色
        this.$get('system/user/queryUserByNoteIds',{
-        noteIds: "2,3,4,0"
+        noteIds: '2,3,4,0'
       }).then((r) => {
         const userRoles = []
         const rows = r.data.data
