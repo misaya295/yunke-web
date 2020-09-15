@@ -27,6 +27,7 @@
       </el-form-item>
       <el-form-item :label="$t('table.user.dept')" prop="deptId">
         <treeselect
+          ref="treeSelect"
           v-model="user.deptId"
           :multiple="false"
           :options="depts"
@@ -149,6 +150,7 @@ export default {
           }
         }, trigger: 'blur' },
         roleId: { required: true, message: this.$t('rules.require'), trigger: 'change' },
+        deptId: { required: true, message: this.$t('rules.require'), trigger: 'change' },
         sex: { required: true, message: this.$t('rules.require'), trigger: 'change' },
         status: { required: true, message: this.$t('rules.require'), trigger: 'blur' },
         noteId: { required: true, message: this.$t('rules.require'), trigger: 'blur' }
@@ -237,6 +239,15 @@ export default {
       this.$emit('close')
     },
     submitForm() {
+      this.$refs.form.validateField('deptId', (valid) => {
+        if (valid) {
+          console.log('111')
+          this.$refs.treeSelect.$el.style = 'border: 1px solid red;border-radius: 6px;'
+        } else {
+          console.log('222')
+          this.$refs.treeSelect.$el.style = 'border: 0px;border-radius: 6px;'
+        }
+      })
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.buttonLoading = true
