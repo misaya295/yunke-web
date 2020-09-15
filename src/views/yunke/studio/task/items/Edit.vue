@@ -130,7 +130,7 @@
           <i  class="el-icon-upload" />
           <div slot="tip" style="display: block;" class="el-upload__tip">请勿上传违法文件，可同时上传1个附件，且文件不超过5M</div>
         </el-upload>
-       </el-form-item> 
+       </el-form-item>
        <el-form-item label="源文件" prop="url">
         <el-input v-model="tasks.url" />
         <!-- <el-upload
@@ -185,6 +185,13 @@ export default {
     }
   },
   data() {
+    var validateCost = (rule, value, callback) => {
+      if (value < 0) {
+        return callback(new Error('花费不能小于0'))
+      } else {
+        callback()
+      }
+    }
     return {
       // 上传图片数量限制
       uploadPicLimit: 3,
@@ -220,8 +227,9 @@ export default {
         state: { required: true, message: this.$t('rules.require'), trigger: 'blur' },
         cost: [
           { required: true, message: this.$t('rules.require'), trigger: 'blur' },
-          { type: 'number', message: '花费必须为数字值'}]
-      }, 
+          { type: 'number', message: '花费必须为数字值' },
+          { validator: validateCost }]
+      },
       // 负责人，成员，指导老师
       team: {
         reliable: '',
@@ -230,8 +238,8 @@ export default {
       },
       // 保存预览图片路径
       previewPath: '',
-      //预览窗口显示与影藏
-      previewVisible: false,
+      // 预览窗口显示与影藏
+      previewVisible: false
     }
   },
   computed: {
@@ -283,8 +291,8 @@ export default {
     },
     initUserRoles() {
       // 获取老师角色
-      this.$get('system/user/queryUserByNoteIds',{
-        noteIds: "1"
+      this.$get('system/user/queryUserByNoteIds', {
+        noteIds: '1'
       }).then((r) => {
         const teacherRoles = []
         const rows = r.data.data
@@ -293,13 +301,13 @@ export default {
             userId: v.userId,
             fullName: v.fullName
           }
-         teacherRoles.push(obj)
+          teacherRoles.push(obj)
         })
         this.teacherRoles = teacherRoles
       })
       // 获取学生角色
-       this.$get('system/user/queryUserByNoteIds',{
-        noteIds: "2,3,4"
+      this.$get('system/user/queryUserByNoteIds', {
+        noteIds: '2,3,4'
       }).then((r) => {
         const userRoles = []
         const rows = r.data.data
@@ -308,7 +316,7 @@ export default {
             userId: v.userId,
             fullName: v.fullName
           }
-         userRoles.push(obj)
+          userRoles.push(obj)
         })
         this.userRoles = userRoles
       })
@@ -317,7 +325,6 @@ export default {
       // 获得数据
       // 浅克隆，同一源里的数值也会改变
       // this.tasks = row;
-      console.log(123,val)
       this.tasks = Object.assign({}, val)
       this.team.reliable = val.reliable
       this.team.member = val.member
@@ -401,7 +408,7 @@ export default {
                 type: 'success'
               })
               this.$emit('success')
-              })
+            })
           }
         } else {
           return false
@@ -483,21 +490,19 @@ export default {
     //   }
     // },
     // 删除添加表单上传的发票图片，写死的（图片长度限定为3）
-    addInvoiceBeforeRemove (file, fileList) {
+    addInvoiceBeforeRemove(file, fileList) {
       let fileUrl = ''
       let flag = false
       // 添加
       if (this.title === '新增') {
-         fileUrl = file.response.data.url
-         flag = true
-       } else {
-         // 修改
-         fileUrl = file.url
-       }
-      console.log(file,this.invoiceFileList)
-      if(flag) this.addInvoice(fileUrl, file)
+        fileUrl = file.response.data.url
+        flag = true
+      } else {
+        // 修改
+        fileUrl = file.url
+      }
+      if (flag) this.addInvoice(fileUrl, file)
       else this.updateInvoice(file)
-       
     },
     addInvoice(fileUrl, file) {
       for (let j = 0; j < this.invoiceFiles.length; j++) {
@@ -541,11 +546,11 @@ export default {
     updateInvoice(file) {
       for (let n = 0; n < this.invoiceFileList.length; n++) {
         if (this.invoiceFileList[n].uid === file.uid) {
-          const fileUrl = this.invoiceFileList[n].url;
+          const fileUrl = this.invoiceFileList[n].url
           const fileName = this.invoiceFileList[n].url
             .substring(28)
             .split('.')[0]
-          this.$delete(`oss/content`, { fileName: fileName });
+          this.$delete(`oss/content`, { fileName: fileName })
           // 根据图片数量分别执行删除的功能
           if (this.invoiceFileList.length === 1) {
             this.tasks.invoice = ''
