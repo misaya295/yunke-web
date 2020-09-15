@@ -369,7 +369,7 @@ export default {
             this.doSubmit()
             tasks.userId = a
             tasks.m_state = b
-            this.$post('studsio/items', { ...tasks }).then(() => {
+            this.$post('studio/items', { ...tasks }).then(() => {
               this.buttonLoading = false
               this.isVisible = false
               this.$message({
