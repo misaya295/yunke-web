@@ -152,7 +152,7 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button type="primary" plain :loading="buttonLoading" @click="isVisible = false">
+      <el-button type="warning" plain :loading="buttonLoading" @click="isVisible = false">
         {{ $t('common.cancel') }}
       </el-button>
       <el-button type="primary" plain :loading="buttonLoading" @click.prevent="submitForm">
@@ -363,13 +363,13 @@ export default {
             const tasks = this.tasks
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
-              this.buttonLoading = true
+              this.buttonLoading = false
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
             this.doSubmit()
             tasks.userId = a
             tasks.m_state = b
-            this.$post('studio/items', { ...tasks }).then(() => {
+            this.$post('studsio/items', { ...tasks }).then(() => {
               this.buttonLoading = false
               this.isVisible = false
               this.$message({
@@ -389,7 +389,7 @@ export default {
             const tasks = this.tasks
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
-              this.buttonLoading = true
+              this.buttonLoading = false
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
             tasks.userId = a
