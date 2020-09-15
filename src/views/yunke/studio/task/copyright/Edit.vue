@@ -196,7 +196,7 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button type="primary" plain :loading="buttonLoading" @click="isVisible = false">
+      <el-button type="warning" plain :loading="buttonLoading" @click="isVisible = false">
         {{ $t('common.cancel') }}
       </el-button>
       <el-button type="primary" plain :loading="buttonLoading" @click="submitForm">
@@ -426,7 +426,7 @@ export default {
             const copyright = this.copyright
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
-              this.buttonLoading = true
+              this.buttonLoading = false
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
             this.doSubmit()
@@ -454,7 +454,7 @@ export default {
             // 调用getDge
             const { a, b, flag } = this.getDge(this.team.reliable, this.team.member, this.team.teacher)
             if (flag) {
-              this.buttonLoading = true
+              this.buttonLoading = false
               return this.$message.info('不能多次选择同一个人，只能选择一次')
             }
             copyright.userId = a
