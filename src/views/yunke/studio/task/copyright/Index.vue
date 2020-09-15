@@ -573,7 +573,6 @@ export default {
       this.$get('studio/copyright', {
         ...params
       }).then((r) => {
-        console.log(r)
         const data = r.data.data
         this.total = data.total
         this.TakeTeams(data.rows)
@@ -591,10 +590,10 @@ export default {
             v.chargeFullName = v1.fullName
           }
           if (v1.state === 3) {
-            if (v.teacherFullName.length === 0 || v.teacherFullName === null) {
+            if (v.teacherFullName === '' || v.teacherFullName === null) {
               v.teacherFullName = v1.fullName
             }else {
-              v.teacherFullName += ','+v1.fullName
+              v.teacherFullName += ',' + v1.fullName
             }
           }
           if (v1.state === 2) {
