@@ -7,6 +7,16 @@
         placeholder="姓名"
         class="filter-item search-item"
       />
+      <el-input
+        v-model="queryParams.type"
+        placeholder="类型"
+        class="filter-item search-item"
+      />
+      <el-input
+        v-model="queryParams.title"
+        placeholder="证书名称"
+        class="filter-item search-item"
+      />
       <el-select
         v-model="queryParams.state"
         placeholder="考试状态"
@@ -19,16 +29,6 @@
           :value="item.value"
         />
       </el-select>
-      <el-input
-        v-model="queryParams.type"
-        placeholder="类型"
-        class="filter-item search-item"
-      />
-      <el-input
-        v-model="queryParams.title"
-        placeholder="证书名称"
-        class="filter-item search-item"
-      />
       <el-button
         v-hasPermission="['certificate:get']"
         type="primary"
