@@ -724,7 +724,7 @@ export default {
       this.team.member = row.memberFullName
       const $table = this.$refs.table
       this.listRows.map((item) => {
-        if (row.itemsId !== item.itemsId) {
+        if (row.copyrightId !== item.copyrightId) {
           $table.toggleRowExpansion(item, false)
         }
       })
