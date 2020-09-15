@@ -22,9 +22,11 @@
         type="daterange"
         align="right"
         unlink-panels
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
+        start-placeholder="入职时间段头"
+        end-placeholder="入职时间段尾"
         :picker-options="pickerOptions"
+        class="filter-item search-item"
+        style="width:250px"
       />
       <el-button
         v-hasPermission="['graduatedcorporation:get']"
