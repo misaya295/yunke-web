@@ -93,7 +93,7 @@
         </template>
       </el-table-column>
        <!-- 论文下载  -->
-      <el-table-column  label="论文下载"  :show-overflow-tooltip="true" align="center" min-width="90px">
+      <el-table-column  label="论文下载"  :show-overflow-tooltip="true" align="center" min-width="95px">
        <template slot-scope="scope">
         <el-button v-if="scope.row.url !== ''" size="mini" type="primary" plain  @click.stop="upload(scope.row.url)">下载</el-button>
         </template>
@@ -430,64 +430,6 @@ export default {
         this.search()
       })
     },
-    // view(row) {
-    //   this.$get(`studio/thesis/${row.thesisId}`).then((r) => {
-    //     const uResult = []
-    //     const data = r.data.data
-    //     let userId = []
-    //     let userState = []
-    //     if (data.userId && typeof data.userId === 'string') {
-    //       userId = data.userId.split(',')
-    //     }
-    //     if (data.userState && typeof data.userState === 'string') {
-    //       userState = data.userState.split(',')
-    //     }
-    //     // 拿到uesrId及名称
-    //     this.$get('system/user').then((r) => {
-    //       const rows = r.data.data.rows
-    //       rows.forEach((v, i) => {
-    //         userId.forEach((v1, i1) => {
-    //           if (v1 === ('' + v.userId)) {
-    //             uResult.push(v.fullName)
-    //           }
-    //         })
-    //       })
-    //       let reliable = ''
-    //       let member = ''
-    //       let teacher = ''
-    //       userState.forEach((v1, i1) => {
-    //         if (v1 === '1') {
-    //           if (reliable === '') {
-    //             reliable = uResult[i1]
-    //           } else {
-    //             reliable += '，' + uResult[i1]
-    //           }
-    //         }
-    //         if (v1 === '2') {
-    //           if (member === '') {
-    //             member = uResult[i1]
-    //           } else {
-    //             member += '，' + uResult[i1]
-    //           }
-    //         }
-    //         if (v1 === '3') {
-    //           if (teacher === '') {
-    //             teacher = uResult[i1]
-    //           } else {
-    //             teacher += '，' + uResult[i1]
-    //           }
-    //         }
-    //       })
-    //       this.team = {
-    //         reliable,
-    //         member,
-    //         teacher
-    //       }
-    //       // this.$refs.view.setTasks(data)
-    //       // this.taskViewVisible = true
-    //     })
-    //   })
-    // },
     // 弹出申请报销对话框
     async changeReimbursement(row) {
       // 管理员权限  任务负责人权限
