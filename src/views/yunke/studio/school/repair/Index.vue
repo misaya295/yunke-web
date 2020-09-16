@@ -82,10 +82,10 @@
           <template slot-scope="scope">
             <el-tag
               v-if="scope.row.state === 0"
-              type="warning"
+              type="info"
             >拒绝维修</el-tag>
             <el-tag
-              v-if="scope.row.state === 1"
+              v-else-if="scope.row.state === 1"
               type="warning"
             >申请维修中</el-tag>
             <el-tag
@@ -815,14 +815,14 @@ export default {
       }
       const schoolAssetsRepair = {
         id: row.id,
-        state: 0
+        state: 4
       }
       this.$put(`studio/school/assets/repair/state`, {
         ...schoolAssetsRepair,
       }).then((r) => {
         console.log(r)
         if (r.status === 200) {
-          this.$message.success('已拒绝维修!')
+          this.$message.success('资产状态已变成维修失败!')
         } else {
           this.$message.error('提交失败！')
         }
@@ -850,12 +850,14 @@ export default {
       this.$put(`studio/school/assets/repair/state`, {
         ...schoolAssetsRepair,
       }).then((r) => {
+        console.log('111')
         console.log(r)
         if (r.status === 200) {
-          if (state === 1) {
+          console.log(state)
+          if (state === 2) {
             this.$message.success('已接受维修!')
           } else {
-            this.$message.success('已拒绝维修!')
+            this.$message.warning('已拒绝维修!')
           }
         } else {
           this.$message.error('提交失败！')
